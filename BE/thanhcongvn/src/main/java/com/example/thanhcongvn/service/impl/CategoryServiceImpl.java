@@ -1,0 +1,119 @@
+package com.example.thanhcongvn.service.impl;
+
+import com.example.thanhcongvn.dto.request.category.CreateCategoryDTO;
+import com.example.thanhcongvn.dto.request.category.UpdateCategoryDTO;
+import com.example.thanhcongvn.dto.response.category.CategoryResponse;
+import com.example.thanhcongvn.entity.Category;
+import com.example.thanhcongvn.repository.CategoryRepository;
+import com.example.thanhcongvn.service.CategoryService;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+@Transactional
+public class CategoryServiceImpl implements CategoryService {
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Override
+    public List<CategoryResponse> getAll() {
+        return categoryRepository.findAll()
+                .stream()
+                .map(this::maptoResponse)
+                .toList();
+    }
+
+    @Override
+    public CategoryResponse create(CreateCategoryDTO createCategoryDTO) {
+      if (categoryRepository.existsBySlug(createCategoryDTO.getSlug())) {
+          throw new RuntimeException("Slug đã tồn tại");
+      }
+      Category category = Category.builder()
+              .name(createCategoryDTO.getName())
+              .slug(createCategoryDTO.getSlug())
+              .description(createCategoryDTO.getDescription())
+              .status(createCategoryDTO.getStatus())
+              .build();
+      if (createCategoryDTO.getParentId() != null) {
+          Category parent = categoryRepository.findById(createCategoryDTO.getParentId()).orElseThrow(
+                  () -> new RuntimeException("Parent category không tồn tại")
+          );
+          category.setParent(parent);
+      }
+      return maptoResponse(categoryRepository.save(category));
+    }
+
+    @Override
+    public CategoryResponse update(String id, UpdateCategoryDTO updateCategoryDTO) {
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new RuntimeException("Category không tồn tại")
+        );
+        if (!category.getSlug().equals(updateCategoryDTO.getSlug()) && categoryRepository.existsBySlug(updateCategoryDTO.getSlug())){
+            throw new RuntimeException("Slug đã tồn tại");
+        }
+        category.setName(updateCategoryDTO.getName());
+        category.setSlug(updateCategoryDTO.getSlug());
+        category.setDescription(updateCategoryDTO.getDescription());
+        category.setStatus(updateCategoryDTO.getStatus());
+        if (updateCategoryDTO.getParentId() != null) {
+            Category parent = categoryRepository.findById(updateCategoryDTO.getParentId()).orElseThrow(
+                    () -> new RuntimeException("Parent category không tồn tại")
+            );
+            category.setParent(parent);
+        }else  {
+            category.setParent(null);
+        }
+        return maptoResponse(categoryRepository.save(category));
+    }
+
+    @Override
+    public void delete(String id) {
+
+    }
+
+    @Override
+    public CategoryResponse getById(String id) {
+        return categoryRepository.findById(id)
+                .map(this::maptoResponse)
+                .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
+    }
+
+    @Override
+    public List<CategoryResponse> getCategoryTree() {
+        return categoryRepository.findAll()
+                .stream()
+                .filter(c -> c.getParent() == null)
+                .map(this::mapToResponseWithChildren)
+                .collect(Collectors.toList());
+    }
+    private CategoryResponse maptoResponse(Category category) {
+        CategoryResponse categoryResponse = new CategoryResponse();
+        categoryResponse.setId(category.getId());
+        categoryResponse.setName(category.getName());
+        categoryResponse.setSlug(category.getSlug());
+        categoryResponse.setStatus(category.getStatus());
+        categoryResponse.setDescription(category.getDescription());
+        categoryResponse.setCreateAt(category.getCreateAt());
+
+        if (category.getParent() != null) {
+            categoryResponse.setParentId(category.getParent().getId());
+        }
+
+        return categoryResponse;
+    }
+    private CategoryResponse mapToResponseWithChildren(Category category) {
+        CategoryResponse categoryResponse = maptoResponse(category);
+        if (category.getChildren() != null){
+            categoryResponse.setChildren(
+                    category.getChildren()
+                            .stream()
+                            .map(this::mapToResponseWithChildren)
+                            .collect(Collectors.toList())
+            );
+        }
+        return categoryResponse;
+    }
+}

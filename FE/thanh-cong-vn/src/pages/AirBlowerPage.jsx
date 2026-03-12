@@ -1,0 +1,32 @@
+import { ProductCard } from "../components/common/ProductCard/ProductCard";
+import { ProductSection } from "../components/home/ProductSection";
+import { ProductSelect } from "../components/home/ProductSelect";
+import { Link } from "react-router-dom";
+import "./AirBlowerPage.css";
+export function AirBlowerPage() {
+    const products = [
+        {
+            name: "Còi hú LK-JDW245PK",
+            price: "31.990.000₫",
+        },
+        {
+            name: "Còi hú báo cháy LK-200",
+            price: "12.990.000₫",
+        },
+    ];
+
+    return (
+        <div className="siren-page">
+            <div className="breadcrumb">
+                <div className="breadcrumb-inner">
+                    Trang chủ › Máy thổi khí
+                </div>
+            </div>
+            <div className="product-grid">
+                {products.map((p) => (
+                    <ProductSelect key={p.name} {...p} />
+                ))}
+            </div>
+        </div>
+    );
+}

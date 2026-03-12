@@ -1,0 +1,76 @@
+.sd-section-header {
+  text-align: center;
+}
+
+.sd-section-header h2 {
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 45px;
+  color: #1D1D1F;
+  /* padding-bottom: 15px; */
+  padding-top: 30px;
+}
+
+/* căn giữa nút */
+.sd-view-more {
+  margin-top: 30px;
+  text-align: center;
+}
+
+/* nút xem thêm */
+.sd-view-more-btn {
+  padding: 10px 22px;
+  border-radius: 30px;
+  border: 1px solid #d9d9d9;
+  background: #fff;
+  cursor: pointer;
+  font-size: 15px;
+  transition: all 0.25s ease;
+}
+
+/* hover */
+.sd-view-more-btn:hover {
+  background: #1677ff;
+  color: #fff;
+  border-color: #1677ff;
+}
+
+/* mũi tên */
+.arrow {
+  margin-left: 6px;
+  font-weight: bold;
+}
+
+.sd-product-grid {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.sd-product-section {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+@media (max-width: 1024px) {
+  .sd-product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .sd-product-section {
+    padding-top: 16px;
+  }
+
+  .sd-section-header {
+    padding: 0 16px;
+  }
+
+  .sd-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0 16px;
+  }
+}

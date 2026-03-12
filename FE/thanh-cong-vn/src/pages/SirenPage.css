@@ -1,0 +1,29 @@
+.breadcrumb {
+    width: 100%;
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
+}
+
+.breadcrumb-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 15px;
+    font-size: 14px;
+    color: #6e6e73;
+}
+
+.siren-page {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.breadcrumb a {
+    color: #0071e3;
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}

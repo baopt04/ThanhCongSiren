@@ -1,0 +1,19 @@
+.sd-layout {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f4f5f7;
+}
+
+/* Main content - căn giữa trang, tránh bị header fixed che */
+.sd-layout-main {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 130px;
+  /* Khoảng trống cho header fixed */
+  padding-bottom: 40px;
+  color: #000;
+  box-sizing: border-box;
+}

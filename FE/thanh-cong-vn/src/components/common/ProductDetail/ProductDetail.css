@@ -1,0 +1,304 @@
+.pd-container {
+    max-width: 1280px;
+    margin: auto;
+    padding: 40px 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+
+.pd-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 40px;
+}
+
+/* LEFT */
+
+.pd-main-image {
+    border: 1px solid #e5e5e5;
+    padding: 20px;
+    border-radius: 16px;
+    height: 586px;
+    background: #e9e9eb;
+    /* màu xám padding */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 20px;
+}
+
+.pd-main-image-inner {
+    width: 100%;
+    height: 100%;
+
+    background: #f5f5f7;
+    /* nền trắng */
+
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pd-main-image img {
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+}
+
+.pd-description-image {
+    width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border-radius: 12px;
+    object-fit: cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.pd-content-video {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.pd-content-video p {
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.pd-content-video iframe {
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16/9;
+    border-radius: 10px;
+}
+
+.pd-contact-box {
+    margin-top: 40px;
+    border-radius: 12px;
+    padding: 20px;  
+    text-align: center;
+}
+
+
+.pd-contact-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* icon */
+
+.pd-phone-icon {
+    font-size: 22px;
+}
+
+/* hotline email */
+
+.pd-contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 15px;
+    font-size: 15px;
+}
+
+.pd-contact-info span {
+    font-weight: 600;
+    color: #0071e3;
+}
+
+/* shipping */
+
+.pd-shipping {
+    font-size: 15px;
+    font-weight: 500;
+    color: #16a34a;
+}
+
+.pd-thumb-list {
+    display: flex;
+    gap: 10px;
+}
+
+.pd-thumb-list img {
+    width: 86.86px;
+    height: 86.86px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    cursor: pointer;
+}
+
+.pd-thumb-list img.active {
+    border: 2px solid #0071e3;
+}
+
+/* RIGHT */
+
+.pd-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #1D1D1F;
+    padding-left: 16px;
+}
+
+.pd-price {
+    font-size: 30px;
+    font-weight: 700;
+    color: #0071e3;
+    margin-bottom: 20px;
+    padding-left: 16px;
+}
+
+.pd-spec h3,
+.pd-promo h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.pd-spec ul,
+.pd-promo ul {
+    padding-left: 18px;
+    margin-bottom: 20px;
+}
+
+.pd-spec li,
+.pd-promo li {
+    margin-bottom: 6px;
+}
+
+.pd-meta {
+    font-size: 14px;
+    color: #555;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 16px;
+    margin-bottom: 5px;
+}
+
+.pd-meta span {
+    font-weight: 600;
+    color: #1d1d1f;
+}
+
+/* mô tả */
+
+.pd-description {
+    line-height: 1.6;
+    color: #444;
+    font-size: 15px;
+    padding-left: 16px;
+}
+
+
+.pd-dimension {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    background: #f5f5f7;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.pd-dimension div {
+    margin-right: 10px;
+}
+
+.pd-dimension span {
+    font-weight: 600;
+}
+
+.pd-spec {
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.pd-spec h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.pd-spec ul {
+    padding-left: 18px;
+}
+
+.pd-spec li {
+    margin-bottom: 6px;
+}
+
+
+.pd-buy-btn {
+    background: #0066cc;
+    color: #fffFFF;
+    border: none;
+    padding: 0 24px;
+    font-size: 18px;
+    border-radius: 8px;
+    width: 570px;
+    height: 64px;
+    cursor: pointer;
+}
+
+.pd-buy-btn:hover {
+    background: #005bb5;
+}
+
+/* Tabs */
+
+.pd-tabs {
+    margin-top: 60px;
+}
+
+.pd-tab-header {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+.pd-tab-header button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    padding-bottom: 6px;
+    cursor: pointer;
+    color: #555;
+}
+
+.pd-tab-header button.active {
+    color: #0071e3;
+    border-bottom: 2px solid #0071e3;
+    font-weight: 600;
+}
+
+.pd-tab-content {
+    max-width: 1280px;
+    margin: auto;
+    text-align: left;
+    line-height: 1.7;
+}
+
+.pd-spec-list {
+    padding-left: 18px;
+}
+
+.pd-spec-list li {
+    margin-bottom: 6px;
+}

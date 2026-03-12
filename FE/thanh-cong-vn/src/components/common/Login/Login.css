@@ -1,0 +1,110 @@
+.login-page {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: white;
+    margin-left: calc(-50vw + 50%);
+    height: 550px;
+}
+
+main {
+    padding-bottom: 0 !important;
+}
+
+.login-container {
+    max-width: 1185px;
+    display: flex;
+}
+
+/* bên trái */
+.login-left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-image {
+    width: 90%;
+}
+
+/* bên phải */
+.login-right {
+    flex: 1;
+    padding: 40px;
+}
+
+.login-right h2 {
+    margin-bottom: 30px;
+}
+
+.login-right label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.login-right input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 5px;
+}
+
+/* options */
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.login-options label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.login-options input {
+    margin: 0;
+    /* bỏ margin mặc định của checkbox */
+}
+
+.login-options a {
+    color: #1976d2;
+    text-decoration: none;
+}
+
+
+/* button */
+.login-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px;
+    border: none;
+    background: #1565c0;
+    color: white;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.login-btn:hover {
+    background: #0d47a1;
+}
+
+/* register */
+.register {
+    margin-top: 20px;
+}
+
+.register a {
+    color: #1976d2;
+    text-decoration: none;
+}
