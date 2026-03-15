@@ -68,19 +68,25 @@ public class PostServiceImpl implements PostService {
                 && postRepository.existsBySlug(request.getSlug())) {
             throw new RuntimeException("Slug đã tồn tại");
         }
+        CategoryNews category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
 
+        User author = userRepository.findById(request.getAuthorId())
+                .orElseThrow(() -> new RuntimeException("Author không tồn tại"));
         post.setTitle(request.getTitle());
         post.setSlug(request.getSlug());
         post.setThumbnailUrl(request.getThumbnailUrl());
         post.setExcerpt(request.getExcerpt());
         post.setContent(request.getContent());
         post.setStatus(request.getStatus());
+        post.setCategory(category);
+        post.setAuthor(author);
 
         if (request.getStatus() == PostStatus.PUBLISHED
                 && post.getPublishedAt() == null) {
             post.setPublishedAt(LocalDateTime.now());
         }
-
+        postRepository.save(post);
         return mapToResponse(post);
     }
 
@@ -135,6 +141,7 @@ public class PostServiceImpl implements PostService {
     private PostResponse mapToResponse(Post post) {
 
         return PostResponse.builder()
+                .id(post.getId())
                 .title(post.getTitle())
                 .slug(post.getSlug())
                 .thumbnailUrl(post.getThumbnailUrl())

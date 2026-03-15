@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class PostResponse {
+    private String id;
     private String title;
     private String slug;
     private String thumbnailUrl;

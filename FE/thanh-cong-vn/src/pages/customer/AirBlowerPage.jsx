@@ -1,9 +1,9 @@
-import { ProductCard } from "../components/common/ProductCard/ProductCard";
-import { ProductSection } from "../components/home/ProductSection";
-import { ProductSelect } from "../components/home/ProductSelect";
+import { ProductCard } from "../../components/common/customer/ProductCard/ProductCard";
+import { ProductSection } from "../../components/common/customer/home/ProductSection";
+import { ProductSelect } from "../../components/common/customer/home/ProductSelect";
 import { Link } from "react-router-dom";
-import "./SirenPage.css";
-export function SirenPage() {
+import "./AirBlowerPage.css";
+export function AirBlowerPage() {
     const products = [
         {
             name: "Còi hú LK-JDW245PK",
@@ -17,10 +17,9 @@ export function SirenPage() {
 
     return (
         <div className="siren-page">
-
             <div className="breadcrumb">
                 <div className="breadcrumb-inner">
-                    Trang chủ › Còi hú báo động
+                    Trang chủ › Máy thổi khí
                 </div>
             </div>
             <div className="product-grid">

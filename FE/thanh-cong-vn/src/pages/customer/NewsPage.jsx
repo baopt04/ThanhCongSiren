@@ -1,5 +1,5 @@
-import News from "../components/common/News/News";
-import { ProductSelect } from "../components/home/ProductSelect";
+import News from "../../components/common/customer/News/News";
+import { ProductSelect } from "../../components/common/customer/home/ProductSelect";
 import { Link } from "react-router-dom";
 import "./NewsPage.css";
 export function NewsPage() {

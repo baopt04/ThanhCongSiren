@@ -1,5 +1,5 @@
 import "./ProductSection.css";
-import { ProductCard } from "../common/ProductCard/ProductCard";
+import { ProductCard } from "../ProductCard/ProductCard";
 
 const demoProducts = [
     {

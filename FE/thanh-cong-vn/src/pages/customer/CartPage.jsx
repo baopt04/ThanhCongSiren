@@ -1,4 +1,4 @@
-import CartItem from "../components/common/cart/CartItem";
+import CartItem from "../../components/common/customer/cart/CartItem";
 import "./CartPage.css";
 export default function CartPage() {
 

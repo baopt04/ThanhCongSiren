@@ -1,0 +1,59 @@
+.rich-editor {
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rich-editor-toolbar {
+  display: flex;
+  gap: 4px;
+  padding: 8px;
+  background: #fafafa;
+  border-bottom: 1px solid #d9d9d9;
+  flex-wrap: wrap;
+}
+
+.rich-editor-toolbar button {
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.rich-editor-toolbar button:hover {
+  background: #f0f0f0;
+}
+
+.rich-editor-toolbar button.active {
+  background: #e6f4ff;
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+.toolbar-divider {
+  width: 1px;
+  background: #d9d9d9;
+  margin: 0 4px;
+}
+
+.rich-editor-body {
+  min-height: 200px;
+}
+
+.rich-editor-body .ProseMirror {
+  padding: 12px 16px;
+  min-height: 200px;
+  outline: none;
+}
+
+.rich-editor-body .ProseMirror p {
+  margin: 0 0 8px;
+}
+
+.rich-editor-body .ProseMirror ul,
+.rich-editor-body .ProseMirror ol {
+  padding-left: 24px;
+  margin: 0 0 8px;
+}

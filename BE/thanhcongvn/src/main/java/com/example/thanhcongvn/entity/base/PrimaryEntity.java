@@ -18,5 +18,8 @@ public abstract class PrimaryEntity
     @Id
     @Column(length = 36, updatable = false)
     private String id;
-
+    @Override
+    public String getId() {
+        return id;
+    }
 }

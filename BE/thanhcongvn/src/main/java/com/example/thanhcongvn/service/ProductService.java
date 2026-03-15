@@ -22,7 +22,9 @@ public interface ProductService {
 
     void updateStock(String productId, Integer quantity);
 
-    void updatePrice(String productId, BigDecimal price, BigDecimal salePrice);
+    void updatePrice(String productId, BigDecimal price);
+
+    void updateSalePrice(String productId, BigDecimal salePrice);
 
     void toggleActive(String productId);
 

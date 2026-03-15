@@ -30,7 +30,6 @@ private final ProductService productService;
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // ================= UPDATE =================
     @PutMapping("/update/{id}")
     public ResponseEntity<ProductResponse> update(
             @PathVariable String id,
@@ -40,7 +39,6 @@ private final ProductService productService;
         return ResponseEntity.ok(response);
     }
 
-    // ================= GET BY ID =================
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getById(
             @PathVariable String id) {
@@ -48,7 +46,6 @@ private final ProductService productService;
         return ResponseEntity.ok(productService.getById(id));
     }
 
-    // ================= GET ALL + FILTER =================
     @GetMapping
     public ResponseEntity<Page<ProductResponse>> getAll(
             ProductFilterRequest filter,
@@ -58,7 +55,6 @@ private final ProductService productService;
         return ResponseEntity.ok(productService.getAll(filter, pageable));
     }
 
-    // ================= UPDATE STOCK =================
     @PatchMapping("/{id}/stock")
     public ResponseEntity<Void> updateStock(
             @PathVariable String id,
@@ -68,18 +64,23 @@ private final ProductService productService;
         return ResponseEntity.ok().build();
     }
 
-    // ================= UPDATE PRICE =================
     @PatchMapping("/{id}/price")
     public ResponseEntity<Void> updatePrice(
             @PathVariable String id,
-            @RequestParam BigDecimal price,
-            @RequestParam(required = false) BigDecimal salePrice) {
+            @RequestParam BigDecimal price) {
 
-        productService.updatePrice(id, price, salePrice);
+        productService.updatePrice(id, price);
+        return ResponseEntity.ok().build();
+    }
+    @PatchMapping("/{id}/sale-price")
+    public ResponseEntity<Void> updateSalePrice(
+            @PathVariable String id,
+            @RequestParam BigDecimal salePrice) {
+
+        productService.updateSalePrice(id, salePrice);
         return ResponseEntity.ok().build();
     }
 
-    // ================= TOGGLE ACTIVE =================
     @PatchMapping("/{id}/active")
     public ResponseEntity<Void> toggleActive(
             @PathVariable String id) {
@@ -88,7 +89,6 @@ private final ProductService productService;
         return ResponseEntity.ok().build();
     }
 
-    // ================= TOGGLE FEATURED =================
     @PatchMapping("/{id}/featured")
     public ResponseEntity<Void> toggleFeatured(
             @PathVariable String id) {

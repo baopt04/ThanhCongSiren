@@ -1,6 +1,6 @@
-import { HeroBanner } from "../components/home/HeroBanner";
-import { InfoStrip } from "../components/home/InfoStrip";
-import { ProductSection } from "../components/home/ProductSection";
+import { HeroBanner } from "../../components/common/customer/home/HeroBanner";
+import { InfoStrip } from "../../components/common/customer/home/InfoStrip";
+import { ProductSection } from "../../components/common/customer/home/ProductSection";
 
 export function HomePage() {
   return (

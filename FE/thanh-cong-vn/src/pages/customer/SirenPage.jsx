@@ -1,9 +1,9 @@
-import { ProductCard } from "../components/common/ProductCard/ProductCard";
-import { ProductSection } from "../components/home/ProductSection";
-import { ProductSelect } from "../components/home/ProductSelect";
+import { ProductCard } from "../../components/common/customer/ProductCard/ProductCard";
+import { ProductSection } from "../../components/common/customer/home/ProductSection";
+import { ProductSelect } from "../../components/common/customer/home/ProductSelect";
 import { Link } from "react-router-dom";
-import "./AirMattressPage.css";
-export function AirMattressPage() {
+import "./SirenPage.css";
+export function SirenPage() {
     const products = [
         {
             name: "Còi hú LK-JDW245PK",
@@ -20,7 +20,7 @@ export function AirMattressPage() {
 
             <div className="breadcrumb">
                 <div className="breadcrumb-inner">
-                    Trang chủ › Cứu hộ cứu nạn
+                    Trang chủ › Còi hú báo động
                 </div>
             </div>
             <div className="product-grid">

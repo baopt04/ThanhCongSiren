@@ -1,6 +1,6 @@
-import { ProductCard } from "../components/common/ProductCard/ProductCard";
-import { ProductSection } from "../components/home/ProductSection";
-import { ProductSelect } from "../components/home/ProductSelect";
+import { ProductCard } from "../../components/common/customer/ProductCard/ProductCard";
+import { ProductSection } from "../../components/common/customer/home/ProductSection";
+import { ProductSelect } from "../../components/common/customer/home/ProductSelect";
 import { Link } from "react-router-dom";
 import "./FireAlarmPage.css";
 export function FireAlarmPage() {

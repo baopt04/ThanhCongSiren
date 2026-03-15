@@ -34,7 +34,6 @@ export default function Login() {
                                 <input type="checkbox" />
                                 Nhớ mật khẩu
                             </label>
-
                             <a href="#">Quên mật khẩu?</a>
                         </div>
 

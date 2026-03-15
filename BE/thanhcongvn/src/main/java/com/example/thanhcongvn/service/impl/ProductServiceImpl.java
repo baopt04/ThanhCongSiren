@@ -65,7 +65,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
 
-        // ===== Nếu đổi category =====
         if (dto.getCategoryId() != null &&
                 !dto.getCategoryId().equals(product.getCategory().getId())) {
 
@@ -75,7 +74,6 @@ public class ProductServiceImpl implements ProductService {
             product.setCategory(category);
         }
 
-        // ===== Nếu đổi brand =====
         if (dto.getBrandId() != null &&
                 !dto.getBrandId().equals(product.getBrand().getId())) {
 
@@ -85,7 +83,6 @@ public class ProductServiceImpl implements ProductService {
             product.setBrand(brand);
         }
 
-        // ===== Check trùng SKU (trừ chính nó) =====
         if (dto.getSku() != null &&
                 !dto.getSku().equals(product.getSku()) &&
                 productRepository.existsBySku(dto.getSku())) {
@@ -93,7 +90,6 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Sku đã tồn tại!");
         }
 
-        // ===== Check trùng Slug (trừ chính nó) =====
         if (dto.getSlug() != null &&
                 !dto.getSlug().equals(product.getSlug()) &&
                 productRepository.existsBySlug(dto.getSlug())) {
@@ -101,7 +97,6 @@ public class ProductServiceImpl implements ProductService {
             throw new RuntimeException("Slug đã tồn tại!");
         }
 
-        // ===== Update các field nếu có =====
         if (dto.getName() != null) {
             product.setName(dto.getName());
         }
@@ -198,19 +193,26 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void updatePrice(String productId, BigDecimal price, BigDecimal salePrice) {
+    public void updatePrice(String productId, BigDecimal price) {
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
             throw new RuntimeException("Price phải lớn hơn 0");
         }
-
-        if (salePrice != null && salePrice.compareTo(price) >= 0) {
-            throw new RuntimeException("Sale price phải nhỏ hơn price");
-        }
-
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
 
         product.setPrice(price);
+
+        productRepository.save(product);
+    }
+
+    @Override
+    public void updateSalePrice(String productId, BigDecimal salePrice) {
+        if (salePrice == null || salePrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new RuntimeException("Price phải lớn hơn 0");
+        }
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
+
         product.setSalePrice(salePrice);
 
         productRepository.save(product);
