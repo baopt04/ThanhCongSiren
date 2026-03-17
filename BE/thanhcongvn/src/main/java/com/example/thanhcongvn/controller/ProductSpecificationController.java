@@ -36,7 +36,7 @@ public class ProductSpecificationController {
 
         return ResponseEntity.ok(specificationService.update(id, dto));
     }
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
 
         specificationService.delete(id);
@@ -45,7 +45,6 @@ public class ProductSpecificationController {
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<ProductSpecificationResponse>> getByProduct(
             @PathVariable String productId) {
-
         return ResponseEntity.ok(specificationService.getByProductId(productId));
     }
 }

@@ -1,6 +1,8 @@
 package com.example.thanhcongvn.controller;
 
 import com.example.thanhcongvn.dto.request.post.PostRequest;
+import com.example.thanhcongvn.dto.response.error.ApiFeResponse;
+import com.example.thanhcongvn.dto.response.pagination.PaginationResponse;
 import com.example.thanhcongvn.dto.response.post.PostResponse;
 import com.example.thanhcongvn.entity.enums.PostStatus;
 import com.example.thanhcongvn.service.PostService;
@@ -44,8 +46,23 @@ public class PostController {
         return ResponseEntity.ok(postService.getById(id));
     }
     @GetMapping
-    public ResponseEntity<Page<PostResponse>> getAll(@PageableDefault(size = 10 ) Pageable pageable) {
-        return ResponseEntity.ok(postService.getAll(pageable));
+    public ResponseEntity<ApiFeResponse<List<PostResponse>>> getAll( Pageable pageable) {
+        Page<PostResponse> posts = postService.getAll(pageable);
+        PaginationResponse pagination = PaginationResponse.builder()
+                .page(posts.getNumber())
+                .size(posts.getSize())
+                .totalPages(posts.getTotalPages())
+                .totalElements(posts.getTotalElements())
+                .build();
+
+        ApiFeResponse<List<PostResponse>> response =
+                ApiFeResponse.<List<PostResponse>>builder()
+                        .success(true)
+                        .data(posts.getContent())
+                        .pagination(pagination)
+                        .build();
+
+        return ResponseEntity.ok(response);
     }
     @PatchMapping("/changeStatus/{id}")
    public ResponseEntity<Void> changeStatus(@PathVariable String id ,

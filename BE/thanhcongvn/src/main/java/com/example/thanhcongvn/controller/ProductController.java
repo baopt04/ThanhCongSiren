@@ -3,6 +3,8 @@ package com.example.thanhcongvn.controller;
 import com.example.thanhcongvn.dto.request.product.CreateProductDTO;
 import com.example.thanhcongvn.dto.request.product.ProductFilterRequest;
 import com.example.thanhcongvn.dto.request.product.UpdateProductDTO;
+import com.example.thanhcongvn.dto.response.error.ApiFeResponse;
+import com.example.thanhcongvn.dto.response.pagination.PaginationResponse;
 import com.example.thanhcongvn.dto.response.product.ProductResponse;
 import com.example.thanhcongvn.service.ProductService;
 import jakarta.validation.Valid;
@@ -16,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -47,12 +50,25 @@ private final ProductService productService;
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProductResponse>> getAll(
+    public ResponseEntity<ApiFeResponse<List<ProductResponse>>> getAll(
             ProductFilterRequest filter,
-            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC)
             Pageable pageable) {
+        Page<ProductResponse> page = productService.getAll(filter , pageable);
+        PaginationResponse pagination = PaginationResponse.builder()
+                .page(page.getNumber())
+                .size(page.getSize())
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .build();
 
-        return ResponseEntity.ok(productService.getAll(filter, pageable));
+        ApiFeResponse<List<ProductResponse>> response =
+                ApiFeResponse.<List<ProductResponse>>builder()
+                        .success(true)
+                        .data(page.getContent())
+                        .pagination(pagination)
+                        .build();
+
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{id}/stock")

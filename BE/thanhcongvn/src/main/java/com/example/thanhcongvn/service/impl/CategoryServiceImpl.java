@@ -4,10 +4,14 @@ import com.example.thanhcongvn.dto.request.category.CreateCategoryDTO;
 import com.example.thanhcongvn.dto.request.category.UpdateCategoryDTO;
 import com.example.thanhcongvn.dto.response.category.CategoryResponse;
 import com.example.thanhcongvn.entity.Category;
+import com.example.thanhcongvn.infrastructure.exception.AppException;
+import com.example.thanhcongvn.infrastructure.exception.ErrorCode;
 import com.example.thanhcongvn.repository.CategoryRepository;
 import com.example.thanhcongvn.service.CategoryService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,17 +23,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
     @Override
-    public List<CategoryResponse> getAll() {
-        return categoryRepository.findAll()
-                .stream()
-                .map(this::maptoResponse)
-                .toList();
+    public Page<CategoryResponse> getAll(Pageable pageable) {
+        return categoryRepository.findAll(pageable)
+                .map(this::maptoResponse);
     }
 
     @Override
     public CategoryResponse create(CreateCategoryDTO createCategoryDTO) {
       if (categoryRepository.existsBySlug(createCategoryDTO.getSlug())) {
-          throw new RuntimeException("Slug đã tồn tại");
+          throw new AppException(ErrorCode.CATEGORY_DUPLICATED);
       }
       Category category = Category.builder()
               .name(createCategoryDTO.getName())
@@ -39,7 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
               .build();
       if (createCategoryDTO.getParentId() != null) {
           Category parent = categoryRepository.findById(createCategoryDTO.getParentId()).orElseThrow(
-                  () -> new RuntimeException("Parent category không tồn tại")
+                  () -> new AppException(ErrorCode.CATEGORY_PARENT_NOT_FOUND)
           );
           category.setParent(parent);
       }
@@ -49,10 +51,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse update(String id, UpdateCategoryDTO updateCategoryDTO) {
         Category category = categoryRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Category không tồn tại")
+                () -> new AppException(ErrorCode.CATEGORY_NOT_FOUND)
         );
         if (!category.getSlug().equals(updateCategoryDTO.getSlug()) && categoryRepository.existsBySlug(updateCategoryDTO.getSlug())){
-            throw new RuntimeException("Slug đã tồn tại");
+            throw new AppException(ErrorCode.CATEGORY_DUPLICATED);
         }
         category.setName(updateCategoryDTO.getName());
         category.setSlug(updateCategoryDTO.getSlug());
@@ -60,7 +62,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setStatus(updateCategoryDTO.getStatus());
         if (updateCategoryDTO.getParentId() != null) {
             Category parent = categoryRepository.findById(updateCategoryDTO.getParentId()).orElseThrow(
-                    () -> new RuntimeException("Parent category không tồn tại")
+                    () -> new AppException(ErrorCode.CATEGORY_PARENT_NOT_FOUND)
             );
             category.setParent(parent);
         }else  {
@@ -78,7 +80,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse getById(String id) {
         return categoryRepository.findById(id)
                 .map(this::maptoResponse)
-                .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
     @Override

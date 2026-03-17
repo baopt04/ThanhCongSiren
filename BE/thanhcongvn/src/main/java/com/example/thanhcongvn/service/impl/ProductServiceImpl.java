@@ -7,6 +7,8 @@ import com.example.thanhcongvn.dto.response.product.ProductResponse;
 import com.example.thanhcongvn.entity.Brand;
 import com.example.thanhcongvn.entity.Category;
 import com.example.thanhcongvn.entity.Product;
+import com.example.thanhcongvn.infrastructure.exception.AppException;
+import com.example.thanhcongvn.infrastructure.exception.ErrorCode;
 import com.example.thanhcongvn.repository.BrandRepository;
 import com.example.thanhcongvn.repository.CategoryRepository;
 import com.example.thanhcongvn.repository.ProductRepository;
@@ -30,15 +32,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createProduct(CreateProductDTO dto) {
         Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Brand brand = brandRepository.findById(dto.getBrandId())
-                .orElseThrow(() -> new RuntimeException("Brand not found"));
+                .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
         if (productRepository.existsBySku(dto.getSku())) {
-            throw new RuntimeException("Sku đã tồn tại!");
+            throw new AppException(ErrorCode.SKU_DUPLICATED);
         }
         if (productRepository.existsBySlug(dto.getSlug())) {
-            throw new RuntimeException("Slug đã tồn tại!");
+            throw new AppException(ErrorCode.SLUG_DUPLICATED);
         }
         Product product = Product.builder()
                 .category(category)
@@ -63,13 +65,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse updateProduct(String id, UpdateProductDTO dto) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         if (dto.getCategoryId() != null &&
                 !dto.getCategoryId().equals(product.getCategory().getId())) {
 
             Category category = categoryRepository.findById(dto.getCategoryId())
-                    .orElseThrow(() -> new RuntimeException("Category không tồn tại"));
+                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
 
             product.setCategory(category);
         }
@@ -78,7 +80,7 @@ public class ProductServiceImpl implements ProductService {
                 !dto.getBrandId().equals(product.getBrand().getId())) {
 
             Brand brand = brandRepository.findById(dto.getBrandId())
-                    .orElseThrow(() -> new RuntimeException("Brand không tồn tại"));
+                    .orElseThrow(() -> new AppException(ErrorCode.BRAND_NOT_FOUND));
 
             product.setBrand(brand);
         }
@@ -87,14 +89,14 @@ public class ProductServiceImpl implements ProductService {
                 !dto.getSku().equals(product.getSku()) &&
                 productRepository.existsBySku(dto.getSku())) {
 
-            throw new RuntimeException("Sku đã tồn tại!");
+            throw new AppException(ErrorCode.SKU_DUPLICATED);
         }
 
         if (dto.getSlug() != null &&
                 !dto.getSlug().equals(product.getSlug()) &&
                 productRepository.existsBySlug(dto.getSlug())) {
 
-            throw new RuntimeException("Slug đã tồn tại!");
+            throw new AppException(ErrorCode.SLUG_DUPLICATED);
         }
 
         if (dto.getName() != null) {
@@ -124,7 +126,7 @@ public class ProductServiceImpl implements ProductService {
         if (dto.getSalePrice() != null) {
             if (dto.getPrice() != null &&
                     dto.getSalePrice().compareTo(dto.getPrice()) >= 0) {
-                throw new RuntimeException("Sale price phải nhỏ hơn price");
+                throw new AppException(ErrorCode.PRODUCT_PRICE_SALE);
             }
             product.setSalePrice(dto.getSalePrice());
         }
@@ -166,7 +168,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse getById(String id) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         return mapToResponse(product);
     }
@@ -181,11 +183,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void updateStock(String productId, Integer quantity) {
         if (quantity < 0) {
-            throw new RuntimeException("Stock không được nhỏ hơn 0");
+            throw new AppException(ErrorCode.PRODUCT_STOCK);
         }
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         product.setStockQuantity(quantity);
 
@@ -195,10 +197,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void updatePrice(String productId, BigDecimal price) {
         if (price == null || price.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Price phải lớn hơn 0");
+            throw new AppException(ErrorCode.PRODUCT_PRICE);
         }
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         product.setPrice(price);
 
@@ -208,10 +210,10 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void updateSalePrice(String productId, BigDecimal salePrice) {
         if (salePrice == null || salePrice.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new RuntimeException("Price phải lớn hơn 0");
+            throw new AppException(ErrorCode.PRODUCT_PRICE);
         }
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         product.setSalePrice(salePrice);
 
@@ -221,7 +223,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void toggleActive(String productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         product.setIsActive(product.getIsActive() == 1 ? 0 : 1);
 
@@ -231,7 +233,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void toggleFeatured(String productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product không tồn tại"));
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         product.setIsFeatured(product.getIsFeatured() == 1 ? 0 : 1);
 
