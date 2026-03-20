@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Table, Button, Modal, Form, Input, InputNumber, Select, Space, message, Typography, Tag } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import apiClient from "../../api/client";
-import { getAllProductSpecs, createProductSpec, updateProductSpec } from "../../services/ProductSpecs";
+import { getAllProductSpecs, createProductSpec, updateProductSpec, deleteSpecs } from "../../services/ProductSpecs";
 import { getAllProducts } from "../../services/ProductService";
 
 const { Text } = Typography;
@@ -18,7 +18,7 @@ export function ProductSpecsPage() {
   const fetchProducts = async () => {
     try {
       const res = await getAllProducts();
-      setProducts(res.content || []);
+      setProducts(res.data || []);
     } catch {
       setProducts([]);
     }
@@ -188,10 +188,11 @@ export function ProductSpecsPage() {
       content: "Bạn có chắc chắn muốn xóa thông số này?",
       onOk: async () => {
         try {
-          await apiClient.delete(`/product-specs/${id}`);
-          message.success("Đã xóa");
+          await deleteSpecs(id);
+          message.success("Đã xóa thông số sản phẩm");
           fetchData();
-        } catch {
+        } catch (err) {
+          console.error("ERROR:", err);
           message.error("Lỗi khi xóa");
         }
       }

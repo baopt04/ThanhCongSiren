@@ -4,7 +4,7 @@ const API_ENDPOINT = "/brand";
 
 export const getAllBrands = async () => {
     try {
-        const response = await apiClient.get(`${API_ENDPOINT}/getAll`);
+        const response = await apiClient.get(`${API_ENDPOINT}`);
         return response.data;
     } catch (error) {
         console.error("Error fetching brands:", error);

@@ -37,3 +37,12 @@ export const SpecsForProduct = async (productId) => {
         throw error;
     }
 };
+
+export const deleteSpecs = async (id) => {
+    try {
+        const response = await apiClient.delete(`${API_ENDPOINT}/delete/${id}`)
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}

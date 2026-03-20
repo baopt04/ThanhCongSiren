@@ -37,3 +37,11 @@ export const findById = async (id) => {
         throw error;
     }
 };
+export const deleteCategoryNews = async (id) => {
+    try {
+        const response = await apiClient.delete(`${API_ENDPOINT}/delete/${id}`)
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}

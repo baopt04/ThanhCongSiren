@@ -44,7 +44,7 @@ public class ProductSpecificationController {
     }
     @GetMapping("/product/{productId}")
     public ResponseEntity<List<ProductSpecificationResponse>> getByProduct(
-            @PathVariable String productId) {
-        return ResponseEntity.ok(specificationService.getByProductId(productId));
+                @PathVariable String productId) {
+            return ResponseEntity.ok(specificationService.getByProductId(productId));
+        }
     }
-}

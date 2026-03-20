@@ -18,7 +18,7 @@ export function PostsPage() {
   const fetchCategories = async () => {
     try {
       const res = await getAllCategoriesNew();
-      setCategories(res.content);
+      setCategories(res.data);
     } catch {
       setCategories([]);
     }
@@ -27,7 +27,7 @@ export function PostsPage() {
   const fetchUsers = async () => {
     try {
       const res = await getAllUser();
-      setUsers(res.content);
+      setUsers(res.data);
     } catch (error) {
       console.log(error);
       setUsers([]);
@@ -38,7 +38,7 @@ export function PostsPage() {
     setLoading(true);
     try {
       const res = await getAllPosts();
-      setData(res.content);
+      setData(res.data);
     } catch (err) {
       message.error(err.response?.data?.message || "Lỗi tải dữ liệu");
       setData([]);

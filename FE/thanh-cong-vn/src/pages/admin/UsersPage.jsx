@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, Select, Space, message } from "antd";
+import { Table, Button, Modal, Form, Input, Select, Space, message, Tag } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import apiClient from "../../api/client";
-
+import { getAllUser, createUsers, updateProduct, findById, lockUser } from "../../services/UserService";
 const ROLE_OPTIONS = [
   { value: "ADMIN", label: "Admin" },
   { value: "USER", label: "Người dùng" },
@@ -18,8 +18,8 @@ export function UsersPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await apiClient.get("/users");
-      setData(res.data?.data ?? res.data ?? []);
+      const res = await getAllUser();
+      setData(res.data || []);
     } catch (err) {
       message.error(err.response?.data?.message || "Lỗi tải dữ liệu");
       setData([]);
@@ -81,9 +81,16 @@ export function UsersPage() {
   };
 
   const columns = [
-    { title: "Tên", dataIndex: "name", key: "name" },
+    { title: "Họ Tên", dataIndex: "name", key: "name" },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Số điện thoại", dataIndex: "phone", key: "phone" },
+    {
+      title: "Trạng thái", dataIndex: "status", key: "status", render: (status) => status = 1 ? (
+        <Tag color="green">Hoạt động</Tag>
+      ) : (
+        <Tag color="red">Bị khóa</Tag>
+      )
+    },
     { title: "Vai trò", dataIndex: "role", key: "role" },
     {
       title: "Thao tác",

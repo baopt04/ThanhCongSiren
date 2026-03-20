@@ -20,7 +20,7 @@ export function BrandsPage() {
     setLoading(true);
     try {
       const res = await getAllBrands();
-      setData(res ?? []);
+      setData(res.data ?? []);
     } catch (err) {
       message.error(err.response?.data?.message || "Lỗi tải dữ liệu");
       setData([]);

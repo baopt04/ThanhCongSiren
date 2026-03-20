@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Input, Select, Space, message, Tag } from "antd";
 import { PlusOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import apiClient from "../../api/client";
-import { getAllCategoriesNew, createCategoryNew, updateCategoryNew, findById } from "../../services/CategoryNewService";
+import { getAllCategoriesNew, createCategoryNew, deleteCategoryNews, updateCategoryNew, findById } from "../../services/CategoryNewService";
 const STATUS_OPTIONS = [
   { value: 1, label: "Hoạt động" },
   { value: 0, label: "Ẩn" },
@@ -20,7 +20,7 @@ export function NewsCategoriesPage() {
     setLoading(true);
     try {
       const res = await getAllCategoriesNew();
-      setData(res.content);
+      setData(res.data);
     } catch (err) {
       message.error(err.response?.data?.message || "Lỗi tải dữ liệu");
       setData([]);
@@ -85,14 +85,22 @@ export function NewsCategoriesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Xóa danh mục tin tức này?")) return;
-    try {
-      await apiClient.delete(`/news-categories/${id}`);
-      message.success("Đã xóa");
-      fetchData();
-    } catch (err) {
-      message.error(err.response?.data?.message || "Lỗi xóa");
-    }
+    Modal.confirm(({
+      title: "Xóa danh mục bài viết",
+      content: "Bạn có chắc xóa không?",
+      okText: "Xác nhận",
+      cancelText: "Hủy",
+      onOk: async () => {
+        try {
+          await deleteCategoryNews(id);
+          message.success("Xóa danh mục thành công!")
+          fetchData();
+        } catch (error) {
+          message.error(error.response?.data?.message || "Xóa thất bại!")
+        }
+      }
+    }));
+
   };
 
   const columns = [

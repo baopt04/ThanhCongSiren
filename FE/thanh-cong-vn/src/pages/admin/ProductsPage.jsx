@@ -24,7 +24,7 @@ export function ProductsPage() {
   const fetchCategories = async () => {
     try {
       const res = await getAllCategories();
-      setCategories(res ?? []);
+      setCategories(res.data ?? []);
 
     } catch {
       setCategories([]);
@@ -34,7 +34,7 @@ export function ProductsPage() {
   const fetchBrands = async () => {
     try {
       const res = await getAllBrands();
-      setBrands(res ?? []);
+      setBrands(res.data ?? []);
       console.log("Check br", res);
     } catch {
       setBrands([]);
@@ -45,9 +45,7 @@ export function ProductsPage() {
     setLoading(true);
     try {
       const res = await getAllProducts();
-      console.log("Check res", res);
-
-      const products = res.content ?? [];
+      const products = res.data ?? [];
       const dataWithImages = await Promise.all(
         products.map(async (p) => {
           const thumbnail = await fetchProductThumbnail(p.id);
