@@ -61,7 +61,8 @@ public class SecurityConfig {
                                 "/api/v1/customer/product/**",
                                 "/api/v1/customer/post/**",
                                 "/api/products/search",
-                                "/api/home/**"
+                                "/api/home/**",
+                                "/api/v1/customer/**"
                         ).permitAll()
                         // Các endpoint cần quyền ADMIN
                         .requestMatchers("/api/v1/admin/posts/upload-post-image", "/api/v1/admin/posts/delete/image-post").hasAnyRole("ADMIN", "USER")
