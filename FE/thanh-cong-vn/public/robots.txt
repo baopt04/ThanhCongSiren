@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /tai-khoan
+Disallow: /gio-hang
+Disallow: /dang-nhap
+Disallow: /dang-ky
+
+Sitemap: https://coihubaodong.com/sitemap.xml

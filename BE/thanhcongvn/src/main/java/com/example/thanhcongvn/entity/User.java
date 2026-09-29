@@ -1,14 +1,20 @@
 package com.example.thanhcongvn.entity;
 
 import com.example.thanhcongvn.entity.base.PrimaryEntity;
+import com.example.thanhcongvn.entity.enums.Gender;
 import com.example.thanhcongvn.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -21,7 +27,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class User extends PrimaryEntity {
+public class User extends PrimaryEntity implements UserDetails {
 
     @Column(nullable = false)
     private String name;
@@ -37,7 +43,11 @@ public class User extends PrimaryEntity {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
-
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('MALE','FEMALE','OTHER')")
+    private Gender gender;
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('user','admin') DEFAULT 'user'")
     private UserRole role = UserRole.USER;
@@ -85,4 +95,38 @@ public class User extends PrimaryEntity {
     }
 
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return role != null ? List.of(new SimpleGrantedAuthority("ROLE_" + role.name())) : List.of();
+    }
+
+    @Override
+    public String getUsername() {
+        return this.getId();
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

@@ -1,0 +1,643 @@
+/* ═══════════════════════════════════════════════════════════════
+   ABOUT PAGE — THÀNH CÔNG VIỆT NAM (CLEAN & CORPORATE)
+   Thiết kế giao diện sáng, tối giản, sang trọng và đầy đủ thông tin
+   ═══════════════════════════════════════════════════════════════ */
+
+.about-page-clean {
+  background-color: #f8fafc;
+  color: #1e293b;
+  min-height: 100vh;
+  padding-bottom: 70px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.about-clean-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* --- 1. Breadcrumb --- */
+.about-nav-breadcrumb {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 0;
+  margin-bottom: 24px;
+}
+
+.about-breadcrumb-trail {
+  font-size: 13px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.about-breadcrumb-trail a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.about-breadcrumb-trail a:hover {
+  color: #b91c1c;
+}
+
+.about-sep {
+  color: #cbd5e1;
+}
+
+.about-current {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* --- 2. Simple Page Header --- */
+.about-header-simple {
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto 36px;
+}
+
+.about-badge-sub {
+  display: inline-block;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.about-header-simple h1 {
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+  letter-spacing: -0.2px;
+  line-height: 1.3;
+}
+
+.about-header-simple p {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- 3. Overview Row (2 Columns) --- */
+.about-overview-row {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 28px;
+  margin-bottom: 48px;
+  align-items: stretch;
+}
+
+/* Cột trái: Câu chuyện & Năng lực */
+.about-story-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.about-card-title-head {
+  margin-bottom: 16px;
+}
+
+.about-tag-label {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 800;
+  color: #b91c1c;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.about-card-title-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.about-lead-p {
+  font-size: 14.5px;
+  color: #1e293b;
+  line-height: 1.7;
+  margin: 0 0 14px 0;
+  border-left: 3px solid #b91c1c;
+  padding-left: 14px;
+  background: #fef2f2;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border-radius: 0 8px 8px 0;
+}
+
+.about-body-p {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.7;
+  margin: 0 0 24px 0;
+}
+
+/* 4 Thống kê rút gọn */
+.about-stats-compact {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.about-stat-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.about-stat-val {
+  display: block;
+  font-size: 20px;
+  font-weight: 800;
+  color: #b91c1c;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.about-stat-name {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+/* Cột phải: Thẻ pháp lý doanh nghiệp */
+.about-legal-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.about-legal-top {
+  margin-bottom: 18px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.about-legal-badge {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.about-legal-top h3 {
+  font-size: 17px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.about-legal-sub {
+  font-size: 11.5px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.about-legal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  margin-bottom: 24px;
+}
+
+.about-legal-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  font-size: 12.5px;
+  line-height: 1.5;
+  align-items: start;
+}
+
+.legal-key {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.legal-val {
+  color: #1e293b;
+}
+
+.legal-val a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.legal-val a:hover {
+  text-decoration: underline;
+}
+
+.legal-phone-link {
+  color: #b91c1c !important;
+  font-weight: 800 !important;
+  font-size: 14px;
+}
+
+.about-btn-action-red {
+  display: block;
+  text-align: center;
+  background: #b91c1c;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 12px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(185, 28, 28, 0.25);
+}
+
+.about-btn-action-red:hover {
+  background: #991b1b;
+  transform: translateY(-1px);
+}
+
+/* --- 4. Applications Section (Clean Grid) --- */
+.about-apps-section-clean {
+  margin-bottom: 48px;
+}
+
+.about-section-title-clean {
+  text-align: center;
+  max-width: 720px;
+  margin: 0 auto 30px;
+}
+
+.about-section-title-clean h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.about-section-title-clean p {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.about-apps-grid-clean {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.about-app-item-clean {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s;
+}
+
+.about-app-item-clean:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+}
+
+.about-app-thumb {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  background: #0f172a;
+  overflow: hidden;
+}
+
+.about-app-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.about-app-item-clean:hover .about-app-thumb img {
+  transform: scale(1.05);
+}
+
+.about-app-badge-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(15, 23, 42, 0.85);
+  color: #ffffff;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.about-app-content {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.about-app-content h3 {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.about-app-content p {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.55;
+  margin: 0 0 12px 0;
+  flex: 1;
+}
+
+.about-app-models-box {
+  background: #f8fafc;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: #475569;
+  margin-bottom: 12px;
+}
+
+.about-app-models-box strong {
+  color: #b91c1c;
+}
+
+.about-app-link-more {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #b91c1c;
+  text-decoration: none;
+  display: inline-block;
+  transition: gap 0.2s;
+}
+
+.about-app-link-more:hover {
+  color: #991b1b;
+  text-decoration: underline;
+}
+
+/* --- 5. Factors Section (Clean Cards) --- */
+.about-factors-clean {
+  margin-bottom: 48px;
+}
+
+.about-factors-grid-clean {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.about-factor-card-clean {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 22px 18px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.about-factor-card-clean:hover {
+  border-color: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+}
+
+.about-factor-header-clean {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.about-factor-num-clean {
+  font-size: 18px;
+  font-weight: 900;
+  color: #b91c1c;
+  background: #fee2e2;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: monospace;
+}
+
+.about-factor-header-clean h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.35;
+}
+
+.about-factor-card-clean p {
+  font-size: 12.5px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- 6. Partners & CTA --- */
+.about-partners-clean {
+  margin-bottom: 30px;
+}
+
+.about-partners-img-box {
+  max-width: 760px;
+  margin: 0 auto 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.about-partners-img-box img {
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  display: block;
+}
+
+.about-partner-tags-clean {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  max-width: 860px;
+  margin: 0 auto 36px;
+}
+
+.about-partner-tags-clean span {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  transition: all 0.2s;
+}
+
+.about-partner-tags-clean span:hover {
+  border-color: #b91c1c;
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+/* Quick CTA Box */
+.about-quick-cta-clean {
+  background: #ffffff;
+  border: 1.5px solid #fecaca;
+  border-radius: 14px;
+  padding: 26px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.06);
+}
+
+.about-cta-left h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.about-cta-left p {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0;
+}
+
+.about-cta-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.about-cta-phone-btn {
+  background: #b91c1c;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 11px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(185, 28, 28, 0.25);
+  white-space: nowrap;
+}
+
+.about-cta-phone-btn:hover {
+  background: #991b1b;
+}
+
+.about-cta-link-btn {
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 11px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.about-cta-link-btn:hover {
+  background: #e2e8f0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   7. RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .about-overview-row {
+    grid-template-columns: 1fr;
+  }
+  .about-apps-grid-clean {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .about-factors-grid-clean {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .about-quick-cta-clean {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-header-simple h1 {
+    font-size: 22px;
+  }
+  .about-story-card,
+  .about-legal-card {
+    padding: 20px;
+  }
+  .about-stats-compact {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .about-legal-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .about-apps-grid-clean {
+    grid-template-columns: 1fr;
+  }
+  .about-factors-grid-clean {
+    grid-template-columns: 1fr;
+  }
+  .about-cta-right {
+    flex-direction: column;
+    width: 100%;
+  }
+  .about-cta-phone-btn,
+  .about-cta-link-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

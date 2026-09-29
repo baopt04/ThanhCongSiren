@@ -4,6 +4,7 @@ import com.example.thanhcongvn.entity.Post;
 import com.example.thanhcongvn.entity.enums.PostStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +24,10 @@ public interface PostRepository extends JpaRepository<Post , String> {
             PostStatus status,
             String categoryId,
             Pageable pageable);
+    @EntityGraph(attributePaths = {"category"})
+    Page<Post> findByStatusOrderByPublishedAtDesc(PostStatus status, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"category"})
+    Page<Post> findByStatusAndCategory_IdOrderByPublishedAtDesc(
+            PostStatus status, String categoryId, Pageable pageable);
 }

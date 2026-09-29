@@ -1,8 +1,11 @@
 package com.example.thanhcongvn.infrastructure.exception;
 
+import com.example.thanhcongvn.dto.response.error.ApiFeResponse;
 import com.example.thanhcongvn.dto.response.error.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -47,5 +50,14 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.internalServerError()
                 .body(ApiResponse.error("INTERNAL_ERROR", "Lỗi hệ thống, vui lòng thử lại"));
+    }
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiFeResponse<Void>> handleBadCredentials(BadCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+                ApiFeResponse.<Void>builder()
+                        .success(false)
+                        .message("Email hoặc mật khẩu không đúng")
+                        .build()
+        );
     }
 }

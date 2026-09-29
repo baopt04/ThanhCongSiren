@@ -1,6 +1,6 @@
 import apiClient from "../api/client";
 
-const API_ENDPOINT = "/brand";
+const API_ENDPOINT = "/admin/brand";
 
 export const getAllBrands = async () => {
     try {
@@ -28,6 +28,16 @@ export const updateBrand = async (id, brandData) => {
         return response.data;
     } catch (error) {
         console.error("Error updating brand:", error);
+        throw error;
+    }
+};
+
+export const deleteBrand = async (id) => {
+    try {
+        const response = await apiClient.delete(`${API_ENDPOINT}/delete/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting brand:", error);
         throw error;
     }
 };

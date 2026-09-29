@@ -1,76 +1,221 @@
-.sd-section-header {
-  text-align: center;
+/* ═══════════════════════════════════════════
+   PRODUCT SECTION — Horizontal carousel (2 cards visible)
+   Matching coihubaodong.com mobile layout
+   ═══════════════════════════════════════════ */
+
+.tc-home-section {
+  padding: 20px 0;
+  background: #ffffff;
 }
 
-.sd-section-header h2 {
-  font-size: 30px;
-  font-weight: 700;
-  line-height: 45px;
-  color: #1D1D1F;
-  /* padding-bottom: 15px; */
-  padding-top: 30px;
+.tc-home-section:nth-child(even) {
+  background: #f8fafc;
 }
 
-/* căn giữa nút */
-.sd-view-more {
-  margin-top: 30px;
-  text-align: center;
-}
-
-/* nút xem thêm */
-.sd-view-more-btn {
-  padding: 10px 22px;
-  border-radius: 30px;
-  border: 1px solid #d9d9d9;
-  background: #fff;
-  cursor: pointer;
-  font-size: 15px;
-  transition: all 0.25s ease;
-}
-
-/* hover */
-.sd-view-more-btn:hover {
-  background: #1677ff;
-  color: #fff;
-  border-color: #1677ff;
-}
-
-/* mũi tên */
-.arrow {
-  margin-left: 6px;
-  font-weight: bold;
-}
-
-.sd-product-grid {
-  max-width: 1280px;
+.tc-section-container {
+  max-width: 1240px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 16px;
+  padding: 0 12px;
 }
 
-.sd-product-section {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+.tc-section-header {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 14px;
 }
 
-@media (max-width: 1024px) {
-  .sd-product-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+.tc-section-tab-badge {
+  background: #d90429;
+  color: #ffffff;
+  padding: 6px 18px 6px 14px;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  transform: skewX(-15deg);
+  display: inline-block;
+  z-index: 2;
+  margin-left: 6px;
+  box-shadow: 0 2px 6px rgba(217, 4, 41, 0.3);
+}
+
+.tc-section-tab-badge span {
+  transform: skewX(15deg);
+  display: inline-block;
+}
+
+.tc-section-header-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #d90429;
+  z-index: 1;
+}
+
+.tc-section-more-link {
+  margin-left: auto;
+  color: #d90429;
+  font-weight: 700;
+  font-size: 12px;
+  text-decoration: none;
+  z-index: 2;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tc-section-more-link:hover {
+  text-decoration: underline;
+}
+
+.tc-product-loading {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px dashed #e2e8f0;
+  padding: 36px 16px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+}
+
+.tc-product-loading p {
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ── Horizontal slider ── */
+.tc-product-slider-wrap {
+  position: relative;
+}
+
+.tc-product-slider {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 2px 10px;
+  scrollbar-width: none;
+}
+
+.tc-product-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.tc-product-slide {
+  flex: 0 0 calc(50% - 5px);
+  min-width: calc(50% - 5px);
+  max-width: calc(50% - 5px);
+  scroll-snap-align: start;
+}
+
+.tc-product-slide .tc-catalog-card {
+  height: 100%;
+}
+
+.tc-slider-nav {
+  position: absolute;
+  top: 38%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.tc-slider-nav:hover {
+  background: rgba(185, 28, 28, 0.9);
+  transform: translateY(-50%) scale(1.05);
+}
+
+.tc-slider-prev {
+  left: 2px;
+}
+
+.tc-slider-next {
+  right: 2px;
+}
+
+/* Tablet: ~2.5–3 cards */
+@media (min-width: 640px) {
+  .tc-product-slide {
+    flex: 0 0 calc(33.333% - 7px);
+    min-width: calc(33.333% - 7px);
+    max-width: calc(33.333% - 7px);
   }
 }
 
-@media (max-width: 768px) {
-  .sd-product-section {
-    padding-top: 16px;
+/* Desktop: 4 cards visible, vẫn kéo ngang nếu nhiều hơn */
+@media (min-width: 1024px) {
+  .tc-home-section {
+    padding: 28px 0;
   }
 
-  .sd-section-header {
+  .tc-section-container {
     padding: 0 16px;
   }
 
-  .sd-product-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 0 16px;
+  .tc-section-tab-badge {
+    font-size: 15px;
+    padding: 8px 22px 8px 16px;
+  }
+
+  .tc-product-slide {
+    flex: 0 0 calc(25% - 9px);
+    min-width: calc(25% - 9px);
+    max-width: calc(25% - 9px);
+  }
+
+  .tc-product-slider {
+    gap: 12px;
+  }
+
+  .tc-slider-nav {
+    width: 40px;
+    height: 40px;
+    font-size: 15px;
+  }
+
+  .tc-slider-prev {
+    left: -8px;
+  }
+
+  .tc-slider-next {
+    right: -8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tc-section-tab-badge {
+    font-size: 11px;
+    padding: 4px 12px 4px 8px;
+  }
+
+  .tc-section-more-link {
+    font-size: 11px;
+  }
+
+  .tc-slider-nav {
+    width: 28px;
+    height: 28px;
+    font-size: 10px;
   }
 }

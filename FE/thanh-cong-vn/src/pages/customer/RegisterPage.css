@@ -1,0 +1,246 @@
+/* ═══════════════════════════════════════════════════
+   CUSTOMER REGISTER PAGE — Matches Login Page UI/UX
+   ═══════════════════════════════════════════════════ */
+
+.register-page {
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    margin-left: calc(-50vw + 50%);
+    min-height: 620px;
+    padding: 30px 0;
+}
+
+.register-breadcrumb {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+.register-breadcrumb-inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.register-breadcrumb-inner a {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.register-breadcrumb-inner a:hover {
+    color: #1565c0;
+}
+
+.register-container {
+    max-width: 1185px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* Bên trái - banner hình ảnh */
+.register-left {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.register-image {
+    width: 90%;
+    max-height: 520px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+/* Bên phải - Form */
+.register-right {
+    flex: 1;
+    padding: 30px 40px;
+}
+
+.register-right h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+.register-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+/* Form fields */
+.register-form-group {
+    margin-bottom: 16px;
+}
+
+.register-right label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.register-required {
+    color: #e53935;
+    margin-left: 2px;
+}
+
+.register-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.register-right input[type="text"],
+.register-right input[type="email"],
+.register-right input[type="password"] {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #222;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+
+.register-right input:focus {
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+}
+
+.register-right input.input-error {
+    border-color: #e53935;
+    background-color: #fffbfa;
+}
+
+.register-password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.register-password-toggle:hover {
+    color: #333;
+}
+
+.register-field-error {
+    display: block;
+    font-size: 12px;
+    color: #e53935;
+    margin-top: 4px;
+}
+
+/* Password strength indicator hint */
+.register-hint {
+    font-size: 12px;
+    color: #777;
+    margin-top: 4px;
+}
+
+/* Alert error */
+.register-alert-error {
+    padding: 10px 14px;
+    background-color: #fde8e8;
+    border-left: 4px solid #e53935;
+    color: #c62828;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Button */
+.register-btn {
+    width: 100%;
+    margin-top: 22px;
+    padding: 13px;
+    border: none;
+    background: #1565c0;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.register-btn:hover:not(:disabled) {
+    background: #0d47a1;
+}
+
+.register-btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.register-btn:disabled {
+    background: #90caf9;
+    cursor: not-allowed;
+}
+
+/* Login link */
+.register-login-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+    text-align: center;
+}
+
+.register-login-link a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 5px;
+    transition: color 0.2s;
+}
+
+.register-login-link a:hover {
+    color: #0d47a1;
+    text-decoration: underline;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .register-container {
+        flex-direction: column;
+    }
+
+    .register-left {
+        display: none;
+    }
+
+    .register-right {
+        width: 100%;
+        max-width: 480px;
+        padding: 20px;
+    }
+}

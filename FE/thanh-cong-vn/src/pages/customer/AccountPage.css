@@ -1,0 +1,1396 @@
+/* ═══════════════════════════════════════════════════════════
+   CUSTOMER ACCOUNT PROFILE PAGE — SHOPEE STYLE
+   Tài khoản của tôi | Địa chỉ | Đơn mua | Đổi mật khẩu
+   ═══════════════════════════════════════════════════════════ */
+
+.tc-account-page {
+  background-color: #f5f5f5;
+  min-height: calc(100vh - 120px);
+  padding: 24px 0 60px 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #333333;
+}
+
+.tc-account-container {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Breadcrumb */
+.tc-account-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 20px;
+}
+
+.tc-account-breadcrumb a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.tc-account-breadcrumb a:hover {
+  color: #c8102e;
+}
+
+.tc-account-breadcrumb .active {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* Main 2-Column Grid Layout */
+.tc-account-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   LEFT SIDEBAR (SHOPEE STYLE)
+   ═══════════════════════════════════════════════════════════ */
+.tc-account-sidebar {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.tc-account-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 16px;
+}
+
+.tc-user-avatar-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #e2e8f0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fee2e2;
+}
+
+.tc-user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tc-user-avatar-placeholder {
+  font-size: 20px;
+  font-weight: 700;
+  color: #c8102e;
+}
+
+.tc-user-card-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.tc-user-card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+
+.tc-user-card-edit-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12px;
+  color: #888888;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s ease;
+}
+
+.tc-user-card-edit-btn:hover {
+  color: #c8102e;
+}
+
+/* Sidebar Nav Menu */
+.tc-account-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tc-nav-group-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0f172a;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.tc-nav-group-title:hover {
+  background: #f8fafc;
+}
+
+.tc-nav-group-title .tc-nav-icon {
+  font-size: 16px;
+  color: #c8102e;
+}
+
+.tc-nav-sub-list {
+  display: flex;
+  flex-direction: column;
+  padding-left: 36px;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.tc-nav-sub-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #475569;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.tc-nav-sub-item:hover {
+  color: #c8102e;
+}
+
+.tc-nav-sub-item.active {
+  color: #c8102e;
+  font-weight: 700;
+}
+
+.tc-nav-link-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  font-size: 13.5px;
+  color: #334155;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.tc-nav-link-item .tc-nav-icon {
+  font-size: 16px;
+  color: #64748b;
+}
+
+.tc-nav-link-item:hover {
+  color: #c8102e;
+  background: #f8fafc;
+}
+
+.tc-nav-link-item.active {
+  color: #c8102e;
+  font-weight: 700;
+  background: #fef2f2;
+}
+
+.tc-nav-link-item.active .tc-nav-icon {
+  color: #c8102e;
+}
+
+.tc-nav-logout-item {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
+  color: #dc2626;
+}
+
+.tc-nav-logout-item .tc-nav-icon {
+  color: #dc2626;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RIGHT MAIN CONTENT CARD
+   ═══════════════════════════════════════════════════════════ */
+.tc-account-content {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 24px 30px 40px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  min-height: 580px;
+}
+
+.tc-account-content-header {
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tc-content-header-text h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 4px 0;
+}
+
+.tc-content-header-text p {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 1: HỒ SƠ CỦA TÔI
+   ═══════════════════════════════════════════════════════════ */
+.tc-profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 40px;
+  align-items: flex-start;
+}
+
+.tc-profile-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tc-profile-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 16px;
+}
+
+.tc-profile-row label {
+  font-size: 13.5px;
+  color: #555555;
+  text-align: right;
+  font-weight: 500;
+}
+
+.tc-profile-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tc-profile-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+}
+
+.tc-profile-input:focus {
+  border-color: #c8102e;
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.1);
+}
+
+.tc-profile-input:disabled {
+  background-color: #f8fafc;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+.tc-profile-input.input-error,
+.tc-pwd-input-wrap input.input-error,
+.tc-birthday-selects select.input-error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2;
+}
+
+.tc-field-error {
+  font-size: 11.5px;
+  color: #ef4444;
+  font-weight: 500;
+  margin-top: 3px;
+  display: block;
+}
+
+.tc-profile-readonly-text {
+  font-size: 14px;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* Radio Group */
+.tc-gender-group {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.tc-gender-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13.5px;
+  color: #334155;
+  cursor: pointer;
+}
+
+.tc-gender-label input[type="radio"] {
+  accent-color: #c8102e;
+  cursor: pointer;
+}
+
+/* Birthday Selects */
+.tc-birthday-selects {
+  display: flex;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.tc-birthday-selects select {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.tc-birthday-selects select:focus {
+  border-color: #c8102e;
+}
+
+/* Save Button */
+.tc-profile-save-btn {
+  background: #c8102e;
+  color: #ffffff;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+  align-self: flex-start;
+  margin-top: 10px;
+  margin-left: 146px;
+}
+
+.tc-profile-save-btn:hover:not(:disabled) {
+  background: #a90d26;
+}
+
+.tc-profile-save-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Avatar Column */
+.tc-profile-avatar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-left: 30px;
+  border-left: 1px solid #f1f5f9;
+}
+
+.tc-big-avatar-preview {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #fee2e2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  margin-bottom: 16px;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tc-big-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.tc-big-avatar-placeholder {
+  font-size: 42px;
+  font-weight: 800;
+  color: #c8102e;
+}
+
+.tc-avatar-upload-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 12px;
+}
+
+.tc-avatar-upload-btn:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.tc-avatar-guideline {
+  font-size: 11.5px;
+  color: #94a3b8;
+  text-align: center;
+  line-height: 1.5;
+  max-width: 180px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 2: ĐỊA CHỈ NHẬN HÀNG (SHOPEE STYLE)
+   ═══════════════════════════════════════════════════════════ */
+.tc-btn-add-address {
+  background: #c8102e;
+  color: #ffffff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.2s ease;
+}
+
+.tc-btn-add-address:hover {
+  background: #a90d26;
+}
+
+.tc-address-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tc-address-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px 20px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tc-address-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.tc-address-card.is-default {
+  border-color: #fee2e2;
+  background: #fffafa;
+}
+
+.tc-address-card-left {
+  flex: 1;
+}
+
+.tc-addr-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.tc-addr-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.tc-addr-divider {
+  color: #cbd5e1;
+}
+
+.tc-addr-phone {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.tc-addr-badge-default {
+  background: #c8102e;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.tc-addr-badge-type {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.tc-addr-line-specific {
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 3px;
+}
+
+.tc-addr-line-region {
+  font-size: 12.5px;
+  color: #64748b;
+}
+
+.tc-address-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.tc-addr-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.tc-addr-action-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: #0284c7;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.tc-addr-action-btn:hover {
+  color: #0369a1;
+  text-decoration: underline;
+}
+
+.tc-addr-action-btn.delete {
+  color: #dc2626;
+}
+
+.tc-addr-action-btn.delete:hover {
+  color: #b91c1c;
+}
+
+.tc-btn-set-default {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tc-btn-set-default:hover:not(:disabled) {
+  border-color: #c8102e;
+  color: #c8102e;
+}
+
+.tc-btn-set-default:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
+}
+
+/* Modal Address Form Styles */
+.tc-addr-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tc-addr-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+  display: block;
+}
+
+.tc-addr-input,
+.tc-addr-select {
+  width: 100%;
+  padding: 8.5px 11px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tc-addr-input:focus,
+.tc-addr-select:focus {
+  border-color: #c8102e;
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.1);
+}
+
+.tc-addr-input.input-error,
+.tc-addr-select.input-error {
+  border-color: #ef4444 !important;
+  background-color: #fef2f2;
+}
+
+.tc-addr-input:disabled,
+.tc-addr-select:disabled {
+  background-color: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 3: ĐƠN MUA (SHOPEE STYLE)
+   ═══════════════════════════════════════════════════════════ */
+.tc-orders-tabs-header {
+  display: flex;
+  border-bottom: 2px solid #e2e8f0;
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.tc-order-tab-item {
+  padding: 12px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tc-order-tab-item:hover {
+  color: #c8102e;
+}
+
+.tc-order-tab-item.active {
+  color: #c8102e;
+  border-bottom-color: #c8102e;
+  font-weight: 700;
+}
+
+.tc-orders-search-bar {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.tc-orders-search-input {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  background: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.tc-orders-search-input:focus {
+  background: #ffffff;
+  border-color: #c8102e;
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.08);
+}
+
+.tc-orders-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 15px;
+}
+
+/* Order Card */
+.tc-orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.tc-order-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.tc-order-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background: #f8fafc;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.tc-order-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.tc-order-code {
+  font-weight: 700;
+  color: #0f172a;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tc-order-date {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.tc-order-status-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tc-status-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.tc-status-processing {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.tc-status-shipping {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.tc-status-completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.tc-status-cancelled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Order Item Row */
+.tc-order-items {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tc-order-item-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tc-order-item-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.tc-order-item-info {
+  flex: 1;
+}
+
+.tc-order-item-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #0f172a;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.tc-order-item-specs {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.tc-order-item-qty {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.tc-order-item-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #c8102e;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* Order Card Footer */
+.tc-order-card-footer {
+  padding: 14px 18px;
+  background: #fffafa;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tc-order-footer-total {
+  font-size: 13.5px;
+  color: #475569;
+}
+
+.tc-order-total-highlight {
+  font-size: 18px;
+  font-weight: 800;
+  color: #c8102e;
+  margin-left: 6px;
+}
+
+.tc-order-footer-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.tc-btn-order-action {
+  padding: 7px 14px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tc-btn-order-action.primary {
+  background: #c8102e;
+  color: #ffffff;
+  border: 1px solid #c8102e;
+}
+
+.tc-btn-order-action.primary:hover {
+  background: #a90d26;
+}
+
+.tc-btn-order-action.secondary {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.tc-btn-order-action.secondary:hover {
+  background: #f8fafc;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TAB 4: ĐỔI MẬT KHẨU
+   ═══════════════════════════════════════════════════════════ */
+.tc-password-form {
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tc-password-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tc-password-row label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.tc-pwd-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.tc-pwd-input-wrap input {
+  width: 100%;
+  padding: 10px 40px 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13.5px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.tc-pwd-input-wrap input:focus {
+  border-color: #c8102e;
+  box-shadow: 0 0 0 2px rgba(200, 16, 46, 0.1);
+}
+
+.tc-pwd-toggle-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+}
+
+.tc-pwd-toggle-btn:hover {
+  color: #475569;
+}
+
+.tc-pwd-note {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.tc-btn-submit-pwd {
+  background: #c8102e;
+  color: #ffffff;
+  border: none;
+  padding: 11px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  align-self: flex-start;
+  transition: background 0.2s ease;
+  margin-top: 8px;
+}
+
+.tc-btn-submit-pwd:hover:not(:disabled) {
+  background: #a90d26;
+}
+
+.tc-btn-submit-pwd:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Empty State */
+.tc-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.tc-empty-icon {
+  font-size: 54px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+}
+
+.tc-empty-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 8px;
+}
+
+.tc-empty-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-bottom: 20px;
+}
+
+.tc-empty-btn {
+  display: inline-block;
+  background: #c8102e;
+  color: #ffffff;
+  padding: 9px 24px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.tc-empty-btn:hover {
+  background: #a90d26;
+  color: #ffffff;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .tc-account-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .tc-profile-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tc-profile-avatar-col {
+    padding-left: 0;
+    border-left: none;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 24px;
+    margin-bottom: 24px;
+    order: -1;
+  }
+
+  .tc-profile-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .tc-profile-row label {
+    text-align: left;
+  }
+
+  .tc-profile-save-btn {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .tc-account-page {
+    padding: 10px 0 40px;
+  }
+
+  .tc-account-container {
+    padding: 0 10px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .tc-account-breadcrumb {
+    font-size: 11px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .tc-account-sidebar {
+    padding: 12px 10px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .tc-account-user-card {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+  }
+
+  .tc-user-avatar-wrap {
+    width: 40px;
+    height: 40px;
+  }
+
+  .tc-user-card-name {
+    font-size: 13px;
+  }
+
+  .tc-user-card-edit-btn {
+    font-size: 11px;
+  }
+
+  /* Menu: lưới 2 cột — không tràn ngang */
+  .tc-account-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    overflow: visible;
+  }
+
+  .tc-nav-group-title {
+    display: none; /* Mobile: dùng mục Hồ sơ / Địa chỉ trực tiếp */
+  }
+
+  .tc-nav-sub-list {
+    display: contents; /* Đưa Hồ sơ, Địa chỉ vào lưới */
+  }
+
+  .tc-nav-sub-item {
+    font-size: 12px;
+    padding: 10px 8px;
+    min-height: 40px;
+    border: 1px solid #f1f5f9;
+    border-radius: 6px;
+    background: #fff;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .tc-nav-sub-item.active {
+    background: #fef2f2;
+  }
+
+  .tc-nav-link-item {
+    font-size: 12px;
+    padding: 10px 8px;
+    min-height: 40px;
+    gap: 6px;
+    justify-content: center;
+    border: 1px solid #f1f5f9;
+    margin: 0;
+  }
+
+  .tc-nav-link-item .tc-nav-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .tc-nav-link-item span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .tc-nav-logout-item {
+    grid-column: 1 / -1;
+    margin-top: 4px;
+    padding-top: 10px;
+    justify-content: center;
+  }
+
+  .tc-account-content,
+  .tc-account-main {
+    padding: 12px 10px;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 100%;
+  }
+
+  .tc-account-content-header h2 {
+    font-size: 15px;
+  }
+
+  .tc-account-content-header p,
+  .tc-content-header-text p {
+    font-size: 11px;
+  }
+
+  /* Đơn mua: tabs scroll gọn */
+  .tc-orders-tabs-header {
+    gap: 0;
+    margin-bottom: 12px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .tc-orders-tabs-header::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tc-order-tab-item {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .tc-orders-search-bar {
+    margin-bottom: 12px;
+  }
+
+  .tc-orders-search-input {
+    font-size: 16px; /* chống zoom iOS */
+    padding: 8px 12px 8px 34px;
+    min-height: 40px;
+  }
+
+  .tc-order-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .tc-order-header-left {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .tc-order-code {
+    font-size: 11px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+  }
+
+  .tc-order-date {
+    font-size: 11px;
+  }
+
+  .tc-order-status-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+  }
+
+  .tc-order-item-row {
+    gap: 8px;
+    padding: 10px 12px;
+  }
+
+  .tc-order-item-img {
+    width: 52px;
+    height: 52px;
+  }
+
+  .tc-order-item-name {
+    font-size: 12px;
+  }
+
+  .tc-order-item-qty,
+  .tc-order-item-specs {
+    font-size: 11px;
+  }
+
+  .tc-order-item-price {
+    font-size: 12px;
+  }
+
+  .tc-order-card-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .tc-order-footer-total {
+    font-size: 12px;
+  }
+
+  .tc-order-total-highlight {
+    font-size: 14px;
+  }
+
+  .tc-order-footer-actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tc-order-footer-actions button,
+  .tc-order-footer-actions .ant-btn {
+    flex: 1 1 auto;
+    min-height: 36px;
+    font-size: 12px;
+  }
+
+  /* Form hồ sơ / địa chỉ / mật khẩu */
+  .tc-profile-form-grid,
+  .tc-address-form,
+  .tc-password-form {
+    max-width: 100%;
+  }
+
+  .tc-profile-row label,
+  .tc-form-label {
+    font-size: 11px;
+  }
+
+  .tc-profile-row input,
+  .tc-profile-row select,
+  .tc-address-form input,
+  .tc-address-form select,
+  .tc-password-form input {
+    font-size: 16px;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tc-account-container {
+    padding: 0 8px;
+  }
+
+  .tc-account-nav {
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+  }
+
+  .tc-nav-link-item {
+    font-size: 11px;
+    padding: 8px 6px;
+  }
+
+  .tc-nav-group-title {
+    font-size: 11px;
+  }
+
+  .tc-profile-save-btn,
+  .tc-account-btn,
+  .tc-addr-save-btn {
+    width: 100%;
+    min-height: 40px;
+    font-size: 13px;
+  }
+
+  .tc-order-code {
+    font-size: 10px;
+  }
+}

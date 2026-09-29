@@ -1,9 +1,7 @@
 package com.example.thanhcongvn.entity;
 import com.example.thanhcongvn.entity.base.PrimaryEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -12,9 +10,11 @@ import java.time.LocalDateTime;
         @Index(name = "idx_order_history_bill", columnList = "id_bill"),
         @Index(name = "idx_order_history_changed_at", columnList = "changed_at")
 })
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class OrderStatusHistory extends PrimaryEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)

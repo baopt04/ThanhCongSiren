@@ -3,6 +3,7 @@ import com.example.thanhcongvn.entity.base.PrimaryEntity;
 import com.example.thanhcongvn.entity.enums.TokenType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,9 +17,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class AuthToken extends PrimaryEntity {
-
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_users", nullable = false)
@@ -28,7 +28,7 @@ public class AuthToken extends PrimaryEntity {
     private String token;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "token_type", nullable = false, columnDefinition = "ENUM('access','refresh','verify','reset_password')")
+    @Column(name = "token_type", nullable = false, columnDefinition = "ENUM('ACCESS','REFRESH','VERIFY','RESET_PASSWORD')")
     private TokenType tokenType;
 
     @Column(name = "expires_at", nullable = false)

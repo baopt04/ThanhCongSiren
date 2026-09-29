@@ -4,9 +4,7 @@ import com.example.thanhcongvn.entity.enums.BillStatus;
 import com.example.thanhcongvn.entity.enums.PaymentMethod;
 import com.example.thanhcongvn.entity.enums.PaymentStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,16 +17,18 @@ import java.util.List;
         @Index(name = "idx_bill_payment_status", columnList = "payment_status"),
         @Index(name = "idx_bill_created", columnList = "created_at")
 })
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Bill extends PrimaryEntity {
 
     @Column(name = "bill_code", nullable = false, unique = true, length = 50)
     private String billCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_user", nullable = false)
+    @JoinColumn(name = "id_user", nullable = true)
     private User user;
 
     @Column(name = "shipping_name", nullable = false)
@@ -53,12 +53,15 @@ public class Bill extends PrimaryEntity {
     private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_method")
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
     private PaymentStatus paymentStatus = PaymentStatus.UNPAID;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "bill_status")
     private BillStatus billStatus = BillStatus.PENDING;
 
     @Column(columnDefinition = "TEXT")

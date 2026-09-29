@@ -1,33 +1,105 @@
-import { ProductCard } from "../../components/common/customer/ProductCard/ProductCard";
-import { ProductSection } from "../../components/common/customer/home/ProductSection";
-import { ProductSelect } from "../../components/common/customer/home/ProductSelect";
-import { Link } from "react-router-dom";
-import "./FireAlarmPage.css";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+import { ProductListingLayout } from "../../components/common/customer/ProductListingLayout/ProductListingLayout";
+import { SafetyCertificateOutlined, PhoneOutlined } from "@ant-design/icons";
+import { getAllProductsForCustomer } from "../../services/customer/CustomerProductService";
+import { Seo } from "../../components/common/Seo";
+
+function isFireAlarmProduct(p) {
+  const cat = (p.categoryName || "").toLowerCase();
+  const name = (p.name || "").toLowerCase();
+  return (
+    cat.includes("cháy") ||
+    cat.includes("chay") ||
+    cat.includes("báo cháy") ||
+    cat.includes("bao chay") ||
+    cat.includes("pccc") ||
+    cat.includes("khói") ||
+    cat.includes("khoi") ||
+    cat.includes("nhiệt") ||
+    cat.includes("nhiet") ||
+    cat.includes("thoát hiểm") ||
+    cat.includes("quat") ||
+    cat.includes("quạt") ||
+    name.includes("cháy") ||
+    name.includes("chay") ||
+    name.includes("pccc") ||
+    name.includes("khói") ||
+    name.includes("báo cháy")
+  );
+}
+
 export function FireAlarmPage() {
-    const products = [
-        {
-            name: "Còi hú LK-JDW245PK",
-            price: "31.990.000₫",
-        },
-        {
-            name: "Còi hú báo cháy LK-200",
-            price: "12.990.000₫",
-        },
-    ];
+  const [searchParams] = useSearchParams();
+  const typeParam = searchParams.get("type") || "all";
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    return (
-        <div className="siren-page">
+  useEffect(() => {
+    let isMounted = true;
+    const fetchProducts = async () => {
+      setLoading(true);
+      try {
+        const res = await getAllProductsForCustomer();
+        const rawList = Array.isArray(res)
+          ? res
+          : res?.data || res?.result || res?.content || [];
 
-            <div className="breadcrumb">
-                <div className="breadcrumb-inner">
-                    Trang chủ › Thiết bị báo cháy
-                </div>
-            </div>
-            <div className="product-grid">
-                {products.map((p) => (
-                    <ProductSelect key={p.name} {...p} />
-                ))}
-            </div>
+        if (isMounted) {
+          const list = Array.isArray(rawList) ? rawList : [];
+          const filtered = list.filter(isFireAlarmProduct);
+          setProducts(filtered.length > 0 ? filtered : list);
+        }
+      } catch (error) {
+        console.error("Error loading products for FireAlarmPage:", error);
+        if (isMounted) setProducts([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchProducts();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const guideCard = (
+    <div className="tc-siren-guide-card">
+      <div className="tc-guide-header">
+        <SafetyCertificateOutlined className="tc-guide-ic" />
+        <h2>TƯ VẤN THIẾT KẾ & LẮP ĐẶT HỆ THỐNG BÁO CHÁY TỰ ĐỘNG</h2>
+      </div>
+      <div className="tc-guide-body">
+        <p>Mọi thiết bị báo cháy do Thành Công Việt Nam cung cấp đều đầy đủ chứng nhận kiểm định PCCC & CO/CQ gốc.</p>
+        <div className="tc-guide-cta">
+          <span>Nhận báo giá trọn gói thiết bị PCCC cho công trình:</span>
+          <a href="tel:0865130088" className="tc-guide-phone-btn">
+            <PhoneOutlined /> Gọi Hotline: 0865.130.088
+          </a>
         </div>
-    );
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      <Seo
+        title="Thiết bị báo cháy & PCCC"
+        description="Thiết bị báo cháy tự động, đầu báo khói nhiệt, còi đèn PCCC chính hãng — Công ty TNHH Thành Công Việt Nam."
+      />
+      <ProductListingLayout
+        pageTitle="Thiết bị báo cháy & PCCC"
+        breadcrumbItems={[
+          { label: "Trang chủ", path: "/" },
+          { label: "Thiết bị báo cháy", path: null },
+        ]}
+        defaultCategoryId={typeParam}
+        products={products}
+        loading={loading}
+        pageSize={12}
+        guideCard={guideCard}
+      />
+    </>
+  );
 }

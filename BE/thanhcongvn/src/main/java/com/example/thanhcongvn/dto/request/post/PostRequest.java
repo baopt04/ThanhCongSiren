@@ -12,6 +12,7 @@ public class PostRequest {
     @NotBlank
     private String slug;
 
+
     private String thumbnailUrl;
 
     private String excerpt;

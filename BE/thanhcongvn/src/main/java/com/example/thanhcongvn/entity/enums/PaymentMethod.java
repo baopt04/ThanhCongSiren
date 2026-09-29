@@ -1,5 +1,5 @@
 package com.example.thanhcongvn.entity.enums;
 
 public enum PaymentMethod {
-    COD, BANK_TRANSFER, VNPAY, MOMO, ZALOPAY
+    COD, BANK_TRANSFER, VNPAY, MOMO, ZALOPAY , PICKUP
 }

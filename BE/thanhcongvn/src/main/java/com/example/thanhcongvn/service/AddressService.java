@@ -7,13 +7,13 @@ import java.util.List;
 
 public interface AddressService {
 
-    AddressResponse create(String userId, AddressRequest request);
+    AddressResponse create( AddressRequest request);
 
-    AddressResponse update(String userId, String addressId, AddressRequest request);
+    AddressResponse update( String addressId, AddressRequest request);
 
-    void delete(String userId, String addressId);
+    void delete( String addressId);
 
-    List<AddressResponse> getMyAddresses(String userId);
+    List<AddressResponse> getMyAddresses();
 
-    void setDefault(String userId, String addressId);
+    void setDefault( String addressId);
 }

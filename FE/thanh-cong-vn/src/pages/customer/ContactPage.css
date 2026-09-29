@@ -1,0 +1,518 @@
+/* ═══════════════════════════════════════════════════════════════
+   CONTACT PAGE — THÀNH CÔNG VIỆT NAM (CLEAN & SIMPLE)
+   Thiết kế giao diện sáng, tối giản, trực quan và hiển thị đầy đủ
+   ═══════════════════════════════════════════════════════════════ */
+
+.contact-page-clean {
+  background-color: #f8fafc;
+  color: #1e293b;
+  min-height: 100vh;
+  padding-bottom: 60px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+.contact-clean-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* --- 1. Breadcrumb --- */
+.contact-nav-breadcrumb {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 0;
+  margin-bottom: 24px;
+}
+
+.contact-breadcrumb-trail {
+  font-size: 13px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-breadcrumb-trail a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.contact-breadcrumb-trail a:hover {
+  color: #b91c1c;
+}
+
+.contact-sep {
+  color: #cbd5e1;
+}
+
+.contact-current {
+  color: #0f172a;
+  font-weight: 600;
+}
+
+/* --- 2. Simple Page Header --- */
+.contact-header-simple {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 32px;
+}
+
+.contact-badge-sub {
+  display: inline-block;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+
+.contact-header-simple h1 {
+  font-size: 30px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 10px 0;
+  letter-spacing: -0.2px;
+}
+
+.contact-header-simple p {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* --- 3. Main Row (2 Columns: Left Details, Right Form) --- */
+.contact-main-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 36px;
+  align-items: stretch;
+}
+
+/* Cột trái: Thẻ thông tin công ty */
+.contact-left-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.contact-company-top {
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.contact-auth-tag {
+  display: inline-block;
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.contact-company-top h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+  line-height: 1.35;
+}
+
+.contact-mst-text {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+}
+
+.contact-mst-text strong {
+  color: #0f172a;
+}
+
+/* Danh sách chi tiết liên hệ */
+.contact-details-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.contact-detail-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.contact-detail-item.highlight {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.contact-item-icon {
+  width: 36px;
+  height: 36px;
+  background: #f1f5f9;
+  color: #475569;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-item-icon.hot {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+.contact-item-text {
+  flex: 1;
+}
+
+.contact-item-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  margin-bottom: 2px;
+}
+
+.contact-item-text p {
+  font-size: 14px;
+  color: #1e293b;
+  line-height: 1.5;
+  margin: 0;
+  font-weight: 500;
+}
+
+.contact-item-text a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.contact-item-text a:hover {
+  text-decoration: underline;
+}
+
+.contact-hotline-link {
+  color: #b91c1c !important;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.contact-hotline-link:hover {
+  text-decoration: underline;
+}
+
+/* Nút gọi nhanh */
+.contact-quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.contact-btn-red {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #b91c1c;
+  color: #ffffff;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(185, 28, 28, 0.25);
+}
+
+.contact-btn-red:hover {
+  background: #991b1b;
+  transform: translateY(-1px);
+}
+
+.contact-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #0284c7;
+  border: 1.5px solid #bae6fd;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.contact-btn-outline:hover {
+  background: #f0f9ff;
+  border-color: #0284c7;
+}
+
+/* Cột phải: Form gửi thông tin */
+.contact-right-form {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.contact-form-head {
+  margin-bottom: 22px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.contact-form-head h3 {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.contact-form-head p {
+  font-size: 13.5px;
+  color: #64748b;
+  margin: 0;
+}
+
+.contact-success-banner {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+  color: #166534;
+  margin-bottom: 20px;
+}
+
+.contact-clean-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contact-clean-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.contact-clean-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.contact-clean-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.contact-clean-group input,
+.contact-clean-group select,
+.contact-clean-group textarea {
+  padding: 11px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: #1e293b;
+  background: #ffffff;
+  outline: none;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.contact-clean-group input:focus,
+.contact-clean-group select:focus,
+.contact-clean-group textarea:focus {
+  border-color: #b91c1c;
+  box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
+}
+
+.contact-btn-submit {
+  width: 100%;
+  padding: 13px 20px;
+  background: #b91c1c;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(185, 28, 28, 0.25);
+  margin-top: 6px;
+}
+
+.contact-btn-submit:hover {
+  background: #991b1b;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(185, 28, 28, 0.35);
+}
+
+/* --- 4. Google Map Section --- */
+.contact-map-section {
+  margin-bottom: 36px;
+}
+
+.contact-map-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.contact-map-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.contact-map-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.contact-map-title h3 {
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.contact-map-address {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.contact-map-frame-wrapper {
+  width: 100%;
+  height: 360px;
+  background: #f1f5f9;
+}
+
+.contact-map-frame-wrapper iframe {
+  display: block;
+}
+
+/* --- 5. Ba cam kết dịch vụ chân trang --- */
+.contact-trust-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.contact-trust-box {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px 20px;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.contact-trust-box:hover {
+  border-color: #b91c1c;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.contact-trust-num {
+  font-size: 24px;
+  font-weight: 900;
+  color: #fee2e2;
+  font-family: monospace;
+  margin-bottom: 8px;
+}
+
+.contact-trust-box h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 6px 0;
+}
+
+.contact-trust-box p {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   6. RESPONSIVE DESIGN
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .contact-main-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-header-simple h1 {
+    font-size: 24px;
+  }
+
+  .contact-left-card,
+  .contact-right-form {
+    padding: 20px;
+  }
+
+  .contact-clean-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .contact-quick-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-trust-row {
+    grid-template-columns: 1fr;
+  }
+
+  .contact-map-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

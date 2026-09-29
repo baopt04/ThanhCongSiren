@@ -1,5 +1,5 @@
 import apiClient from "../api/client";
-const API_ENDPOINT = "/product-specifications";
+const API_ENDPOINT = "/admin/product-specifications";
 
 export const getAllProductSpecs = async () => {
     try {

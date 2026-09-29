@@ -123,13 +123,13 @@ public class ProductServiceImpl implements ProductService {
             product.setPrice(dto.getPrice());
         }
 
-        if (dto.getSalePrice() != null) {
-            if (dto.getPrice() != null &&
-                    dto.getSalePrice().compareTo(dto.getPrice()) >= 0) {
-                throw new AppException(ErrorCode.PRODUCT_PRICE_SALE);
-            }
-            product.setSalePrice(dto.getSalePrice());
-        }
+//        if (dto.getSalePrice() != null) {
+//            if (dto.getPrice() != null &&
+//                    dto.getSalePrice().compareTo(dto.getPrice()) >= 0) {
+//                throw new AppException(ErrorCode.PRODUCT_PRICE_SALE);
+//            }
+//            product.setSalePrice(dto.getSalePrice());
+//        }
 
         if (dto.getCostPrice() != null) {
             product.setCostPrice(dto.getCostPrice());

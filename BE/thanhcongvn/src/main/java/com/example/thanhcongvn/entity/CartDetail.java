@@ -2,6 +2,7 @@ package com.example.thanhcongvn.entity;
 import com.example.thanhcongvn.entity.base.PrimaryEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_cart_detail_product", columnList = "id_product")
 })
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartDetail extends PrimaryEntity {

@@ -14,21 +14,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductImage  extends PrimaryEntity {
+    public class ProductImage  extends PrimaryEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_product", nullable = false)
-    private Product product;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "id_product", nullable = false)
+        private Product product;
 
-    @Column(name = "image_url", nullable = false)
-    private String imageUrl;
+        @Column(name = "image_url", nullable = false)
+        private String imageUrl;
 
-    @Column(name = "alt_text")
-    private String altText;
+        @Column(name = "alt_text")
+        private String altText;
 
-    @Column(name = "is_primary", columnDefinition = "TINYINT DEFAULT 0")
-    private Integer isPrimary = 0;
+        @Column(name = "is_primary", columnDefinition = "TINYINT DEFAULT 0")
+        private Integer isPrimary = 0;
 
-    @Column(name = "display_order")
-    private Integer displayOrder = 0;
+        @Column(name = "display_order")
+        private Integer displayOrder = 0;
 }

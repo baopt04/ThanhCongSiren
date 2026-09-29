@@ -1,5 +1,5 @@
 import apiClient from "../api/client";
-const API_ENDPOINT = "/category";
+const API_ENDPOINT = "/admin/category";
 
 export const getAllCategories = async () => {
     try {
@@ -37,6 +37,15 @@ export const findById = async (id) => {
         throw error;
     }
 };
+export const deleteCategory = async (id) => {
+    try {
+        const response = await apiClient.delete(`${API_ENDPOINT}/delete/${id}`)
+        return response.data;
+    } catch (error) {
+        throw error;
+    }     
+}
+
 export const categoryTree = async () => {
     try {
         const response = await apiClient.get(`${API_ENDPOINT}/tree`);

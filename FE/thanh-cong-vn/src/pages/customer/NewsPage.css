@@ -1,29 +1,38 @@
-.breadcrumb {
-    width: 100%;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-    width: 100vw;
-    margin-left: calc(50% - 50vw);
+/* ═══════════════════════════════════════════
+   NEWS PAGE — Wrapper
+   ═══════════════════════════════════════════ */
+
+.news-page {
+  background: #f8fafc;
+  min-height: 60vh;
 }
 
-.breadcrumb-inner {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 15px;
-    font-size: 14px;
-    color: #6e6e73;
+/* --- Breadcrumb --- */
+.news-page-breadcrumb {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 12px 0;
 }
 
-.siren-page {
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-        "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+.news-page-breadcrumb-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  font-size: 13px;
+  color: #64748b;
 }
 
-.breadcrumb a {
-    color: #0071e3;
-    text-decoration: none;
+.news-page-breadcrumb-inner a {
+  color: #64748b;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
-.breadcrumb a:hover {
-    text-decoration: underline;
+.news-page-breadcrumb-inner a:hover {
+  color: #b91c1c;
+}
+
+.news-page-sep {
+  margin: 0 8px;
+  color: #cbd5e1;
 }

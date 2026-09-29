@@ -4,6 +4,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,7 +28,6 @@ public class ProductResponse {
 
     private String categoryId;
     private String categoryName;
-
     private String brandId;
     private String brandName;
 

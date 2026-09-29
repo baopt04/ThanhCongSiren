@@ -1,28 +1,26 @@
 import News from "../../components/common/customer/News/News";
-import { ProductSelect } from "../../components/common/customer/home/ProductSelect";
 import { Link } from "react-router-dom";
+import { Seo } from "../../components/common/Seo";
 import "./NewsPage.css";
+
 export function NewsPage() {
-    const products = [
-        {
-            name: "Còi hú LK-JDW245PK",
-            price: "31.990.000₫",
-        },
-        {
-            name: "Còi hú báo cháy LK-200",
-            price: "12.990.000₫",
-        },
-    ];
-
-    return (
-        <div className="siren-page">
-
-            <div className="breadcrumb">
-                <div className="breadcrumb-inner">
-                    Trang chủ › Tin tức - Video
-                </div>
-            </div>
-            <News />
+  return (
+    <div className="news-page">
+      <Seo
+        title="Tin tức PCCC & còi hú báo động"
+        description="Tin tức, hướng dẫn kỹ thuật và kiến thức PCCC từ Công ty TNHH Thành Công Việt Nam."
+        path="/tin-tuc"
+      />
+      {/* Breadcrumb */}
+      <div className="news-page-breadcrumb">
+        <div className="news-page-breadcrumb-inner">
+          <Link to="/">Trang chủ</Link>
+          <span className="news-page-sep">/</span>
+          <span>Tin tức</span>
         </div>
-    );
+      </div>
+
+      <News />
+    </div>
+  );
 }

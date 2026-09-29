@@ -1,4 +1,5 @@
 package com.example.thanhcongvn.entity;
+
 import com.example.thanhcongvn.entity.base.PrimaryEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,6 +37,12 @@ public class Address extends PrimaryEntity {
     @Column(nullable = false)
     private String province;
 
+    @Column(name = "province_id", nullable = false)
+    private String province_id;
+    @Column(name = "to_district_id", nullable = false)
+    private String to_district_id;
+    @Column(name = "ward_id", nullable = false)
+    private String ward_id;
     @Column(name = "postal_code", length = 20)
     private String postalCode;
 

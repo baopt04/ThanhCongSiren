@@ -7,7 +7,8 @@
         "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     background: white;
     margin-left: calc(-50vw + 50%);
-    height: 550px;
+    min-height: 550px;
+    padding: 30px 0;
 }
 
 main {
@@ -16,7 +17,9 @@ main {
 
 .login-container {
     max-width: 1185px;
+    width: 100%;
     display: flex;
+    align-items: center;
 }
 
 /* bên trái */
@@ -29,30 +32,106 @@ main {
 
 .login-image {
     width: 90%;
+    max-height: 480px;
+    object-fit: cover;
+    border-radius: 8px;
 }
 
 /* bên phải */
 .login-right {
     flex: 1;
-    padding: 40px;
+    padding: 30px 40px;
 }
 
 .login-right h2 {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.login-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
 }
 
 .login-right label {
     display: block;
     margin-top: 15px;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
 }
 
-.login-right input {
+.login-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.login-right input[type="text"],
+.login-right input[type="email"],
+.login-right input[type="password"] {
     width: 100%;
-    padding: 10px;
+    padding: 11px 14px;
     border: 1px solid #ddd;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #222;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-right input:focus {
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+}
+
+.login-right input.input-error {
+    border-color: #e53935;
+    background-color: #fffbfa;
+}
+
+.login-password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    transition: color 0.2s;
+}
+
+.login-password-toggle:hover {
+    color: #333;
+}
+
+.login-field-error {
+    display: block;
+    font-size: 12px;
+    color: #e53935;
+    margin-top: 4px;
+}
+
+.login-alert-error {
+    padding: 10px 14px;
+    background-color: #fde8e8;
+    border-left: 4px solid #e53935;
+    color: #c62828;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* options */
@@ -69,42 +148,91 @@ main {
     gap: 6px;
     white-space: nowrap;
     margin: 0;
+    cursor: pointer;
+    font-size: 14px;
+    color: #444;
 }
 
 .login-options input {
     margin: 0;
-    /* bỏ margin mặc định của checkbox */
+    cursor: pointer;
 }
 
 .login-options a {
     color: #1976d2;
     text-decoration: none;
+    font-size: 14px;
 }
 
+.login-options a:hover {
+    text-decoration: underline;
+}
 
 /* button */
 .login-btn {
     width: 100%;
-    margin-top: 20px;
-    padding: 12px;
+    margin-top: 22px;
+    padding: 13px;
     border: none;
     background: #1565c0;
     color: white;
     font-size: 16px;
+    font-weight: 600;
     border-radius: 6px;
     cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-.login-btn:hover {
+.login-btn:hover:not(:disabled) {
     background: #0d47a1;
+}
+
+.login-btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.login-btn:disabled {
+    background: #90caf9;
+    cursor: not-allowed;
 }
 
 /* register */
 .register {
     margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+    text-align: center;
 }
 
 .register a {
     color: #1976d2;
     text-decoration: none;
+    font-weight: 600;
+    margin-left: 5px;
+    transition: color 0.2s;
+}
+
+.register a:hover {
+    color: #0d47a1;
+    text-decoration: underline;
+}
+
+@media (max-width: 900px) {
+    .login-container {
+        flex-direction: column;
+    }
+
+    .login-left {
+        display: none;
+    }
+
+    .login-right {
+        width: 100%;
+        max-width: 480px;
+        padding: 20px;
+    }
 }

@@ -1,0 +1,271 @@
+/* ═══════════════════════════════════════════
+   CATALOG SIDEBAR — User Reference Style
+   Clean white aesthetic with red category titles
+   ═══════════════════════════════════════════ */
+
+.tc-custom-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+
+.tc-sidebar-section {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Red Heading matching user's image */
+.tc-sidebar-title {
+  color: #d90429;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin: 0 0 16px 0;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+/* Category List */
+.tc-sidebar-cat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tc-sidebar-cat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.tc-sidebar-cat-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.tc-sidebar-cat-row:hover {
+  background-color: #f8fafc;
+}
+
+.tc-sidebar-cat-row.active {
+  font-weight: 700;
+  color: #d90429;
+}
+
+.tc-sidebar-cat-link,
+.tc-sidebar-cat-btn {
+  color: #334155;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  flex: 1;
+  transition: color 0.2s ease;
+  font-family: inherit;
+}
+
+.tc-sidebar-cat-row:hover .tc-sidebar-cat-link,
+.tc-sidebar-cat-row:hover .tc-sidebar-cat-btn,
+.tc-sidebar-cat-link:hover {
+  color: #d90429;
+}
+
+.tc-sidebar-cat-row.active .tc-sidebar-cat-link,
+.tc-sidebar-cat-row.active .tc-sidebar-cat-btn {
+  color: #d90429;
+  font-weight: 700;
+}
+
+.tc-sidebar-toggle-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.tc-sidebar-toggle-btn:hover {
+  color: #d90429;
+}
+
+/* Subcategories (accordion list) */
+.tc-sidebar-subcat-list {
+  list-style: none;
+  margin: 2px 0 6px 14px;
+  padding: 0 0 0 10px;
+  border-left: 2px solid #fee2e2;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tc-sidebar-subcat-item {
+  display: flex;
+}
+
+.tc-sidebar-subcat-link {
+  color: #64748b;
+  font-size: 13px;
+  text-decoration: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.tc-sidebar-subcat-link:hover {
+  color: #d90429;
+  background-color: #fef2f2;
+}
+
+.tc-sidebar-subcat-link.active {
+  color: #d90429;
+  font-weight: 700;
+  background-color: #fef2f2;
+}
+
+/* ═══════════════════════════════════════════
+   PRICE FILTER SECTION — Custom Radio
+   ═══════════════════════════════════════════ */
+
+.tc-price-section {
+  padding-top: 10px;
+}
+
+.tc-sidebar-price-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tc-price-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+  color: #334155;
+  transition: color 0.2s ease;
+}
+
+.tc-price-radio-label:hover {
+  color: #d90429;
+}
+
+.tc-price-radio-label.active {
+  color: #d90429;
+  font-weight: 600;
+}
+
+/* Native radio hidden */
+.tc-price-radio-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* Custom styled circle */
+.tc-price-custom-radio {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  background-color: #ffffff;
+}
+
+.tc-price-radio-label:hover .tc-price-custom-radio {
+  border-color: #d90429;
+}
+
+.tc-price-radio-label.active .tc-price-custom-radio {
+  border-color: #d90429;
+  background-color: #ffffff;
+}
+
+/* Inner dot */
+.tc-price-custom-radio::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #d90429;
+  transform: scale(0);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tc-price-radio-label.active .tc-price-custom-radio::after {
+  transform: scale(1);
+}
+
+.tc-price-radio-text {
+  line-height: 1.3;
+}
+
+/* Loading state */
+.tc-sidebar-loading {
+  padding: 20px 16px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .tc-sidebar-cat-row {
+    padding: 4px 2px;
+    min-height: 44px;
+  }
+
+  .tc-sidebar-cat-link,
+  .tc-sidebar-cat-btn {
+    padding: 10px 8px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .tc-sidebar-toggle-btn {
+    width: 44px;
+    min-height: 44px;
+    padding: 10px;
+  }
+
+  .tc-sidebar-subcat-link {
+    padding: 10px 8px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+  }
+
+  .tc-price-radio-label {
+    min-height: 44px;
+    padding: 10px 8px;
+  }
+}

@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class ApiFeResponse<T> {
     private boolean success;
     private T data;
+    private String message;
     private PaginationResponse pagination;
 
 

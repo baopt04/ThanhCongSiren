@@ -7,6 +7,7 @@ import com.example.thanhcongvn.entity.Category;
 import com.example.thanhcongvn.infrastructure.exception.AppException;
 import com.example.thanhcongvn.infrastructure.exception.ErrorCode;
 import com.example.thanhcongvn.repository.CategoryRepository;
+import com.example.thanhcongvn.repository.ProductRepository;
 import com.example.thanhcongvn.service.CategoryService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private ProductRepository productRepository;
     @Override
     public Page<CategoryResponse> getAll(Pageable pageable) {
         return categoryRepository.findAll(pageable)
@@ -73,8 +76,15 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(String id) {
-
+Category category = categoryRepository.findById(id).orElseThrow(
+        () -> new AppException(ErrorCode.CATEGORY_NOT_FOUND)
+);
+        if (productRepository.existsByCategoryId(id)) {
+            throw new AppException(ErrorCode.CATEGORY_IN_USER);
+        }
+    categoryRepository.delete(category);
     }
+
 
     @Override
     public CategoryResponse getById(String id) {

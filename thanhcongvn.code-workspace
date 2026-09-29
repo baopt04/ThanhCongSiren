@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "BE/thanhcongvn"
+		},
+		{
+			"path": "FE"
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "automatic",
+		"java.jdt.ls.lombokSupport.enabled": true
+	}
+}

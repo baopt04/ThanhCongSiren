@@ -1,5 +1,5 @@
 import apiClient from "../api/client";
-const API_ENDPOINT = "/category-news";
+const API_ENDPOINT = "/admin/category-news";
 
 export const getAllCategoriesNew = async () => {
     try {

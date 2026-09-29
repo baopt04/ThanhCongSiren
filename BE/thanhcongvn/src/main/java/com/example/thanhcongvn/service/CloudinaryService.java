@@ -68,5 +68,34 @@ public class CloudinaryService {
             throw new RuntimeException("Delete image failed");
         }
     }
+    public String extractPublicId(String imageUrl) {
+        // Lấy phần sau "/upload/"
+        String afterUpload = imageUrl.substring(imageUrl.indexOf("/upload/") + 8);
 
+        // Bỏ phần version nếu có (vd: v1789397506/)
+        if (afterUpload.matches("^v\\d+/.*")) {
+            afterUpload = afterUpload.substring(afterUpload.indexOf("/") + 1);
+        }
+
+        // Bỏ đuôi file (.jpg, .png, ...)
+        int lastDot = afterUpload.lastIndexOf(".");
+        if (lastDot != -1) {
+            afterUpload = afterUpload.substring(0, lastDot);
+        }
+
+        return afterUpload; // -> thanhcongvn-products/vmhu0uhxmqypxd1wig0q
+    }
+    public void deleteImageByImage(String imgUrl) throws Exception {
+        String publicId = extractPublicId(imgUrl);
+        try {
+            Map result = cloudinary.uploader().destroy(publicId,
+                    ObjectUtils.asMap("invalidate", true));
+            String status = (String) result.get("result");
+            if (!"ok".equals(status)) {
+                throw new RuntimeException("Không tìm thấy ảnh hoặc xóa thất bại: " + status);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Delete image failed: " + e.getMessage());
+        }
+    }
 }

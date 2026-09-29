@@ -1,209 +1,442 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import {
+  PhoneOutlined,
+  LeftOutlined,
+  RightOutlined,
+  LoadingOutlined,
+  ShoppingCartOutlined,
+  ThunderboltOutlined
+} from "@ant-design/icons";
+import { message } from "antd";
+import { detailProductForId } from "../../../../services/customer/CustomerProductService";
+import { embedYoutubeInHtml } from "../../../../utils/youtubeUtils";
+import { addToCart } from "../../../../utils/cartUtils";
+import { isCustomerAuthenticated } from "../../../../utils/auth";
+import { createCartItem } from "../../../../services/customer/CustomerCartService";
 import "./ProductDetail.css";
 
 export default function ProductDetail() {
-    const images = [
-        "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-bao-dong-lk-jdw245pk-khu-dan-cu-thuy-dien-song-hinh.jpg",
-        "https://cdn0344.cdn4s.com/thumbs/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-tren-dap-ho-chua-nuoc-thuy-dien-sapa_thumb_150.jpg",
-        "https://cdn0344.cdn4s.com/thumbs/2022/coi%20bao%20dong/jdw245pk/coi-bao-dong-lk-jdw245pk-lap-tai-nha-may-thuy-dien-song-hinh_thumb_150.jpg",
-        "https://cdn0344.cdn4s.com/thumbs/2020/11/coi-hu-cong-suat-lon-lk-jdw245pk_thumb_150.jpg"
-    ];
+  const navigate = useNavigate();
+  const { id, param } = useParams();
+  const productId = id || param;
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeImgIndex, setActiveImgIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState("description");
+  const [quantity, setQuantity] = useState(1);
+  const [addingToCart, setAddingToCart] = useState(false);
 
-    const [activeImg, setActiveImg] = useState(images[0]);
-    const [activeTab, setActiveTab] = useState("description");
+  useEffect(() => {
+    let isMounted = true;
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await detailProductForId(productId);
+        const data = res?.data || res;
+        if (isMounted) {
+          setProduct(data);
+          setActiveImgIndex(0);
+        }
+      } catch (err) {
+        console.error("Error loading product detail:", err);
+        if (isMounted) setError("Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    if (productId) fetchProduct();
+    return () => { isMounted = false; };
+  }, [productId]);
+
+  // === Derived data from API response ===
+  const productImages = product?.images
+    ? [...product.images].sort((a, b) => {
+      // isPrimary first, then by displayOrder
+      if (a.isPrimary !== b.isPrimary) return b.isPrimary - a.isPrimary;
+      return (a.displayOrder || 0) - (b.displayOrder || 0);
+    }).map(img => img.imageUrl)
+    : [];
+
+  const activeImg = productImages[activeImgIndex] || productImages[0] || "";
+
+  // Build specifications list from API map
+  const technicalSpecs = [];
+  if (product?.specifications) {
+    Object.entries(product.specifications).forEach(([groupName, specs]) => {
+      specs.forEach(spec => {
+        technicalSpecs.push({
+          label: spec.specName,
+          value: spec.specValue,
+        });
+      });
+    });
+  }
+
+  // Format price
+  const formatPrice = (price) => {
+    if (!price || price === 0) return "Liên hệ báo giá";
+    return `${price.toLocaleString("vi-VN")} VND`;
+  };
+
+  // Calculate discount percentage
+  const discountPercent = (product?.price && product?.salePrice && product.price > product.salePrice && product.salePrice > 0)
+    ? Math.round((1 - product.salePrice / product.price) * 100)
+    : 0;
+
+  const handlePrevImage = () => {
+    setActiveImgIndex((prev) => (prev > 0 ? prev - 1 : productImages.length - 1));
+  };
+
+  const handleNextImage = () => {
+    setActiveImgIndex((prev) => (prev < productImages.length - 1 ? prev + 1 : 0));
+  };
+
+  const handleDecrease = () => {
+    if (quantity > 1) setQuantity(quantity - 1);
+  };
+
+  const handleIncrease = () => {
+    setQuantity(quantity + 1);
+  };
+
+  const handleAddToCart = async () => {
+    if (!product) return;
+    try {
+      setAddingToCart(true);
+      if (isCustomerAuthenticated()) {
+        await createCartItem({
+          productId: product.id,
+          quantity: Number(quantity) || 1,
+        });
+        window.dispatchEvent(new Event("tc_cart_updated"));
+      } else {
+        addToCart(product, quantity);
+      }
+      message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng thành công!`);
+    } catch (err) {
+      console.error("Lỗi khi thêm vào giỏ hàng:", err);
+      message.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Thêm sản phẩm vào giỏ hàng thất bại!"
+      );
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!product) return;
+    try {
+      setAddingToCart(true);
+      if (isCustomerAuthenticated()) {
+        await createCartItem({
+          productId: product.id,
+          quantity: Number(quantity) || 1,
+        });
+        window.dispatchEvent(new Event("tc_cart_updated"));
+      } else {
+        addToCart(product, quantity);
+      }
+      navigate("/gio-hang");
+    } catch (err) {
+      console.error("Lỗi khi mua ngay:", err);
+      message.error(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Không thể thực hiện mua ngay!"
+      );
+    } finally {
+      setAddingToCart(false);
+    }
+  };
+
+  // === Loading State ===
+  if (loading) {
     return (
-        <div className="pd-container">
+      <div className="pd-page">
+        <div className="pd-loading-state">
+          <LoadingOutlined style={{ fontSize: 40, color: "#d90429" }} />
+          <p>Đang tải thông tin sản phẩm...</p>
+        </div>
+      </div>
+    );
+  }
 
-            <div className="pd-grid">
+  // === Error State ===
+  if (error || !product) {
+    return (
+      <div className="pd-page">
+        <div className="pd-error-state">
+          <h2>😔 {error || "Không tìm thấy sản phẩm"}</h2>
+          <Link to="/" className="pd-btn-back">← Quay lại trang chủ</Link>
+        </div>
+      </div>
+    );
+  }
 
-                {/* LEFT */}
-                <div className="pd-gallery">
+  return (
+    <div className="pd-page">
+      {/* Breadcrumb Navigation */}
+      <nav className="pd-breadcrumb" aria-label="Breadcrumb">
+        <div className="pd-breadcrumb-inner">
+          <Link to="/" className="pd-crumb-link">Trang chủ</Link>
+          <span className="pd-crumb-sep">›</span>
+          {product.categoryName && (
+            <>
+              <span className="pd-crumb-link">{product.categoryName}</span>
+              <span className="pd-crumb-sep">›</span>
+            </>
+          )}
+          <span className="pd-crumb-active">{product.name}</span>
+        </div>
+      </nav>
 
-                    <div className="pd-main-image">
-                        <div className="pd-main-image-inner">
-                            <img src={activeImg} alt="" />
-                        </div>
-                    </div>
+      <div className="pd-container">
+        {/* Main 2-Column Product Section */}
+        <div className="pd-main-grid">
 
-                    <div className="pd-thumb-list">
-                        {images.map((img, i) => (
-                            <img
-                                key={i}
-                                src={img}
-                                alt=""
-                                className={activeImg === img ? "active" : ""}
-                                onClick={() => setActiveImg(img)}
-                            />
-                        ))}
-                    </div>
+          {/* CỘT TRÁI: ẢNH SẢN PHẨM */}
+          <div className="pd-gallery-col">
+            {/* Dải ảnh thu nhỏ xếp theo chiều dọc */}
+            {productImages.length > 0 && (
+              <div className="pd-thumb-strip">
+                {productImages.map((img, i) => (
+                  <button
+                    type="button"
+                    key={i}
+                    className={`pd-thumb-btn ${activeImgIndex === i ? "active" : ""}`}
+                    onClick={() => setActiveImgIndex(i)}
+                    onMouseEnter={() => setActiveImgIndex(i)}
+                    title={`Xem ảnh ${i + 1}`}
+                  >
+                    <img src={img} alt={`Ảnh nhỏ ${i + 1}`} />
+                  </button>
+                ))}
+              </div>
+            )}
 
-                </div>
+            {/* Khung ảnh chính to */}
+            <div className="pd-main-image-wrap">
+              {product.isActive === 1 && <span className="pd-image-badge">Nổi Bật</span>}
+              {activeImg ? (
+                <img src={activeImg} alt={product.name} className="pd-main-image" />
+              ) : (
+                <div className="pd-no-image">Chưa có ảnh sản phẩm</div>
+              )}
 
-                {/* RIGHT */}
-                <div className="pd-info">
+              {/* Nút điều hướng ảnh Trước / Sau */}
+              {productImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    className="pd-nav-arrow pd-nav-prev"
+                    onClick={handlePrevImage}
+                    title="Xem ảnh trước"
+                    aria-label="Previous image"
+                  >
+                    <LeftOutlined />
+                  </button>
+                  <button
+                    type="button"
+                    className="pd-nav-arrow pd-nav-next"
+                    onClick={handleNextImage}
+                    title="Xem ảnh kế tiếp"
+                    aria-label="Next image"
+                  >
+                    <RightOutlined />
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
 
-                    <h1 className="pd-title">
-                        Còi hú báo động công suất lớn báo xả lũ LK-JDW245PK
-                    </h1>
+          {/* CỘT PHẢI: THÔNG TIN SẢN PHẨM */}
+          <div className="pd-info-col">
+            <h1 className="pd-title">
+              {product.name}
+            </h1>
 
-                    <div className="pd-price">
-                        32.990.000đ
-                    </div>
-
-                    <div className="pd-meta">
-                        <div>Mã sản phẩm: <span>LK-JDW245PK</span></div>
-                        <div>Danh mục: <span>Còi hú báo động cỡ lớn</span></div>
-                    </div>
-
-                    <div className="pd-description">
-                        Cung cấp Còi Hú Báo LK-JDW245PK công suất lớn 220v. Được sử dụng trong hệ
-                        thống phòng cháy chữa cháy, báo xả lũ, báo động các thành phố lớn.
-                    </div>
-
-                    {/* Thông tin kích thước */}
-                    <div className="pd-dimension">
-                        <div>Cân nặng: <span>55kg</span></div>
-                        <div>Chiều cao: <span>100cm</span></div>
-                        <div>Chiều dài: <span>120cm</span></div>
-                        <div>Chiều rộng: <span>110cm</span></div>
-                    </div>
-
-                    {/* Thông số */}
-                    <div className="pd-spec">
-                        <h3>Thông số chính</h3>
-                        <ul>
-                            <li>Độ ồn: 135 ± 2dB (A) @ 1M</li>
-                            <li>Động cơ điện: 0.75kW, 220VAC, 50/60Hz</li>
-                            <li>Cấp độ IP bảo vệ: sử dụng IP55</li>
-                            <li>Tần số đầu ra: 530/580±20Hz</li>
-                            <li>Bao gồm 20 loa phóng âm thanh</li>
-                            <li>Trọng lượng: 55kg</li>
-                            <li>Kích thước đóng gói : 110x110x100CM</li>
-                        </ul>
-                    </div>
-
-                    {/* Ưu đãi */}
-                    {/* <div className="pd-promo">
-                        <h3>Ưu đãi</h3>
-                        <ul>
-                            <li>✔ Giảm 1.000.000đ khi thanh toán online</li>
-                            <li>✔ Trả góp 0%</li>
-                            <li>✔ Bảo hành chính hãng 12 tháng</li>
-                        </ul>
-                    </div> */}
-
-                    <button className="pd-buy-btn">
-                        MUA NGAY
-                    </button>
-
-                </div>
-
+            <div className="pd-meta-bar">
+              {product.slug && (
+                <>
+                  <span className="pd-meta-item">Mã SP: <strong>{product.slug}</strong></span>
+                  <span className="pd-meta-divider">•</span>
+                </>
+              )}
+              {product.brandName && (
+                <>
+                  <span className="pd-meta-item">Thương hiệu: <strong>{product.brandName}</strong></span>
+                  <span className="pd-meta-divider">•</span>
+                </>
+              )}
+              <span className="pd-meta-item pd-stock-tag">
+                {product.isActive === 1 ? "Còn hàng" : "Hết hàng"}
+              </span>
             </div>
 
-
-            {/* Tabs */}
-            <div className="pd-tabs">
-
-                <div className="pd-tab-header">
-                    <button
-                        className={activeTab === "description" ? "active" : ""}
-                        onClick={() => setActiveTab("description")}
-                    >
-                        Mô tả sản phẩm
-                    </button>
-
-                    <button
-                        className={activeTab === "spec" ? "active" : ""}
-                        onClick={() => setActiveTab("spec")}
-                    >
-                        Thông số kỹ thuật
-                    </button>
-                </div>
-
-                <div className="pd-tab-content">
-
-                    {activeTab === "description" && (
-                        <>
-                            <p>
-                                Còi hú công suất lớn LK-JDW245PK là loại còi phát ra tiếng còi báo động đa hướng. Tiếng còi báo động kêu do động cơ điện quay tác động đến bộ phận phát, phát ra âm thanh đặc biệt và chất lượng có thể sử dụng để báo động, báo xả lũ trong các nhà máy thủy điện.
-                                Âm thanh đặc biệt này có một âm lượng lớn, cao cung cấp độ tương phản với tiếng ồn xung quanh có thể phóng đi tới các khu vực dân cư dưới hạ lưu nhờ các loa phóng âm.
-                            </p>
-
-                            <div className="pd-description-image">
-                                <img src="https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-bao-dong-lk-jdw245pk-lap-tai-nha-may-thuy-dien-song-hinh.jpg" />
-                            </div>
-
-                            <p>
-                                Thông tin chung về Còi hú công suất lớn LK-JDW245PK. Còi có thể
-                                phát âm thanh lớn giúp cảnh báo trong các khu vực dân cư.
-                            </p>
-                            <p>
-                                Thông tin chung về Còi hú công suất lớn LK-JDW245PK
-                                Còi hú công suất lớn LK-JDW245PK có động cơ hoạt động với nguồn điện 220VAC.
-                            </p>
-                            <ul>
-                                <li>Động cơ còi có một ngoại hình hấp dẫn và cao cấp chống ăn mòn</li>
-                                <li>Sản phẩm có thể kết hợp với một bộ phận điều khiển và tạo ra một tiếng còi với độ ồn 135dB @ 1M, khoảng âm hiệu quả đạt được từ 2Km đến 3Km</li>
-                                <li>Còi có thể được sử dụng trong hệ thống phòng cháy chữa cháy, báo xả lũ, báo động các thành phố lớn.</li>
-                                <li>Còi hú báo động công suất lớn LK-JDW245PK có thể ngăn chặn sự xâm nhập của các vật rắn lớn hơn 1.0 mm. Ngăn chặn các đối tượng (công cụ, dây hoặc tương tự) với đường kính hoặc độ dày lớn hơn 1.0mm chạm vào bên trong.</li>
-
-                            </ul>
-                            <p>Còi hú được sử dụng trong:</p>
-                            <ul>
-                                <li>Hệ thống cảnh báo dân phòng của các thành phố lớn trên khắp thế giới</li>
-                                <li>Hệ thống phòng cháy chữa cháy</li>
-                                <li>Cảnh báo cháy trong hệ thống của cộng đồng, nhà máy, mỏ, các tòa nhà, vv
-                                </li>
-                                <li>Cảnh báo tai nạn của các hồ chứa, đập, nhà tù, các sân bay, quân đội, vv</li>
-                            </ul>
-                        </>
-                    )}
-
-                    {activeTab === "spec" && (
-                        <ul className="pd-spec-list">
-                            <li>Độ ồn: 135 ± 2dB (A) @ 1M</li>
-                            <li>Động cơ điện: 0.75kW, 220VAC</li>
-                            <li>Cấp độ IP bảo vệ: IP55</li>
-                            <li>Tần số đầu ra: 530/580±20Hz</li>
-                            <li>Bao gồm 20 loa phóng âm thanh</li>
-                            <li>Trọng lượng: 55kg</li>
-                            <li>Kích thước đóng gói: 110x110x100CM</li>
-                        </ul>
-                    )}
-                    <div className="pd-content-video">
-                        <p>Video thực tế sản phẩm:</p>
-
-                        <iframe
-                            width="560"
-                            height="315"
-                            src="https://www.youtube.com/embed/vzQlZfFuZF8"
-                            title="YouTube video player"
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                        ></iframe>
-                    </div>
-                    <div className="pd-contact-box">
-
-                        <div className="pd-contact-title">
-                            <span className="pd-phone-icon">📞</span>
-                            Hãy liên hệ với chúng tôi để được tư vấn thêm
-                        </div>
-
-                        <div className="pd-contact-info">
-                            <div>Hotline: <span>0865.130.088</span></div>
-                            <div>Email: <span>coihubaodongvn@gmail.com</span></div>
-                        </div>
-
-                        <div className="pd-shipping">
-                            Giao hàng toàn quốc - Miễn phí giao hàng nội thành Hà Nội với các đơn hàng trên 1 triệu đồng
-                        </div>
-
-                    </div>
-                </div>
-
+            {/* Giá sản phẩm */}
+            <div className="pd-price-box">
+              {product.salePrice > 0 ? (
+                <>
+                  <span className="pd-price-current">{formatPrice(product.salePrice)}</span>
+                  {product.price > 0 && product.price !== product.salePrice && (
+                    <span className="pd-price-old">{formatPrice(product.price)}</span>
+                  )}
+                  {discountPercent > 0 && (
+                    <span className="pd-price-save">Tiết kiệm {discountPercent}%</span>
+                  )}
+                </>
+              ) : product.price > 0 ? (
+                <span className="pd-price-current">{formatPrice(product.price)}</span>
+              ) : (
+                <span className="pd-price-current pd-price-contact">Liên hệ báo giá</span>
+              )}
             </div>
+
+            {/* Tóm tắt ngắn gọn */}
+            {product.description && (
+              <p className="pd-short-desc">
+                {product.description}
+              </p>
+            )}
+
+            {/* Bảng tóm tắt thông số nhanh từ specifications */}
+            {technicalSpecs.length > 0 && (
+              <div className="pd-quick-specs">
+                {technicalSpecs.slice(0, 6).map((spec, idx) => (
+                  <div className="pd-spec-row" key={idx}>
+                    <span className="pd-spec-label">{spec.label}:</span>
+                    <span className="pd-spec-val">{spec.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Cam kết chất lượng tối giản */}
+            <div className="pd-commitments">
+              <div className="pd-commit-item">✓ Hồ sơ chứng nhận xuất xứ CO/CQ bản gốc công chứng</div>
+              <div className="pd-commit-item">✓ Bảo hành chính hãng 24 tháng - Hỗ trợ kỹ thuật trọn đời</div>
+              <div className="pd-commit-item">✓ Tư vấn giải pháp lắp đặt & sơ đồ đấu nối tủ GSM từ xa</div>
+              <div className="pd-commit-item">✓ Giao hàng toàn quốc - Đóng thùng gỗ bảo vệ an toàn</div>
+            </div>
+
+            {/* Nhóm nút hành động */}
+            <div className="pd-action-section">
+              <div className="pd-qty-selector">
+                <button type="button" onClick={handleDecrease} className="pd-qty-btn" title="Giảm số lượng">−</button>
+                <span className="pd-qty-value">{quantity}</span>
+                <button type="button" onClick={handleIncrease} className="pd-qty-btn" title="Tăng số lượng">+</button>
+              </div>
+
+              <button
+                type="button"
+                className="pd-btn-add-cart"
+                onClick={handleAddToCart}
+                disabled={addingToCart}
+              >
+                <ShoppingCartOutlined /> {addingToCart ? "ĐANG THÊM..." : "THÊM VÀO GIỎ"}
+              </button>
+
+              <button
+                type="button"
+                className="pd-btn-buy-now"
+                onClick={handleBuyNow}
+                disabled={addingToCart}
+              >
+                <ThunderboltOutlined /> MUA NGAY
+              </button>
+
+              <button type="button" className="pd-btn-quote" onClick={() => window.location.href = "tel:0865130088"}>
+                BÁO GIÁ DỰ ÁN
+              </button>
+
+              <a href="tel:0865130088" className="pd-btn-hotline" title="Gọi kỹ thuật tư vấn">
+                <PhoneOutlined /> 0865.130.088
+              </a>
+            </div>
+
+          </div>
 
         </div>
-    );
+
+        {/* Tabs Chi Tiết */}
+        <div className="pd-tabs-section">
+          <div className="pd-tab-nav">
+            <button
+              type="button"
+              className={`pd-tab-btn ${activeTab === "description" ? "active" : ""}`}
+              onClick={() => setActiveTab("description")}
+            >
+              Mô tả chi tiết sản phẩm
+            </button>
+            <button
+              type="button"
+              className={`pd-tab-btn ${activeTab === "spec" ? "active" : ""}`}
+              onClick={() => setActiveTab("spec")}
+            >
+              Thông số kỹ thuật
+            </button>
+          </div>
+
+          <div className="pd-tab-body">
+            {activeTab === "description" && (
+              <div className="pd-tab-panel">
+                {product.longDescription ? (
+                  <div
+                    className="pd-long-description"
+                    dangerouslySetInnerHTML={{ __html: embedYoutubeInHtml(product.longDescription) }}
+                  />
+                ) : (
+                  <p>Chưa có mô tả chi tiết cho sản phẩm này.</p>
+                )}
+              </div>
+            )}
+
+            {activeTab === "spec" && (
+              <div className="pd-tab-panel">
+                <h3 className="pd-panel-title">Bảng thông số kỹ thuật chi tiết</h3>
+                {technicalSpecs.length > 0 ? (
+                  <div className="pd-spec-table-wrap">
+                    <table className="pd-spec-table">
+                      <tbody>
+                        {technicalSpecs.map((item, index) => (
+                          <tr key={index}>
+                            <td className="pd-tbl-label">{item.label}</td>
+                            <td className="pd-tbl-value">{item.value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p>Chưa có thông số kỹ thuật cho sản phẩm này.</p>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Khối liên hệ tư vấn cuối trang (Đơn giản, tinh tế) */}
+        <div className="pd-bottom-contact">
+          <div className="pd-bcontact-text">
+            <h4>Cần tư vấn thiết kế hệ thống & Báo giá dự án?</h4>
+            <p>Đội ngũ kỹ sư giàu kinh nghiệm của Thành Công Việt Nam luôn sẵn sàng hỗ trợ kỹ thuật và bản vẽ 24/7.</p>
+          </div>
+          <div className="pd-bcontact-actions">
+            <a href="tel:0865130088" className="pd-bcontact-btn">
+              Hotline: 0865.130.088
+            </a>
+            <a href="https://zalo.me/0865130088" target="_blank" rel="noreferrer" className="pd-bzalo-btn">
+              Chat Zalo Kỹ Thuật
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
 }

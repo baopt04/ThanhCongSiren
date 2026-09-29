@@ -1,9 +1,7 @@
 package com.example.thanhcongvn.entity;
 import com.example.thanhcongvn.entity.base.PrimaryEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -13,8 +11,10 @@ import java.time.LocalDateTime;
         @Index(name = "idx_bill_detail_bill", columnList = "id_bill"),
         @Index(name = "idx_bill_detail_product", columnList = "id_product")
 })
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor
 public class BillDetail extends PrimaryEntity {
 

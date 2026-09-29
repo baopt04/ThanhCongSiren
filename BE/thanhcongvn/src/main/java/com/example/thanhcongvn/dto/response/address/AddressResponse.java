@@ -15,8 +15,9 @@ public class AddressResponse {
     private String ward;
     private String district;
     private String province;
-    private String postalCode;
-
+    private String provinceId;
+    private String toDistrictId;
+    private String wardId;
     private Integer isDefault;
 
 }

@@ -1,8 +1,8 @@
 import apiClient from "../api/client";
 import { getAllCategories } from "./CategoryService";
 
-const API_ENDPOINT = "/product";
-const API_ENDPOINT_IMAGES = "/product-images";
+const API_ENDPOINT = "/admin/product";
+const API_ENDPOINT_IMAGES = "/admin/product-images";
 export const getAllProducts = async () => {
     try {
         const response = await apiClient.get(`${API_ENDPOINT}`);
@@ -119,3 +119,35 @@ export const updateProductSalePrice = async (id, salePrice) => {
         throw error;
     }
 };
+
+export const updateImageDescription = async (file) => {
+    try {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await apiClient.post(
+            `${API_ENDPOINT}/upload-description-image`,
+            formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            }
+        );
+
+        return response.data;
+    } catch (error) {
+        console.error("Error uploading product image description:", error);
+        throw error;
+    }
+};
+
+export const deleteImageDescription = async (imageUrl) => {
+    try {
+        const response = await apiClient.delete(`${API_ENDPOINT}/delete/image-description`, {
+            params: { imageUrl },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting product image description:", error);
+        throw error;
+    }
+}
