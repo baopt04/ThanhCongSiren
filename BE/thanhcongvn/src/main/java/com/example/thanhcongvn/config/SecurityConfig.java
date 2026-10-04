@@ -33,12 +33,14 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider =
@@ -62,7 +64,9 @@ public class SecurityConfig {
                                 "/api/v1/customer/post/**",
                                 "/api/products/search",
                                 "/api/home/**",
-                                "/api/v1/customer/**"
+                                "/api/v1/customer/**",
+                                "/actuator/health",
+                                "/api/v1/health"
                         ).permitAll()
                         // Các endpoint cần quyền ADMIN
                         .requestMatchers("/api/v1/admin/posts/upload-post-image", "/api/v1/admin/posts/delete/image-post").hasAnyRole("ADMIN", "USER")
