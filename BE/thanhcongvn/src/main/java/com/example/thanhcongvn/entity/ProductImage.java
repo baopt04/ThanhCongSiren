@@ -20,6 +20,10 @@ import lombok.NoArgsConstructor;
         @JoinColumn(name = "id_product", nullable = false)
         private Product product;
 
+        /** Read-only FK — avoid loading Product entity just to get id when batching images. */
+        @Column(name = "id_product", insertable = false, updatable = false)
+        private String productId;
+
         @Column(name = "image_url", nullable = false)
         private String imageUrl;
 

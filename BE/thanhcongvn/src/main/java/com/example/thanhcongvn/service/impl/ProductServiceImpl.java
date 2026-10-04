@@ -1,5 +1,6 @@
 package com.example.thanhcongvn.service.impl;
 
+import com.example.thanhcongvn.dto.projection.ProductListView;
 import com.example.thanhcongvn.dto.request.product.CreateProductDTO;
 import com.example.thanhcongvn.dto.request.product.ProductFilterRequest;
 import com.example.thanhcongvn.dto.request.product.UpdateProductDTO;
@@ -179,9 +180,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductResponse> getAll(ProductFilterRequest filter, Pageable pageable) {
-        Page<Product> page = productRepository.findAllWithCategoryAndBrand(pageable);
-
-        return page.map(this::mapToResponse);
+        return productRepository.findAllForAdminList(pageable)
+                .map(this::mapToListResponse);
     }
 
     @Override
@@ -246,6 +246,31 @@ public class ProductServiceImpl implements ProductService {
 
 
 
+
+    private ProductResponse mapToListResponse(ProductListView product) {
+        return ProductResponse.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .slug(product.getSlug())
+                .sku(product.getSku())
+                .categoryId(product.getCategoryId())
+                .categoryName(product.getCategoryName())
+                .brandId(product.getBrandId())
+                .brandName(product.getBrandName())
+                .description(product.getDescription())
+                // longDescription intentionally omitted from list SQL (LONGTEXT) —
+                // FE loads full product on edit via getById
+                .longDescription(null)
+                .price(product.getPrice())
+                .salePrice(product.getSalePrice())
+                .costPrice(product.getCostPrice())
+                .stockQuantity(product.getStockQuantity())
+                .weight(product.getWeight())
+                .isActive(product.getIsActive())
+                .isFeatured(product.getIsFeatured())
+                .createdAt(product.getCreatedAt())
+                .build();
+    }
 
     private ProductResponse mapToResponse(Product product) {
         return ProductResponse.builder()

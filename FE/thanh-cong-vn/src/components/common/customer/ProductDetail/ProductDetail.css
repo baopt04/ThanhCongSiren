@@ -451,6 +451,8 @@
   cursor: pointer;
   display: flex;
   align-items: center;
+  justify-content: center;
+  text-align: center;
   gap: 8px;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -496,6 +498,11 @@
   font-weight: 700;
   letter-spacing: 0.3px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
   transition: background-color 0.2s ease;
   white-space: nowrap;
 }
@@ -1214,6 +1221,7 @@
 }
 
 @media (max-width: 768px) {
+
   .pd-page,
   .pd-container {
     padding-left: 12px !important;
@@ -1359,6 +1367,10 @@
     width: 100%;
     min-height: 42px;
     font-size: 13px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
   }
 
   .pd-tabs-section {
@@ -1462,13 +1474,18 @@
     gap: 8px;
   }
 
+  .pd-btn-add-cart,
+  .pd-btn-buy-now,
   .pd-btn-quote,
   .pd-btn-hotline {
-    justify-content: center;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
     width: 100%;
-    font-size: 12px;
+    font-size: 13px;
     padding: 10px 12px;
-    min-height: 40px;
+    min-height: 42px;
   }
 
   .pd-bottom-contact {

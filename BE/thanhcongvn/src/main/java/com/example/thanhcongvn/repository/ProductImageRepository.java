@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface ProductImageRepository extends JpaRepository<ProductImage , String> {
+public interface ProductImageRepository extends JpaRepository<ProductImage, String> {
 
     List<ProductImage> findByProductIdOrderByDisplayOrderAsc(String productId);
 
@@ -19,15 +19,13 @@ public interface ProductImageRepository extends JpaRepository<ProductImage , Str
 
     @Query("""
         SELECT pi FROM ProductImage pi
-        JOIN FETCH pi.product
-        WHERE pi.product.id IN :productIds
+        WHERE pi.productId IN :productIds
         """)
     List<ProductImage> findByProductIdIn(@Param("productIds") List<String> productIds);
 
     @Query("""
         SELECT pi FROM ProductImage pi
-        JOIN FETCH pi.product
-        WHERE pi.product.id IN :productIds
+        WHERE pi.productId IN :productIds
         AND pi.isPrimary = 1
         ORDER BY pi.displayOrder ASC
         """)
@@ -35,8 +33,7 @@ public interface ProductImageRepository extends JpaRepository<ProductImage , Str
 
     @Query("""
         SELECT i FROM ProductImage i
-        JOIN FETCH i.product
-        WHERE i.product.id IN :productIds
+        WHERE i.productId IN :productIds
         """)
     List<ProductImage> findByProductIds(@Param("productIds") Collection<String> productIds);
 }
