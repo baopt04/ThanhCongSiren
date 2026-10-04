@@ -1,6 +1,5 @@
 package com.example.thanhcongvn.service.impl.customer;
 
-import com.example.thanhcongvn.dto.response.customer.category.ListCategoryCustomerReponse;
 import com.example.thanhcongvn.dto.response.customer.categorynew.CategoryNewsCustomerResponse;
 import com.example.thanhcongvn.dto.response.customer.post.ListPostCustomerResponse;
 import com.example.thanhcongvn.entity.Post;
@@ -9,7 +8,6 @@ import com.example.thanhcongvn.repository.CategoryNewsRepository;
 import com.example.thanhcongvn.repository.PostRepository;
 import com.example.thanhcongvn.service.customer.CustomerPostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

@@ -17,5 +17,7 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
     List<Category> findByParent_Id(String parentId);
 
+    List<Category> findByParent_IdIn(List<String> parentIds);
+
 }
 

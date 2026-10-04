@@ -58,6 +58,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    @Transactional
     public AdminBillDetailResponse updateStatus(String id, UpdateBillStatusRequest request) {
         Bill bill = billRepository.findDetailById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BILL_NOT_FOUND));
@@ -97,6 +98,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    @Transactional
     public AdminBillDetailResponse updatePaymentStatus(String id, UpdatePaymentStatusRequest request) {
         Bill bill = billRepository.findDetailById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BILL_NOT_FOUND));

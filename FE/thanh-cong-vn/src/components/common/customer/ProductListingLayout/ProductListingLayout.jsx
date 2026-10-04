@@ -4,7 +4,8 @@ import { Pagination } from "antd";
 import { LoadingOutlined, FilterOutlined, CloseOutlined } from "@ant-design/icons";
 import { ProductCard } from "../ProductCard/ProductCard";
 import { CatalogSidebar, DEFAULT_CATEGORIES, PRICE_RANGES } from "../CatalogSidebar/CatalogSidebar";
-import { searchCategoryBySlug } from "../../../../services/customer/CustomerProductService";
+import { getByProductForCategeroy } from "../../../../services/customer/CustomerProductService";
+import { getCachedCustomerCategories, findCategoryInTree } from "../../../../utils/categoriesCache";
 import "./ProductListingLayout.css";
 
 export function ProductListingLayout({
@@ -20,7 +21,10 @@ export function ProductListingLayout({
   pageSize = 12,
   guideCard = null,
   headerBadge = null,
-  introText = null
+  introText = null,
+  totalItems: serverTotalItems,
+  currentPage: serverCurrentPage,
+  onPageChange
 }) {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState(defaultCategoryId);
@@ -28,12 +32,12 @@ export function ProductListingLayout({
   const [currentPage, setCurrentPage] = useState(1);
   const [filterOpen, setFilterOpen] = useState(false);
 
-  // Danh sách sản phẩm hiện tại (tất cả hoặc theo slug danh mục)
+  // Danh sách sản phẩm hiện tại (tất cả hoặc theo ID danh mục)
   const [currentProducts, setCurrentProducts] = useState(products);
   const [isLoadingCategory, setIsLoadingCategory] = useState(false);
   const categoryCacheRef = useRef({});
 
-  // Đồng bộ sản phẩm ban đầu khi props products thay đổi và chưa chọn slug
+  // Đồng bộ sản phẩm ban đầu khi props products thay đổi và chưa chọn danh mục
   useEffect(() => {
     if (!activeCategory || activeCategory === "all") {
       setCurrentProducts(products);
@@ -56,42 +60,73 @@ export function ProductListingLayout({
   }, [filterOpen]);
 
   // Xử lý khi người dùng chọn vào danh mục ở sidebar bên trái
-  const handleSelectCategory = async (catSlugOrId, catObj, shouldNavigate = true) => {
-    const slug = catObj?.slug || (typeof catSlugOrId === "string" ? catSlugOrId : null);
-    setActiveCategory(slug || catSlugOrId || "all");
-    setCurrentPage(1);
-    setFilterOpen(false);
-
-    if (shouldNavigate) {
-      if (!slug || slug === "all") {
+  const handleSelectCategory = async (catIdOrSlug, catObj, shouldNavigate = true) => {
+    // 1. Kiểm tra nếu chọn "Tất cả sản phẩm"
+    const isAll = !catIdOrSlug || catIdOrSlug === "all" || catObj?.id === "all";
+    if (isAll) {
+      setActiveCategory("all");
+      setCurrentPage(1);
+      setFilterOpen(false);
+      if (shouldNavigate) {
         navigate("/san-pham");
-      } else {
-        navigate(`/san-pham/${slug}`);
       }
-    }
-
-    // Nếu chọn "Tất cả sản phẩm"
-    if (!slug || slug === "all") {
       setCurrentProducts(products);
       return;
     }
 
-    // Nếu đã có trong cache
-    if (categoryCacheRef.current[slug]) {
-      setCurrentProducts(categoryCacheRef.current[slug]);
+    // 2. Xác định categoryId và slug
+    let categoryId = catObj?.id;
+    let slug = catObj?.slug;
+
+    // Nếu chưa có categoryId hoặc slug (ví dụ load từ URL param)
+    if (!categoryId || !slug) {
+      const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!categoryId && UUID_REGEX.test(catIdOrSlug)) {
+        categoryId = catIdOrSlug;
+      }
+      try {
+        const res = await getCachedCustomerCategories();
+        const raw = res?.data || res?.result || res || [];
+        const found = findCategoryInTree(Array.isArray(raw) ? raw : [], catIdOrSlug);
+        if (found) {
+          categoryId = categoryId || found.id;
+          slug = slug || found.slug;
+        }
+      } catch (err) {
+        console.error("Error finding category in tree:", err);
+      }
+    }
+
+    // Fallback nếu không tìm thấy trong tree
+    if (!categoryId) {
+      categoryId = catIdOrSlug;
+    }
+
+    const activeIdentifier = slug || categoryId;
+    setActiveCategory(activeIdentifier);
+    setCurrentPage(1);
+    setFilterOpen(false);
+
+    if (shouldNavigate) {
+      navigate(`/san-pham/${slug || categoryId}`);
+    }
+
+    // 3. Nếu đã có trong cache theo categoryId
+    if (categoryCacheRef.current[categoryId]) {
+      setCurrentProducts(categoryCacheRef.current[categoryId]);
       return;
     }
 
-    // Gọi API searchCategoryBySlug để lấy sản phẩm thuộc danh mục đó
+    // 4. Lấy id danh mục đó truyền vào api getByProductForCategeroy để lấy ra sản phẩm cho người dùng xem
     setIsLoadingCategory(true);
     try {
-      const res = await searchCategoryBySlug(slug);
+      const res = await getByProductForCategeroy(categoryId);
       const list = res?.data || (Array.isArray(res) ? res : []);
       const validList = Array.isArray(list) ? list : [];
-      categoryCacheRef.current[slug] = validList;
+      categoryCacheRef.current[categoryId] = validList;
       setCurrentProducts(validList);
     } catch (error) {
-      console.error(`Error loading products for category slug "${slug}":`, error);
+      console.error(`Error loading products for category id "${categoryId}":`, error);
       setCurrentProducts([]);
     } finally {
       setIsLoadingCategory(false);
@@ -114,8 +149,8 @@ export function ProductListingLayout({
           typeof item.priceNum === "number"
             ? item.priceNum
             : typeof item.price === "number"
-            ? item.price
-            : 0;
+              ? item.price
+              : 0;
         if (range) {
           matchesPrice = pNum >= range.min && pNum < range.max;
         }
@@ -125,16 +160,27 @@ export function ProductListingLayout({
     });
   }, [currentProducts, selectedPriceRange]);
 
+  // Server vs Client pagination logic
+  const isServerPaginated = Boolean(onPageChange && (!activeCategory || activeCategory === "all"));
+  const activeCurrentPage = isServerPaginated && typeof serverCurrentPage === "number" ? serverCurrentPage : currentPage;
+  const totalItems = isServerPaginated && typeof serverTotalItems === "number" ? serverTotalItems : filteredProducts.length;
+
   // Pagination calculation
-  const totalItems = filteredProducts.length;
-  const startIndex = (currentPage - 1) * pageSize;
-  const paginatedProducts = filteredProducts.slice(startIndex, startIndex + pageSize);
+  const startIndex = (activeCurrentPage - 1) * pageSize;
+  const paginatedProducts = isServerPaginated
+    ? filteredProducts
+    : filteredProducts.slice(startIndex, startIndex + pageSize);
 
   const handleResetFilters = () => {
     setActiveCategory("all");
     setSelectedPriceRange("all");
-    setCurrentPage(1);
+    if (isServerPaginated && onPageChange) {
+      onPageChange(1);
+    } else {
+      setCurrentPage(1);
+    }
     setCurrentProducts(products);
+    navigate("/san-pham");
   };
 
   return (
@@ -165,7 +211,7 @@ export function ProductListingLayout({
       {/* Main 2-Column Container */}
       <div className="tc-listing-container">
         <div className="tc-listing-layout-grid">
-          
+
           {/* CỘT TRÁI: DANH MỤC & GIÁ SẢN PHẨM */}
           <div className="tc-listing-sidebar-col">
             <CatalogSidebar
@@ -232,9 +278,9 @@ export function ProductListingLayout({
             ) : (
               <div className="tc-listing-empty-state">
                 <p className="tc-empty-message">Không có sản phẩm nào thuộc danh mục này.</p>
-                <button 
-                  type="button" 
-                  className="tc-btn-reset-filters" 
+                <button
+                  type="button"
+                  className="tc-btn-reset-filters"
                   onClick={handleResetFilters}
                 >
                   Xóa bộ lọc & Xem tất cả sản phẩm
@@ -246,11 +292,15 @@ export function ProductListingLayout({
             {totalItems > pageSize && (
               <div className="tc-listing-pagination-wrapper">
                 <Pagination
-                  current={currentPage}
+                  current={activeCurrentPage}
                   pageSize={pageSize}
                   total={totalItems}
                   onChange={(page) => {
-                    setCurrentPage(page);
+                    if (isServerPaginated && onPageChange) {
+                      onPageChange(page);
+                    } else {
+                      setCurrentPage(page);
+                    }
                     window.scrollTo({ top: 200, behavior: "smooth" });
                   }}
                   showSizeChanger={false}

@@ -9,11 +9,16 @@ export default defineConfig({
     viteCompression({ algorithm: "gzip", ext: ".gz", threshold: 10240 }),
     viteCompression({ algorithm: "brotliCompress", ext: ".br", threshold: 10240 }),
   ],
+  esbuild: {
+    pure: ["console.log"],
+    legalComments: "none",
+  },
   build: {
     target: "es2020",
     cssCodeSplit: true,
     sourcemap: false,
     chunkSizeWarningLimit: 600,
+    minify: "esbuild",
     rollupOptions: {
       output: {
         manualChunks(id) {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import "./News.css";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   LoadingOutlined,
   SearchOutlined,
@@ -53,13 +53,38 @@ const DEFAULT_THUMBNAIL =
   "https://cdn0344.cdn4s.com/media/coi%20bao%20chay/bao-chay-to-lien-gia/hien/mo-hinh-to-lien-gia-an-toan-pccc.jpg";
 
 export default function News() {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Đọc trạng thái từ URL Search Params hoặc SessionStorage để nhớ trang khi quay lại
+  const [currentPage, setCurrentPage] = useState(() => {
+    const pUrl = parseInt(searchParams.get("page"), 10);
+    if (!isNaN(pUrl) && pUrl > 0) return pUrl;
+    const pStorage = parseInt(sessionStorage.getItem("tc_news_page"), 10);
+    if (!isNaN(pStorage) && pStorage > 0) return pStorage;
+    return 1;
+  });
+
+  const [selectedCategory, setSelectedCategory] = useState(() => {
+    return (
+      searchParams.get("category") ||
+      sessionStorage.getItem("tc_news_category") ||
+      "all"
+    );
+  });
+
+  const [searchKeyword, setSearchKeyword] = useState(() => {
+    return (
+      searchParams.get("search") ||
+      sessionStorage.getItem("tc_news_search") ||
+      ""
+    );
+  });
+
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 6;
 
+  // Tải danh sách bài viết
   useEffect(() => {
     let isMounted = true;
 
@@ -100,6 +125,19 @@ export default function News() {
     };
   }, []);
 
+  // Cuộn nhẹ tới danh sách nếu đang ở trang > 1 khi quay lại
+  useEffect(() => {
+    if (currentPage > 1) {
+      const timer = setTimeout(() => {
+        const feedEl = document.querySelector(".tc-news-feed-col");
+        if (feedEl) {
+          feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   // Trích xuất danh sách các chuyên mục duy nhất từ bài viết
   const categoriesList = useMemo(() => {
     const map = new Map();
@@ -128,10 +166,66 @@ export default function News() {
     });
   }, [articles, selectedCategory, searchKeyword]);
 
-  // Reset trang về 1 khi đổi bộ lọc
-  useEffect(() => {
+  // Xử lý chuyển trang & lưu vào URL + SessionStorage
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    sessionStorage.setItem("tc_news_page", String(page));
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (page > 1) {
+          next.set("page", String(page));
+        } else {
+          next.delete("page");
+        }
+        return next;
+      },
+      { replace: true }
+    );
+    window.scrollTo({ top: 120, behavior: "smooth" });
+  };
+
+  // Xử lý đổi chuyên mục
+  const handleCategoryChange = (catName) => {
+    setSelectedCategory(catName);
     setCurrentPage(1);
-  }, [selectedCategory, searchKeyword]);
+    sessionStorage.setItem("tc_news_category", catName);
+    sessionStorage.setItem("tc_news_page", "1");
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (catName !== "all") {
+          next.set("category", catName);
+        } else {
+          next.delete("category");
+        }
+        next.delete("page");
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  // Xử lý tìm kiếm
+  const handleSearchChange = (kw) => {
+    setSearchKeyword(kw);
+    setCurrentPage(1);
+    sessionStorage.setItem("tc_news_search", kw);
+    sessionStorage.setItem("tc_news_page", "1");
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (kw.trim()) {
+          next.set("search", kw.trim());
+        } else {
+          next.delete("search");
+        }
+        next.delete("page");
+        return next;
+      },
+      { replace: true }
+    );
+  };
 
   // Phân trang
   const totalArticles = filteredArticles.length;
@@ -168,14 +262,14 @@ export default function News() {
               type="text"
               placeholder="Tìm kiếm bài viết, quy chuẩn, kỹ thuật..."
               value={searchKeyword}
-              onChange={(e) => setSearchKeyword(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="tc-news-search-input"
             />
             {searchKeyword && (
               <button
                 type="button"
                 className="tc-news-search-clear"
-                onClick={() => setSearchKeyword("")}
+                onClick={() => handleSearchChange("")}
                 title="Xóa tìm kiếm"
               >
                 ✕
@@ -191,7 +285,7 @@ export default function News() {
           <button
             type="button"
             className={`tc-news-tab-btn ${selectedCategory === "all" ? "active" : ""}`}
-            onClick={() => setSelectedCategory("all")}
+            onClick={() => handleCategoryChange("all")}
           >
             Tất cả ({articles.length})
           </button>
@@ -201,7 +295,7 @@ export default function News() {
               key={name}
               type="button"
               className={`tc-news-tab-btn ${selectedCategory === name ? "active" : ""}`}
-              onClick={() => setSelectedCategory(name)}
+              onClick={() => handleCategoryChange(name)}
             >
               {name} ({count})
             </button>
@@ -239,11 +333,21 @@ export default function News() {
                     >
                       {/* Ảnh bài viết bên trái */}
                       <div className="tc-news-card-thumb-wrap">
-                        <Link to={linkPath} className="tc-news-card-thumb-link">
+                        <Link
+                          to={linkPath}
+                          state={{
+                            fromPage: currentPage,
+                            fromCategory: selectedCategory,
+                            fromSearch: searchKeyword
+                          }}
+                          className="tc-news-card-thumb-link"
+                        >
                           <img
                             src={thumbUrl}
                             alt={article.title}
                             className="tc-news-card-thumb"
+                            loading="lazy"
+                            decoding="async"
                             onError={(e) => {
                               e.target.src = DEFAULT_THUMBNAIL;
                             }}
@@ -260,7 +364,7 @@ export default function News() {
                         <div className="tc-news-card-meta-row">
                           <span
                             className="tc-news-pill-badge"
-                            onClick={() => setSelectedCategory(categoryName)}
+                            onClick={() => handleCategoryChange(categoryName)}
                             title={`Lọc chuyên mục ${categoryName}`}
                           >
                             <FolderOpenOutlined className="tc-pill-icon" />
@@ -282,7 +386,15 @@ export default function News() {
 
                         {/* Tiêu đề bài viết */}
                         <h2 className="tc-news-card-title">
-                          <Link to={linkPath} title={article.title}>
+                          <Link
+                            to={linkPath}
+                            state={{
+                              fromPage: currentPage,
+                              fromCategory: selectedCategory,
+                              fromSearch: searchKeyword
+                            }}
+                            title={article.title}
+                          >
                             {article.title}
                           </Link>
                         </h2>
@@ -296,7 +408,15 @@ export default function News() {
 
                         {/* Nút đọc tiếp */}
                         <div className="tc-news-card-footer">
-                          <Link to={linkPath} className="tc-news-btn-read">
+                          <Link
+                            to={linkPath}
+                            state={{
+                              fromPage: currentPage,
+                              fromCategory: selectedCategory,
+                              fromSearch: searchKeyword
+                            }}
+                            className="tc-news-btn-read"
+                          >
                             <span>Xem chi tiết</span>
                             <ArrowRightOutlined className="tc-arrow-hover" />
                           </Link>
@@ -317,8 +437,8 @@ export default function News() {
                   type="button"
                   className="tc-news-btn-reset"
                   onClick={() => {
-                    setSelectedCategory("all");
-                    setSearchKeyword("");
+                    handleCategoryChange("all");
+                    handleSearchChange("");
                   }}
                 >
                   Xóa bộ lọc & Xem tất cả bài viết
@@ -333,10 +453,7 @@ export default function News() {
                   current={currentPage}
                   pageSize={pageSize}
                   total={totalArticles}
-                  onChange={(page) => {
-                    setCurrentPage(page);
-                    window.scrollTo({ top: 120, behavior: "smooth" });
-                  }}
+                  onChange={handlePageChange}
                   showSizeChanger={false}
                 />
               </div>
@@ -353,69 +470,50 @@ export default function News() {
               </div>
               <div className="tc-widget-body">
                 <p className="tc-hotline-desc">
-                  Hỗ trợ tư vấn giải pháp lắp đặt còi hú xả lũ, trạm truyền thanh cảnh báo và nghiệm thu PCCC:
+                  Liên hệ trực tiếp với kỹ sư giải pháp để nhận bản vẽ nguyên lý và báo giá còi hú cảnh báo:
                 </p>
-                <a href="tel:0865130088" className="tc-hotline-phone-btn">
-                  <PhoneOutlined /> 0865.130.088
+                <a href="tel:0865130088" className="tc-hotline-call-btn">
+                  <PhoneOutlined />
+                  <span>0865.130.088</span>
                 </a>
-                <div className="tc-hotline-subphones">
-                  <span>Hà Nội: <strong>02466.873.822</strong></span>
-                  <span>Hotline 2: <strong>0865.130.088</strong></span>
-                </div>
-                <a
-                  href="https://zalo.me/0865130088"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="tc-hotline-zalo-btn"
-                >
-                  <MessageOutlined /> Chat Zalo Kỹ Thuật
-                </a>
+                <span className="tc-hotline-time">Phục vụ 24/7 (Kể cả ngày nghỉ, lễ)</span>
               </div>
             </div>
 
-            {/* Widget 2: Chuyên mục bài viết */}
-            {categoriesList.length > 0 && (
-              <div className="tc-widget-box tc-widget-categories">
-                <div className="tc-widget-header">
-                  <FolderOpenOutlined className="tc-widget-icon" />
-                  <h3>CHỦ ĐỀ ĐƯỢC QUAN TÂM</h3>
-                </div>
-                <div className="tc-widget-body">
-                  <ul className="tc-widget-cat-list">
-                    <li
-                      className={`tc-widget-cat-item ${selectedCategory === "all" ? "active" : ""}`}
-                      onClick={() => setSelectedCategory("all")}
-                    >
-                      <span>Tất cả chủ đề</span>
-                      <span className="tc-widget-cat-count">{articles.length}</span>
-                    </li>
-                    {categoriesList.map(({ name, count }) => (
-                      <li
-                        key={name}
-                        className={`tc-widget-cat-item ${selectedCategory === name ? "active" : ""}`}
-                        onClick={() => setSelectedCategory(name)}
-                      >
-                        <span>{name}</span>
-                        <span className="tc-widget-cat-count">{count}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            )}
-
-            {/* Widget 3: CTA sản phẩm */}
-            <div className="tc-widget-box tc-widget-products">
+            {/* Widget 2: Cam kết năng lực Thành Công VN */}
+            <div className="tc-widget-box tc-widget-trust">
               <div className="tc-widget-header">
                 <SafetyCertificateOutlined className="tc-widget-icon" />
-                <h3>THIẾT BỊ BÁO ĐỘNG</h3>
+                <h3>CAM KẾT CHẤT LƯỢNG</h3>
               </div>
-              <div className="tc-widget-body">
-                <p style={{ margin: "0 0 12px", color: "#64748b", fontSize: 13, lineHeight: 1.5 }}>
-                  Xem đầy đủ danh mục còi hú báo động Lion King chính hãng và thiết bị PCCC.
-                </p>
-                <Link to="/san-pham" className="tc-sidebar-view-all-prod">
-                  Xem tất cả thiết bị &rarr;
+              <ul className="tc-trust-list">
+                <li>
+                  <span className="tc-trust-check">✓</span>
+                  <span>Đầy đủ chứng nhận CO, CQ chuẩn quốc tế.</span>
+                </li>
+                <li>
+                  <span className="tc-trust-check">✓</span>
+                  <span>Bảo hành chính hãng 12-24 tháng trên toàn quốc.</span>
+                </li>
+                <li>
+                  <span className="tc-trust-check">✓</span>
+                  <span>Hỗ trợ kỹ thuật lắp đặt & nghiệm thu công trình.</span>
+                </li>
+                <li>
+                  <span className="tc-trust-check">✓</span>
+                  <span>Chiết khấu hấp dẫn cho nhà thầu, dự án PCCC.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Widget 3: Nút yêu cầu tư vấn nhanh */}
+            <div className="tc-widget-cta-banner">
+              <div className="tc-cta-inner">
+                <h4>Cần Báo Giá Trọn Gói Dự Án?</h4>
+                <p>Gửi yêu cầu để nhận dự toán chi tiết và bản vẽ nguyên lý trong 15 phút.</p>
+                <Link to="/lien-he" className="tc-cta-btn">
+                  <MessageOutlined />
+                  <span>Yêu cầu báo giá ngay</span>
                 </Link>
               </div>
             </div>

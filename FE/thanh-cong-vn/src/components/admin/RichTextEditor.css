@@ -74,6 +74,39 @@
   color: #065f46;
 }
 
+.rich-editor-toolbar .toolbar-btn-link {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+  font-weight: 500;
+}
+
+.rich-editor-toolbar .toolbar-btn-link:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+  color: #14532d;
+}
+
+.rich-editor-toolbar .toolbar-btn-link.active {
+  background: #2563eb !important;
+  border-color: #1d4ed8 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.rich-editor-toolbar .toolbar-btn-unlink {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.rich-editor-toolbar .toolbar-btn-unlink:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+  color: #991b1b;
+}
+
 .rich-editor-toolbar .btn-html-mode {
   background: #0f172a;
   color: #38bdf8;
@@ -90,6 +123,46 @@
   background: #2563eb;
   color: #ffffff;
   border-color: #1d4ed8;
+}
+
+.rich-editor-toolbar .toolbar-btn-color {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 2px 7px !important;
+  height: 30px !important;
+  min-width: 32px !important;
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.rich-editor-toolbar .toolbar-btn-color:hover {
+  background: #f1f5f9 !important;
+  border-color: #94a3b8 !important;
+}
+
+.rich-editor-toolbar .toolbar-btn-color.active {
+  border-color: #2563eb !important;
+  background: #eff6ff !important;
+}
+
+.toolbar-color-letter {
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.1;
+  color: #0f172a;
+}
+
+.toolbar-color-bar {
+  display: block;
+  width: 16px;
+  height: 3px;
+  margin-top: 1px;
+  border-radius: 1px;
 }
 
 .toolbar-divider {
@@ -118,14 +191,71 @@
   margin: 0 0 10px;
 }
 
+/* Căn lề text (Trái, Giữa, Phải) */
+.rich-editor-body .ProseMirror [style*="text-align: center"],
+.rich-editor-body .ProseMirror p[style*="text-align: center"],
+.rich-editor-body .ProseMirror h1[style*="text-align: center"],
+.rich-editor-body .ProseMirror h2[style*="text-align: center"],
+.rich-editor-body .ProseMirror h3[style*="text-align: center"],
+.rich-editor-body .ProseMirror h4[style*="text-align: center"],
+.rich-editor-body .ProseMirror blockquote[style*="text-align: center"],
+.rich-editor-body .ProseMirror li[style*="text-align: center"] {
+  text-align: center !important;
+}
+
+.rich-editor-body .ProseMirror [style*="text-align: right"],
+.rich-editor-body .ProseMirror p[style*="text-align: right"],
+.rich-editor-body .ProseMirror h1[style*="text-align: right"],
+.rich-editor-body .ProseMirror h2[style*="text-align: right"],
+.rich-editor-body .ProseMirror h3[style*="text-align: right"],
+.rich-editor-body .ProseMirror h4[style*="text-align: right"],
+.rich-editor-body .ProseMirror blockquote[style*="text-align: right"],
+.rich-editor-body .ProseMirror li[style*="text-align: right"] {
+  text-align: right !important;
+}
+
+.rich-editor-body .ProseMirror [style*="text-align: left"],
+.rich-editor-body .ProseMirror p[style*="text-align: left"],
+.rich-editor-body .ProseMirror h1[style*="text-align: left"],
+.rich-editor-body .ProseMirror h2[style*="text-align: left"],
+.rich-editor-body .ProseMirror h3[style*="text-align: left"],
+.rich-editor-body .ProseMirror h4[style*="text-align: left"],
+.rich-editor-body .ProseMirror blockquote[style*="text-align: left"],
+.rich-editor-body .ProseMirror li[style*="text-align: left"] {
+  text-align: left !important;
+}
+
+/* Bullet list (dấu chấm •) & Ordered list (số thứ tự) */
 .rich-editor-body .ProseMirror ul,
-.rich-editor-body .ProseMirror ol {
-  padding-left: 24px;
-  margin: 0 0 10px;
+.rich-editor-body .ProseMirror .editor-bullet-list {
+  list-style-type: disc !important;
+  padding-left: 28px !important;
+  margin: 8px 0 12px !important;
+}
+
+.rich-editor-body .ProseMirror ol,
+.rich-editor-body .ProseMirror .editor-ordered-list {
+  list-style-type: decimal !important;
+  padding-left: 28px !important;
+  margin: 8px 0 12px !important;
 }
 
 .rich-editor-body .ProseMirror li {
-  margin-bottom: 4px;
+  display: list-item !important;
+  list-style: inherit !important;
+  margin-bottom: 5px !important;
+}
+
+.rich-editor-body .ProseMirror li p {
+  margin: 0 !important;
+}
+
+.rich-editor-body .ProseMirror ul ul {
+  list-style-type: circle !important;
+}
+
+.rich-editor-body .ProseMirror ol ol {
+  list-style-type: lower-latin !important;
 }
 
 .rich-editor-body .ProseMirror blockquote {
@@ -200,8 +330,18 @@
 }
 
 .rich-editor-body .ProseMirror a {
-  color: #2563eb;
-  text-decoration: underline;
+  color: #2563eb !important;
+  text-decoration: underline !important;
+  cursor: pointer !important;
+  font-weight: 500;
+  padding: 1px 3px;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+}
+
+.rich-editor-body .ProseMirror a:hover {
+  color: #1d4ed8 !important;
+  background-color: rgba(37, 99, 235, 0.1) !important;
 }
 
 /* Raw HTML Editor Mode */

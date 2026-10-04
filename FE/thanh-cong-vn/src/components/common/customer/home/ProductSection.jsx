@@ -6,10 +6,10 @@ import {
   LeftOutlined,
   LoadingOutlined,
 } from "@ant-design/icons";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, memo } from "react";
 import { categorySections } from "../../../../services/customer/CustomerProductService";
 
-export function ProductSection({
+export const ProductSection = memo(function ProductSection({
   title,
   categorySlug,
   products: propProducts,
@@ -154,4 +154,4 @@ export function ProductSection({
       </div>
     </section>
   );
-}
+});

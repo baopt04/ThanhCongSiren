@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useMemo } from "react";
+import { lazy, Suspense, useState, useEffect, useMemo, useRef, forwardRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Table,
@@ -55,6 +55,7 @@ import {
   updateProductStatus,
   createProduct,
   updateProduct,
+  findById,
   uploadProductImages,
   getProductImages,
   deleteProductImage,
@@ -66,6 +67,24 @@ import { SpecsForProduct } from "../../services/ProductSpecs";
 const RichTextEditor = lazy(() =>
   import("../../components/admin/RichTextEditor").then((m) => ({ default: m.RichTextEditor }))
 );
+import { ShortDescriptionInput } from "../../components/admin/ShortDescriptionInput";
+
+// Wrapper component to bridge Ant Design Form.Item (value, onChange) with lazy-loaded RichTextEditor
+const RichTextEditorControl = forwardRef(function RichTextEditorControl(
+  { value = "", onChange, ...props },
+  ref
+) {
+  return (
+    <Suspense fallback={<Spin tip="Đang tải trình soạn thảo..." />}>
+      <RichTextEditor
+        ref={ref}
+        value={value}
+        onChange={onChange}
+        {...props}
+      />
+    </Suspense>
+  );
+});
 import { embedYoutubeInHtml } from "../../utils/youtubeUtils";
 
 // Helper to convert Vietnamese string to clean slug
@@ -82,15 +101,69 @@ function toSlug(str) {
     .replace(/-+/g, "-");
 }
 
+// Helper to remove Vietnamese tones for fuzzy, accent-insensitive search
+function removeVietnameseTones(str) {
+  if (!str) return "";
+  return String(str)
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[đĐ]/g, "d")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim();
+}
+
+// Helper to highlight matching text in search results
+function highlightMatch(text, keyword) {
+  if (!text || !keyword || !keyword.trim()) return text;
+  const str = String(text);
+  const kw = keyword.trim();
+  const cleanKw = removeVietnameseTones(kw);
+  const cleanStr = removeVietnameseTones(str);
+
+  if (!cleanKw) return text;
+
+  const matchIdx = cleanStr.indexOf(cleanKw);
+  if (matchIdx !== -1) {
+    const start = Math.min(matchIdx, str.length);
+    const end = Math.min(start + kw.length, str.length);
+    return (
+      <span>
+        {str.slice(0, start)}
+        <mark
+          style={{
+            backgroundColor: "#fef08a",
+            color: "#854d0e",
+            padding: "1px 2px",
+            borderRadius: 2,
+            fontWeight: 600,
+          }}
+        >
+          {str.slice(start, end)}
+        </mark>
+        {str.slice(end)}
+      </span>
+    );
+  }
+  return text;
+}
+
 export function ProductsPage() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    size: 10,
+    total: 0,
+    totalPages: 1,
+  });
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [modalLoading, setModalLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("basic");
   const [form] = Form.useForm();
   const [images, setImages] = useState([]);
@@ -188,12 +261,35 @@ export function ProductsPage() {
     }
   };
 
-  // Filter states
+  // Filter & Search states
   const [searchKeyword, setSearchKeyword] = useState("");
   const [filterCategory, setFilterCategory] = useState(null);
   const [filterBrand, setFilterBrand] = useState(null);
   const [filterStatus, setFilterStatus] = useState(null);
   const [filterFeatured, setFilterFeatured] = useState(null);
+
+  // Full product pool for global client-side search & filtering across all products
+  const [allProductsPool, setAllProductsPool] = useState([]);
+  const [poolLoading, setPoolLoading] = useState(false);
+  const [searchPage, setSearchPage] = useState(1);
+  const [searchPageSize, setSearchPageSize] = useState(10);
+  const [, setThumbnailTick] = useState(0);
+  const thumbnailCacheRef = useRef({});
+
+  const fetchAllProductsPool = async () => {
+    setPoolLoading(true);
+    try {
+      const res = await getAllProducts({ page: 0, size: 1000, sort: "createdAt,desc" });
+      const list = Array.isArray(res) ? res : res?.data ?? [];
+      setAllProductsPool(list);
+      return list;
+    } catch (err) {
+      console.warn("Lỗi tải toàn bộ danh sách sản phẩm:", err);
+      return [];
+    } finally {
+      setPoolLoading(false);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -224,21 +320,61 @@ export function ProductsPage() {
     }
   };
 
-  const fetchData = async () => {
+  const fetchData = async (currentPage = pagination.page, pageSize = pagination.size) => {
+    const p = typeof currentPage === "number" ? currentPage : pagination.page || 1;
+    const s = typeof pageSize === "number" ? pageSize : pagination.size || 10;
+
     setLoading(true);
     try {
-      const res = await getAllProducts();
-      const products = res.data ?? [];
+      // Spring Boot Pageable is 0-indexed: UI page 1 corresponds to backend page 0
+      const backendPage = Math.max(0, p - 1);
+      const params = {
+        page: backendPage,
+        size: s,
+        sort: "createdAt,desc",
+      };
+      const res = await getAllProducts(params);
+      const products = Array.isArray(res) ? res : res?.data ?? [];
       const dataWithImages = await Promise.all(
-        products.map(async (p) => {
-          const thumbnail = await fetchProductThumbnail(p.id);
+        products.map(async (item) => {
+          if (item.thumbnail || item.thumbnailUrl) {
+            return {
+              ...item,
+              thumbnail: item.thumbnail || item.thumbnailUrl,
+            };
+          }
+          const thumbnail = await fetchProductThumbnail(item.id);
           return {
-            ...p,
+            ...item,
             thumbnail,
           };
         })
       );
       setData(dataWithImages);
+
+      if (res?.pagination) {
+        // Backend returns 0-based page in res.pagination.page. Convert to 1-based for UI.
+        const uiPage =
+          typeof res.pagination.page === "number"
+            ? res.pagination.page + 1
+            : p;
+        setPagination({
+          page: uiPage,
+          size: res.pagination.size ?? s,
+          total: res.pagination.totalElements ?? products.length,
+          totalPages:
+            res.pagination.totalPages ??
+            (Math.ceil((res.pagination.totalElements ?? products.length) / s) || 1),
+        });
+      } else {
+        setPagination((prev) => ({
+          ...prev,
+          page: p,
+          size: s,
+          total: products.length,
+          totalPages: Math.ceil(products.length / s) || 1,
+        }));
+      }
     } catch (err) {
       message.error(err.response?.data?.message || "Lỗi tải dữ liệu sản phẩm");
       setData([]);
@@ -283,40 +419,134 @@ export function ProductsPage() {
   useEffect(() => {
     fetchCategories();
     fetchBrands();
-    fetchData();
+    fetchData(1, 10);
+    fetchAllProductsPool();
   }, []);
 
-  // Filtered dataset
-  const filteredData = useMemo(() => {
-    return data.filter((item) => {
-      // Search keyword (Name or SKU)
-      if (searchKeyword) {
-        const kw = searchKeyword.toLowerCase();
-        const matchName = item.name?.toLowerCase().includes(kw);
-        const matchSku = item.sku?.toLowerCase().includes(kw);
-        if (!matchName && !matchSku) return false;
+  // Reset search page to 1 whenever any filter changes
+  useEffect(() => {
+    setSearchPage(1);
+  }, [searchKeyword, filterCategory, filterBrand, filterStatus, filterFeatured]);
+
+  // Filter states check
+  const isFiltered = Boolean(
+    (searchKeyword && searchKeyword.trim()) ||
+    filterCategory !== null ||
+    filterBrand !== null ||
+    filterStatus !== null ||
+    filterFeatured !== null
+  );
+
+  // Lazy-load pool if user starts searching before initial background fetch finished
+  useEffect(() => {
+    if (isFiltered && allProductsPool.length === 0 && !poolLoading) {
+      fetchAllProductsPool();
+    }
+  }, [isFiltered, allProductsPool.length, poolLoading]);
+
+  // Filtered dataset across the entire pool
+  const filteredPool = useMemo(() => {
+    if (!isFiltered) return [];
+    const source = allProductsPool.length > 0 ? allProductsPool : data;
+    const cleanKw = searchKeyword ? removeVietnameseTones(searchKeyword.trim()) : "";
+    const rawKw = searchKeyword ? searchKeyword.trim().toLowerCase() : "";
+
+    return source.filter((item) => {
+      // 1. Search keyword (Name, SKU, Slug, Brand, Category)
+      if (cleanKw) {
+        const cat = categories.find((c) => c.id === item.categoryId);
+        const br = brands.find((b) => b.id === item.brandId);
+        const catName = item.categoryName || cat?.name || "";
+        const brName = item.brandName || br?.name || "";
+
+        const cleanName = removeVietnameseTones(item.name);
+        const cleanSku = removeVietnameseTones(item.sku);
+        const cleanSlug = removeVietnameseTones(item.slug);
+        const cleanCat = removeVietnameseTones(catName);
+        const cleanBr = removeVietnameseTones(brName);
+
+        const match =
+          cleanName.includes(cleanKw) ||
+          cleanSku.includes(cleanKw) ||
+          cleanSlug.includes(cleanKw) ||
+          cleanCat.includes(cleanKw) ||
+          cleanBr.includes(cleanKw) ||
+          (item.name && item.name.toLowerCase().includes(rawKw)) ||
+          (item.sku && item.sku.toLowerCase().includes(rawKw));
+
+        if (!match) return false;
       }
-      // Category filter
+
+      // 2. Category filter
       if (filterCategory !== null && item.categoryId !== filterCategory) {
         return false;
       }
-      // Brand filter
+
+      // 3. Brand filter
       if (filterBrand !== null && item.brandId !== filterBrand) {
         return false;
       }
-      // Status filter
+
+      // 4. Status filter
       if (filterStatus !== null) {
         const isActive = item.isActive === 1 || item.isActive === true;
         if (filterStatus === 1 && !isActive) return false;
         if (filterStatus === 0 && isActive) return false;
       }
-      // Featured filter
+
+      // 5. Featured filter
       if (filterFeatured !== null) {
         if (Number(item.isFeatured || 0) !== filterFeatured) return false;
       }
+
       return true;
     });
-  }, [data, searchKeyword, filterCategory, filterBrand, filterStatus, filterFeatured]);
+  }, [
+    isFiltered,
+    allProductsPool,
+    data,
+    searchKeyword,
+    filterCategory,
+    filterBrand,
+    filterStatus,
+    filterFeatured,
+    categories,
+    brands,
+  ]);
+
+  // Current display data for the table
+  const displayData = useMemo(() => {
+    if (!isFiltered) return data;
+    const start = (searchPage - 1) * searchPageSize;
+    return filteredPool.slice(start, start + searchPageSize);
+  }, [isFiltered, data, filteredPool, searchPage, searchPageSize]);
+
+  // Lazy-load thumbnails for the current display rows in search mode
+  useEffect(() => {
+    if (!isFiltered || displayData.length === 0) return;
+    const needThumbnails = displayData.filter(
+      (item) => !item.thumbnail && !item.thumbnailUrl && !thumbnailCacheRef.current[item.id]
+    );
+    if (needThumbnails.length === 0) return;
+
+    let isMounted = true;
+    Promise.all(
+      needThumbnails.map(async (item) => {
+        const thumb = await fetchProductThumbnail(item.id);
+        if (thumb) {
+          thumbnailCacheRef.current[item.id] = thumb;
+        }
+      })
+    ).then(() => {
+      if (isMounted) {
+        setThumbnailTick((prev) => prev + 1);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isFiltered, displayData]);
 
   const handleResetFilters = () => {
     setSearchKeyword("");
@@ -324,6 +554,7 @@ export function ProductsPage() {
     setFilterBrand(null);
     setFilterStatus(null);
     setFilterFeatured(null);
+    setSearchPage(1);
   };
 
   // Open Product Detail Drawer
@@ -361,6 +592,9 @@ export function ProductsPage() {
     setSubmitting(true);
     try {
       const values = await form.validateFields();
+      const rawLongDesc = values.longDescription ? values.longDescription.trim() : "";
+      const cleanLongDesc = rawLongDesc === "<p></p>" ? "" : rawLongDesc;
+
       const payload = {
         categoryId: values.categoryId,
         brandId: values.brandId,
@@ -368,7 +602,7 @@ export function ProductsPage() {
         slug: values.slug ? values.slug.trim() : toSlug(values.name.trim()),
         sku: values.sku ? values.sku.trim() : "",
         description: values.description ? values.description.trim() : "",
-        longDescription: values.longDescription ? values.longDescription.trim() : "",
+        longDescription: cleanLongDesc,
         price: Number(values.price) || 0,
         salePrice: Number(values.salePrice) || 0,
         costPrice: Number(values.costPrice) || 0,
@@ -400,7 +634,8 @@ export function ProductsPage() {
       setImages([]);
       form.resetFields();
       setEditingId(null);
-      fetchData();
+      fetchData(editingId ? pagination.page : 1, pagination.size);
+      fetchAllProductsPool();
     } catch (err) {
       if (err.errorFields) return;
       message.error(err.response?.data?.message || "Lỗi lưu thông tin sản phẩm");
@@ -430,28 +665,57 @@ export function ProductsPage() {
   };
 
   const handleEdit = async (record) => {
-    form.setFieldsValue({
-      ...record,
-      salePrice: Number(record.salePrice) || 0,
-      costPrice: Number(record.costPrice) || 0,
-      stockQuantity: Number(record.stockQuantity) || 0,
-      weight: Number(record.weight) || 0,
-    });
-    try {
-      const res = await getProductImages(record.id);
-      const fileList = res.map((img, index) => ({
-        uid: img.id || index,
-        name: `ảnh-${index + 1}`,
-        status: "done",
-        url: img.imageUrl,
-      }));
-      setImages(fileList);
-    } catch {
-      setImages([]);
-    }
     setEditingId(record.id);
     setActiveTab("basic");
     setModalOpen(true);
+    setModalLoading(true);
+
+    try {
+      const [fullProdRes, imgRes] = await Promise.allSettled([
+        findById(record.id),
+        getProductImages(record.id),
+      ]);
+
+      const full =
+        fullProdRes.status === "fulfilled" && fullProdRes.value
+          ? fullProdRes.value
+          : record;
+
+      form.setFieldsValue({
+        ...full,
+        sku: full.sku ?? record.sku ?? "",
+        longDescription: full.longDescription ?? record.longDescription ?? "",
+        salePrice: Number(full.salePrice ?? record.salePrice) || 0,
+        costPrice: Number(full.costPrice ?? record.costPrice) || 0,
+        stockQuantity: Number(full.stockQuantity ?? record.stockQuantity) || 0,
+        weight: Number(full.weight ?? record.weight) || 0,
+      });
+
+      if (imgRes.status === "fulfilled" && imgRes.value) {
+        const fileList = imgRes.value.map((img, index) => ({
+          uid: img.id || index,
+          name: `ảnh-${index + 1}`,
+          status: "done",
+          url: img.imageUrl,
+        }));
+        setImages(fileList);
+      } else {
+        setImages([]);
+      }
+    } catch {
+      form.setFieldsValue({
+        ...record,
+        sku: record.sku || "",
+        longDescription: record.longDescription || "",
+        salePrice: Number(record.salePrice) || 0,
+        costPrice: Number(record.costPrice) || 0,
+        stockQuantity: Number(record.stockQuantity) || 0,
+        weight: Number(record.weight) || 0,
+      });
+      setImages([]);
+    } finally {
+      setModalLoading(false);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -462,7 +726,11 @@ export function ProductsPage() {
         await apiClient.delete(`/product/delete/${id}`);
       }
       message.success("Đã xóa sản phẩm thành công!");
-      fetchData();
+      const targetPage =
+        data.length === 1 && pagination.page > 1
+          ? pagination.page - 1
+          : pagination.page;
+      fetchData(targetPage, pagination.size);
     } catch (err) {
       message.error(err.response?.data?.message || "Lỗi khi xóa sản phẩm");
     }
@@ -481,19 +749,29 @@ export function ProductsPage() {
       key: "stt",
       width: 55,
       align: "center",
-      render: (_, __, index) => (
-        <span style={{ color: "#64748b", fontWeight: 500 }}>{index + 1}</span>
-      ),
+      render: (_, __, index) => {
+        const basePage = isFiltered ? searchPage : pagination.page;
+        const baseSize = isFiltered ? searchPageSize : pagination.size;
+        return (
+          <span style={{ color: "#64748b", fontWeight: 500 }}>
+            {(basePage - 1) * baseSize + index + 1}
+          </span>
+        );
+      },
     },
     {
       title: "Ảnh",
       key: "image",
       width: 75,
       align: "center",
-      render: (_, record) =>
-        record.thumbnail ? (
+      render: (_, record) => {
+        const thumbSrc =
+          record.thumbnail ||
+          record.thumbnailUrl ||
+          thumbnailCacheRef.current[record.id];
+        return thumbSrc ? (
           <Image
-            src={record.thumbnail}
+            src={thumbSrc}
             alt={record.name}
             width={52}
             height={52}
@@ -522,7 +800,8 @@ export function ProductsPage() {
           >
             <PictureOutlined />
           </div>
-        ),
+        );
+      },
     },
     {
       title: "Thông tin sản phẩm",
@@ -531,6 +810,8 @@ export function ProductsPage() {
       render: (_, record) => {
         const cat = categories.find((c) => c.id === record.categoryId);
         const br = brands.find((b) => b.id === record.brandId);
+        const catName = record.categoryName || cat?.name;
+        const brName = record.brandName || br?.name;
         return (
           <div>
             <div
@@ -544,7 +825,7 @@ export function ProductsPage() {
               onClick={() => handleViewDetail(record)}
               title="Nhấn để xem chi tiết sản phẩm"
             >
-              {record.name}
+              {highlightMatch(record.name, searchKeyword)}
             </div>
             <div
               style={{
@@ -557,17 +838,17 @@ export function ProductsPage() {
             >
               {record.sku && (
                 <Tag color="blue" style={{ margin: 0, fontSize: 11, borderRadius: 4 }}>
-                  SKU: {record.sku}
+                  SKU: {highlightMatch(record.sku, searchKeyword)}
                 </Tag>
               )}
-              {cat && (
+              {catName && (
                 <Tag color="default" style={{ margin: 0, fontSize: 11, borderRadius: 4 }}>
-                  📁 {cat.name}
+                  📁 {highlightMatch(catName, searchKeyword)}
                 </Tag>
               )}
-              {br && (
+              {brName && (
                 <Tag color="purple" style={{ margin: 0, fontSize: 11, borderRadius: 4 }}>
-                  🏷️ {br.name}
+                  🏷️ {highlightMatch(brName, searchKeyword)}
                 </Tag>
               )}
             </div>
@@ -671,7 +952,14 @@ export function ProductsPage() {
               try {
                 await updateProductStatus(record.id);
                 message.success("Cập nhật trạng thái thành công");
-                fetchData();
+                setAllProductsPool((prev) =>
+                  prev.map((item) =>
+                    item.id === record.id
+                      ? { ...item, isActive: item.isActive === 1 ? 0 : 1 }
+                      : item
+                  )
+                );
+                fetchData(pagination.page, pagination.size);
               } catch {
                 message.error("Lỗi cập nhật trạng thái");
               }
@@ -719,7 +1007,14 @@ export function ProductsPage() {
               try {
                 await updateProductFeatured(record.id);
                 message.success("Đã cập nhật trạng thái nổi bật");
-                fetchData();
+                setAllProductsPool((prev) =>
+                  prev.map((item) =>
+                    item.id === record.id
+                      ? { ...item, isFeatured: item.isFeatured === 1 ? 0 : 1 }
+                      : item
+                  )
+                );
+                fetchData(pagination.page, pagination.size);
               } catch {
                 message.error("Lỗi cập nhật nổi bật");
               }
@@ -805,6 +1100,8 @@ export function ProductsPage() {
   // Helper info for Detail Drawer
   const detailCat = categories.find((c) => c.id === detailProduct?.categoryId);
   const detailBr = brands.find((b) => b.id === detailProduct?.brandId);
+  const detailCategoryName = detailCat?.name || detailProduct?.categoryName;
+  const detailBrandName = detailBr?.name || detailProduct?.brandName;
   const detailPrice = Number(detailProduct?.price) || 0;
   const detailSalePrice = Number(detailProduct?.salePrice) || 0;
   const detailCostPrice = Number(detailProduct?.costPrice) || 0;
@@ -827,7 +1124,14 @@ export function ProductsPage() {
         </div>
 
         <Space>
-          <Button icon={<ReloadOutlined />} onClick={fetchData} loading={loading}>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() => {
+              fetchData(pagination.page, pagination.size);
+              fetchAllProductsPool();
+            }}
+            loading={loading || poolLoading}
+          >
             Tải lại
           </Button>
           <Button
@@ -882,7 +1186,7 @@ export function ProductsPage() {
                 Tổng sản phẩm
               </div>
               <div style={{ fontSize: 20, fontWeight: 700, color: "#0f172a" }}>
-                {data.length}
+                {pagination.total || (allProductsPool.length || data.length)}
               </div>
             </div>
           </div>
@@ -921,7 +1225,7 @@ export function ProductsPage() {
                 Đang kinh doanh
               </div>
               <div style={{ fontSize: 20, fontWeight: 700, color: "#059669" }}>
-                {data.filter((p) => p.isActive === 1 || p.isActive === true).length}
+                {(allProductsPool.length > 0 ? allProductsPool : data).filter((p) => p.isActive === 1 || p.isActive === true).length}
               </div>
             </div>
           </div>
@@ -960,7 +1264,7 @@ export function ProductsPage() {
                 Hết hàng tồn
               </div>
               <div style={{ fontSize: 20, fontWeight: 700, color: "#dc2626" }}>
-                {data.filter((p) => (Number(p.stockQuantity) || 0) === 0).length}
+                {(allProductsPool.length > 0 ? allProductsPool : data).filter((p) => (Number(p.stockQuantity) || 0) === 0).length}
               </div>
             </div>
           </div>
@@ -999,7 +1303,7 @@ export function ProductsPage() {
                 Sản phẩm nổi bật
               </div>
               <div style={{ fontSize: 20, fontWeight: 700, color: "#d97706" }}>
-                {data.filter((p) => p.isFeatured === 1).length}
+                {(allProductsPool.length > 0 ? allProductsPool : data).filter((p) => p.isFeatured === 1).length}
               </div>
             </div>
           </div>
@@ -1010,11 +1314,11 @@ export function ProductsPage() {
       <div className="admin-toolbar">
         <div className="admin-toolbar-left">
           <Input
-            placeholder="Tìm theo tên hoặc SKU..."
+            placeholder="Tìm theo tên, SKU, danh mục, thương hiệu..."
             prefix={<SearchOutlined style={{ color: "#94a3b8" }} />}
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
-            style={{ width: 230, borderRadius: 8 }}
+            style={{ width: 280, borderRadius: 8 }}
             allowClear
           />
 
@@ -1077,7 +1381,19 @@ export function ProductsPage() {
 
         <div className="admin-toolbar-right">
           <span style={{ fontSize: 13, color: "#64748b" }}>
-            Hiển thị <strong>{filteredData.length}</strong> / {data.length} sản phẩm
+            {isFiltered ? (
+              <>
+                Tìm thấy{" "}
+                <strong style={{ color: "#2563eb" }}>{filteredPool.length}</strong> kết quả phù hợp
+                &bull; Trang <strong>{searchPage}</strong> /{" "}
+                {Math.ceil(filteredPool.length / searchPageSize) || 1}
+              </>
+            ) : (
+              <>
+                Trang <strong>{pagination.page}</strong> / {pagination.totalPages || 1} &bull; Tổng{" "}
+                <strong>{pagination.total || data.length}</strong> sản phẩm
+              </>
+            )}
           </span>
         </div>
       </div>
@@ -1085,17 +1401,41 @@ export function ProductsPage() {
       {/* Main Table */}
       <div className="admin-table">
         <Table
-          dataSource={filteredData}
+          dataSource={displayData}
           columns={columns}
           rowKey="id"
-          loading={loading}
+          loading={loading || poolLoading}
           scroll={{ x: 1100 }}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            pageSizeOptions: ["10", "20", "50"],
-            showTotal: (total) => `Tổng cộng ${total} sản phẩm`,
-          }}
+          pagination={
+            isFiltered
+              ? {
+                  current: searchPage,
+                  pageSize: searchPageSize,
+                  total: filteredPool.length,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50"],
+                  showTotal: (total, range) =>
+                    `${range[0]}-${range[1]} trong tổng số ${total} kết quả tìm kiếm`,
+                  onChange: (p, s) => {
+                    const targetPage = s !== searchPageSize ? 1 : p;
+                    setSearchPage(targetPage);
+                    setSearchPageSize(s);
+                  },
+                }
+              : {
+                  current: pagination.page,
+                  pageSize: pagination.size,
+                  total: pagination.total,
+                  showSizeChanger: true,
+                  pageSizeOptions: ["10", "20", "50"],
+                  showTotal: (total, range) =>
+                    `${range[0]}-${range[1]} trong tổng số ${total} sản phẩm`,
+                  onChange: (p, s) => {
+                    const targetPage = s !== pagination.size ? 1 : p;
+                    fetchData(targetPage, s);
+                  },
+                }
+          }
         />
       </div>
 
@@ -1183,15 +1523,15 @@ export function ProductsPage() {
                     </Tag>
                   )}
 
-                  {detailCat && (
+                  {detailCategoryName && (
                     <Tag color="blue" style={{ padding: "3px 10px", borderRadius: 12, fontSize: 12 }}>
-                      📁 {detailCat.name}
+                      📁 {detailCategoryName}
                     </Tag>
                   )}
 
-                  {detailBr && (
+                  {detailBrandName && (
                     <Tag color="purple" style={{ padding: "3px 10px", borderRadius: 12, fontSize: 12 }}>
-                      🏷️ {detailBr.name}
+                      🏷️ {detailBrandName}
                     </Tag>
                   )}
                 </div>
@@ -1569,15 +1909,18 @@ export function ProductsPage() {
         width={860}
         destroyOnClose
       >
-        <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Tabs
-            activeKey={activeTab}
-            onChange={setActiveTab}
-            items={[
-              {
-                key: "basic",
-                label: "📋 1. Thông tin cơ bản",
-                children: (
+        <Spin spinning={modalLoading} tip="Đang tải dữ liệu sản phẩm...">
+          <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
+            <Tabs
+              activeKey={activeTab}
+              onChange={setActiveTab}
+              destroyInactiveTabPane={false}
+              items={[
+                {
+                  key: "basic",
+                  label: "📋 1. Thông tin cơ bản",
+                  forceRender: true,
+                  children: (
                   <div>
                     <Row gutter={16}>
                       <Col span={12}>
@@ -1668,13 +2011,15 @@ export function ProductsPage() {
                           label="Mã sản phẩm (SKU)"
                           tooltip="Mã định danh duy nhất của sản phẩm"
                           rules={[
+                            { required: true, message: "Vui lòng nhập mã sản phẩm (SKU)" },
+                            { whitespace: true, message: "Mã SKU không được chỉ chứa khoảng trắng" },
                             {
-                              pattern: /^[A-Za-z0-9-_]*$/,
-                              message: "SKU chỉ được chứa chữ cái, số, gạch ngang (-) hoặc gạch dưới (_)",
+                              pattern: /^[A-Za-z0-9\-_./]+$/,
+                              message: "SKU chỉ được chứa chữ cái, số, gạch ngang (-), gạch dưới (_), dấu chấm (.) hoặc gạch chéo (/)",
                             },
                           ]}
                         >
-                          <Input placeholder="TC-245PK" maxLength={50} showCount />
+                          <Input placeholder="TC-245PK" maxLength={50} showCount autoComplete="off" />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -1684,6 +2029,7 @@ export function ProductsPage() {
               {
                 key: "pricing",
                 label: "💰 2. Giá bán & Kho hàng",
+                forceRender: true,
                 children: (
                   <div>
                     <Row gutter={16}>
@@ -1803,6 +2149,7 @@ export function ProductsPage() {
               {
                 key: "media",
                 label: "🖼️ 3. Hình ảnh & Mô tả",
+                forceRender: true,
                 children: (
                   <div>
                     <Form.Item
@@ -1831,26 +2178,23 @@ export function ProductsPage() {
                         { max: 500, message: "Mô tả tóm tắt tối đa 500 ký tự" },
                       ]}
                     >
-                      <Input.TextArea
-                        rows={3}
-                        placeholder="Mô tả ngắn gọn về đặc điểm nổi bật, ứng dụng của sản phẩm..."
+                      <ShortDescriptionInput
+                        placeholder="Mô tả ngắn gọn về đặc điểm nổi bật, ứng dụng của sản phẩm (hỗ trợ đánh dấu danh sách •)..."
                         maxLength={500}
-                        showCount
+                        rows={3}
                       />
                     </Form.Item>
 
                     <Form.Item
                       name="longDescription"
                       label="Mô tả chi tiết sản phẩm (Hỗ trợ định dạng Rich Text & HTML)"
-                      tooltip="Soạn thảo trực quan hoặc dán mã HTML. Bạn có thể nhấn '📁 Tải ảnh từ máy' trên thanh công cụ hoặc bấm nút chọn ảnh bên dưới để tải ảnh lên Cloudinary và chèn vào nội dung."
+                      tooltip="Soạn thảo trực quan hoặc dán mã HTML. Hỗ trợ bôi đen văn bản để gắn link liên kết (Ctrl+K), căn lề, đổi màu chữ, chèn ảnh Cloudinary hoặc video YouTube."
                     >
-                      <Suspense fallback={<Spin tip="Đang tải trình soạn thảo..." />}>
-                        <RichTextEditor
-                          placeholder="Nhập nội dung mô tả chi tiết sản phẩm, chèn ảnh hoặc dán mã HTML..."
-                          onUploadImage={handleUploadDescImage}
-                          onDeleteImage={handleDeleteDescImage}
-                        />
-                      </Suspense>
+                      <RichTextEditorControl
+                        placeholder="Nhập nội dung mô tả chi tiết sản phẩm, chèn ảnh hoặc dán mã HTML..."
+                        onUploadImage={handleUploadDescImage}
+                        onDeleteImage={handleDeleteDescImage}
+                      />
                     </Form.Item>
 
                     {/* Quick Image Inserter directly below description */}
@@ -1904,7 +2248,8 @@ export function ProductsPage() {
             ]}
           />
         </Form>
-      </Modal>
+      </Spin>
+    </Modal>
     </div>
   );
 }

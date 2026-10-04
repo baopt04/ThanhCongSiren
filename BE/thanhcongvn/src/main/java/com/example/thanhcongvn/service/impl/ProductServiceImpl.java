@@ -3,22 +3,32 @@ package com.example.thanhcongvn.service.impl;
 import com.example.thanhcongvn.dto.request.product.CreateProductDTO;
 import com.example.thanhcongvn.dto.request.product.ProductFilterRequest;
 import com.example.thanhcongvn.dto.request.product.UpdateProductDTO;
+import com.example.thanhcongvn.dto.response.customer.product.ListProductResponse;
+import com.example.thanhcongvn.dto.response.image.ProductImageReponse;
 import com.example.thanhcongvn.dto.response.product.ProductResponse;
 import com.example.thanhcongvn.entity.Brand;
 import com.example.thanhcongvn.entity.Category;
 import com.example.thanhcongvn.entity.Product;
+import com.example.thanhcongvn.entity.ProductImage;
 import com.example.thanhcongvn.infrastructure.exception.AppException;
 import com.example.thanhcongvn.infrastructure.exception.ErrorCode;
 import com.example.thanhcongvn.repository.BrandRepository;
 import com.example.thanhcongvn.repository.CategoryRepository;
+import com.example.thanhcongvn.repository.ProductImageRepository;
 import com.example.thanhcongvn.repository.ProductRepository;
 import com.example.thanhcongvn.service.ProductService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -28,6 +38,8 @@ public class ProductServiceImpl implements ProductService {
     private CategoryRepository categoryRepository;
     @Autowired
     private BrandRepository brandRepository;
+    @Autowired
+    private ProductImageRepository productImageRepository;
 
     @Override
     public ProductResponse createProduct(CreateProductDTO dto) {
@@ -123,13 +135,6 @@ public class ProductServiceImpl implements ProductService {
             product.setPrice(dto.getPrice());
         }
 
-//        if (dto.getSalePrice() != null) {
-//            if (dto.getPrice() != null &&
-//                    dto.getSalePrice().compareTo(dto.getPrice()) >= 0) {
-//                throw new AppException(ErrorCode.PRODUCT_PRICE_SALE);
-//            }
-//            product.setSalePrice(dto.getSalePrice());
-//        }
 
         if (dto.getCostPrice() != null) {
             product.setCostPrice(dto.getCostPrice());
@@ -156,7 +161,6 @@ public class ProductServiceImpl implements ProductService {
         }
 
         productRepository.save(product);
-
         return mapToResponse(product);
     }
 
@@ -167,7 +171,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse getById(String id) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findDetailById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
 
         return mapToResponse(product);
@@ -175,7 +179,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<ProductResponse> getAll(ProductFilterRequest filter, Pageable pageable) {
-        Page<Product> page = productRepository.findAll(pageable);
+        Page<Product> page = productRepository.findAllWithCategoryAndBrand(pageable);
 
         return page.map(this::mapToResponse);
     }
@@ -239,6 +243,9 @@ public class ProductServiceImpl implements ProductService {
 
         productRepository.save(product);
     }
+
+
+
 
     private ProductResponse mapToResponse(Product product) {
         return ProductResponse.builder()

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import "./ProductCard.css";
 import { Link } from "react-router-dom";
 import {
@@ -5,11 +6,12 @@ import {
   EyeOutlined,
   ShoppingOutlined,
   StarFilled,
-  SafetyCertificateOutlined
+  SafetyCertificateOutlined,
 } from "@ant-design/icons";
 
-export function ProductCard({
+export const ProductCard = memo(function ProductCard({
   id,
+  slug,
   name,
   code,
   specs,
@@ -20,10 +22,10 @@ export function ProductCard({
   isNew,
   categoryTag,
   rating = 5,
-  variant = "catalog"
+  defaultImg = "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg",
+  variant = "catalog",
 }) {
-  const productLink = id ? `/san-pham/${id}` : "#";
-  const defaultImg = "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg";
+  const productLink = id ? `/san-pham/${id}` : (slug ? `/san-pham/${slug}` : "#");
 
   // Resolve Primary Image (isPrimary === 1) & Hover Image (displayOrder === 0 or secondary image)
   let primaryImageUrl = defaultImg;
@@ -32,43 +34,56 @@ export function ProductCard({
   if (Array.isArray(image) && image.length > 0) {
     // 1. Ảnh đại diện chính: isPrimary === 1
     const primaryObj =
-      image.find((item) => item.isPrimary === 1 || item.isPrimary === true || item.isPrimary === "1") ||
-      image[0];
+      image.find(
+        (item) =>
+          item.isPrimary === 1 ||
+          item.isPrimary === true ||
+          item.isPrimary === "1"
+      ) || image[0];
 
     primaryImageUrl = primaryObj?.imageUrl || defaultImg;
 
     // 2. Ảnh khi di chuyển chuột qua (hover):
-    // Ưu tiên:
-    // - Ảnh có displayOrder === 0 khác ảnh primary
-    // - Nếu primary đã mang displayOrder === 0, lấy ảnh có displayOrder === 1
-    // - Fallback lấy ảnh phụ tiếp theo (isPrimary === 0)
     const hoverObj =
-      image.find((item) => (item.displayOrder === 0 || item.displayOrder === "0") && item !== primaryObj) ||
-      image.find((item) => (item.displayOrder === 1 || item.displayOrder === "1") && item !== primaryObj) ||
-      image.find((item) => (item.isPrimary === 0 || item.isPrimary === false || item.isPrimary === "0") && item !== primaryObj) ||
+      image.find(
+        (item) =>
+          (item.displayOrder === 0 || item.displayOrder === "0") &&
+          item !== primaryObj
+      ) ||
+      image.find(
+        (item) =>
+          (item.displayOrder === 1 || item.displayOrder === "1") &&
+          item !== primaryObj
+      ) ||
+      image.find(
+        (item) =>
+          (item.isPrimary === 0 ||
+            item.isPrimary === false ||
+            item.isPrimary === "0") &&
+          item !== primaryObj
+      ) ||
       image.find((item) => item !== primaryObj);
 
     hoverImageUrl = hoverObj?.imageUrl || null;
   } else if (typeof image === "string" && image.trim()) {
     primaryImageUrl = image;
+  } else if (image && typeof image === "object" && image.imageUrl) {
+    primaryImageUrl = image.imageUrl;
   }
 
-  // Format price if numeric
+  // Format price if numeric or numeric string
+  const numPrice = Number(price);
   const displayPrice =
-    typeof price === "number"
-      ? (price > 0 ? `${price.toLocaleString("vi-VN")} VND` : "Liên hệ báo giá")
-      : (price || "Liên hệ báo giá");
+    !isNaN(numPrice) && numPrice > 0
+      ? `${numPrice.toLocaleString("vi-VN")} VND`
+      : price || "Liên hệ báo giá";
 
-  // Catalog variant matching user's photo
+  // Catalog variant matching user's photo & ProductCard.css
   if (variant === "catalog") {
     return (
       <div className="tc-catalog-card" id={`product-${code || name}`}>
         {/* Top-Left Badge (Green "Nổi Bật" as in image) */}
-        {badge && (
-          <div className="tc-catalog-badge">
-            {badge}
-          </div>
-        )}
+        {badge && <div className="tc-catalog-badge">{badge}</div>}
 
         {/* Product Image + Hover Action Icons */}
         <div className="tc-catalog-thumb-box">
@@ -76,6 +91,8 @@ export function ProductCard({
             <img
               src={primaryImageUrl}
               alt={name}
+              loading="lazy"
+              decoding="async"
               className={`tc-catalog-thumb ${hoverImageUrl ? "has-hover" : ""}`}
               onError={(e) => {
                 e.target.src = defaultImg;
@@ -85,6 +102,8 @@ export function ProductCard({
               <img
                 src={hoverImageUrl}
                 alt={`${name} hover`}
+                loading="lazy"
+                decoding="async"
                 className="tc-catalog-thumb-hover"
                 onError={(e) => {
                   e.target.style.display = "none";
@@ -158,6 +177,8 @@ export function ProductCard({
         <img
           src={primaryImageUrl}
           alt={name}
+          loading="lazy"
+          decoding="async"
           className={`tc-product-thumb ${hoverImageUrl ? "has-hover" : ""}`}
           onError={(e) => {
             e.target.src = defaultImg;
@@ -167,6 +188,8 @@ export function ProductCard({
           <img
             src={hoverImageUrl}
             alt={`${name} hover`}
+            loading="lazy"
+            decoding="async"
             className="tc-product-thumb-hover"
             onError={(e) => {
               e.target.style.display = "none";
@@ -182,7 +205,12 @@ export function ProductCard({
 
       {/* Info Container */}
       <div className="tc-product-info">
-        {code && <span className="tc-product-code">Mã SP: <strong>{code}</strong></span>}
+        {code && (
+          <span className="tc-product-code">
+            Mã SP: <strong>{code}</strong>
+          </span>
+        )}
+
         <h3 className="tc-product-name">
           <Link to={productLink} title={name}>
             {name}
@@ -197,15 +225,19 @@ export function ProductCard({
 
         <div className="tc-product-bottom-row">
           <div className="tc-product-price-box">
-            <span className="tc-product-price">{price || "Liên hệ báo giá"}</span>
+            <span className="tc-product-price">{displayPrice}</span>
             {oldPrice && <span className="tc-product-old-price">{oldPrice}</span>}
           </div>
 
-          <a href="tel:0865130088" className="tc-product-call-btn" title="Gọi tư vấn báo giá ngay">
+          <a
+            href="tel:0865130088"
+            className="tc-product-call-btn"
+            title="Gọi tư vấn báo giá ngay"
+          >
             <PhoneOutlined /> Báo giá
           </a>
         </div>
       </div>
     </div>
   );
-}
+});

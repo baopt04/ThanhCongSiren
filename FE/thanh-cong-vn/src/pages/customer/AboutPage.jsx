@@ -183,13 +183,13 @@ export function AboutPage() {
               <div className="about-legal-row">
                 <span className="legal-key">Điện thoại VP:</span>
                 <span className="legal-val">
-                  <a href="tel:02466873822">024.6687.3822</a> — <a href="tel:0865130088">0865.130.088</a>
+                  <a href="tel:0364862148">0364.862.148</a> — <a href="tel:0865130088">0865.130.088</a>
                 </span>
               </div>
               <div className="about-legal-row">
                 <span className="legal-key">Email:</span>
                 <span className="legal-val">
-                  <a href="mailto:sieuthianninhviet@gmail.com">sieuthianninhviet@gmail.com</a>
+                  <a href="mailto:coihubaodongvn@gmail.com">coihubaodongvn@gmail.com</a>
                 </span>
               </div>
               <div className="about-legal-row">
@@ -224,6 +224,7 @@ export function AboutPage() {
                     src={app.image}
                     alt={app.title}
                     loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       e.target.src = "https://cdn0344.cdn4s.com/media/logo/cropped-logo-coihubaodong.png";
                     }}
@@ -279,6 +280,7 @@ export function AboutPage() {
               src="https://cdn0344.cdn4s.com/media/bv-gioi-thieu/coi-hu-bao-dong-khach-hang-noi-ve.jpg"
               alt="Đối tác tiêu biểu Thành Công Việt Nam"
               loading="lazy"
+              decoding="async"
               onError={(e) => {
                 e.target.style.display = "none";
               }}

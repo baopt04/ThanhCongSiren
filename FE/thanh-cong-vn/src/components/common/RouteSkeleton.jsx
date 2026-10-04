@@ -226,7 +226,9 @@ export function RouteSkeleton({ layout = "admin", duration = 400, children }) {
     // Customer
     const isDetail =
       location.pathname.includes("/chi-tiet/") ||
-      Boolean(location.pathname.match(/\/san-pham\/[a-f0-9-]{36}/i)) ||
+      (location.pathname.startsWith("/san-pham/") &&
+        location.pathname !== "/san-pham" &&
+        location.pathname !== "/san-pham/") ||
       Boolean(location.pathname.match(/\/tin-tuc\/.+/i));
 
     return isDetail ? <CustomerDetailSkeleton /> : <CustomerListingSkeleton />;
@@ -250,7 +252,6 @@ export function RouteSkeleton({ layout = "admin", duration = 400, children }) {
 
     timerRef.current = setTimeout(() => {
       setLoading(false);
-      window.dispatchEvent(new Event("resize"));
     }, duration);
 
     return () => {

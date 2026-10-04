@@ -18,4 +18,6 @@ public interface CustomerProductService {
     List<HomeCategorySectionResponse> getHomeCategorySection( int productLimitCategory);
 
     QuoteResponse createQuote(QuoteResponse quote);
+    Page<ListProductResponse> getProductsByCategory(String categoryId, Pageable pageable);
+
 }

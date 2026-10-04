@@ -5,6 +5,7 @@ import com.example.thanhcongvn.entity.enums.BillStatus;
 import com.example.thanhcongvn.entity.enums.PaymentStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +15,7 @@ import java.util.Optional;
 
 @Repository
 public interface BillRepository extends JpaRepository<Bill, String> {
+    @EntityGraph(attributePaths = {"user"})
     @Query("""
         SELECT b FROM Bill b
         WHERE (:status IS NULL OR b.billStatus = :status)
@@ -29,8 +31,10 @@ public interface BillRepository extends JpaRepository<Bill, String> {
                       Pageable pageable);
 
     @Query("""
-        SELECT b FROM Bill b
-        LEFT JOIN FETCH b.billDetails
+        SELECT DISTINCT b FROM Bill b
+        LEFT JOIN FETCH b.billDetails d
+        LEFT JOIN FETCH d.product
+        LEFT JOIN FETCH b.user
         WHERE b.id = :id
         """)
     Optional<Bill> findDetailById(@Param("id") String id);

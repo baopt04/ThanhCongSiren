@@ -1,43 +1,102 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useParams } from "react-router-dom";
 import { ProductListingLayout } from "../../components/common/customer/ProductListingLayout/ProductListingLayout";
 import { SafetyCertificateOutlined, PhoneOutlined } from "@ant-design/icons";
 import { getAllProductsForCustomer } from "../../services/customer/CustomerProductService";
+import { getCachedCustomerCategories, findCategoryInTree } from "../../utils/categoriesCache";
 import { Seo } from "../../components/common/Seo";
 
 export function SirenPage() {
   const { param, slug } = useParams();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const activeCategorySlug = param || slug || searchParams.get("type") || "all";
+  const [categoryName, setCategoryName] = useState("");
+
+  const pageFromUrl = parseInt(searchParams.get("page") || "1", 10);
+  const currentPage = isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
+
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(activeCategorySlug === "all");
+  const [pagination, setPagination] = useState({
+    page: currentPage,
+    size: 10,
+    total: 0,
+    totalPages: 1,
+  });
+
+  // Tải tên danh mục để hiển thị breadcrumb và title thân thiện
+  useEffect(() => {
+    if (activeCategorySlug && activeCategorySlug !== "all") {
+      getCachedCustomerCategories()
+        .then((res) => {
+          const raw = res?.data || res?.result || res || [];
+          const found = findCategoryInTree(Array.isArray(raw) ? raw : [], activeCategorySlug);
+          if (found?.name) {
+            setCategoryName(found.name);
+          }
+        })
+        .catch(() => { });
+    } else {
+      setCategoryName("");
+    }
+  }, [activeCategorySlug]);
+
+
+  const fetchProducts = useCallback(async (targetPage = currentPage) => {
+    setLoading(true);
+    try {
+      // Backend customer API uses 0-based page index (page 0 is page 1 in UI)
+      const backendPage = Math.max(0, targetPage - 1);
+      const res = await getAllProductsForCustomer({ page: backendPage, size: 12 });
+      const rawList = Array.isArray(res)
+        ? res
+        : res?.data || res?.result || res?.content || [];
+
+      setProducts(Array.isArray(rawList) ? rawList : []);
+
+      if (res?.pagination) {
+        setPagination({
+          page: (res.pagination.page ?? backendPage) + 1, // Convert 0-based to 1-based for UI
+          size: res.pagination.size ?? 10,
+          total: res.pagination.totalElements ?? rawList.length,
+          totalPages: res.pagination.totalPages ?? 1,
+        });
+      } else {
+        setPagination({
+          page: targetPage,
+          size: 10,
+          total: rawList.length,
+          totalPages: Math.ceil(rawList.length / 10) || 1,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading products for SirenPage:", error);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [currentPage]);
 
   useEffect(() => {
-    let isMounted = true;
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const res = await getAllProductsForCustomer();
-        const rawList = Array.isArray(res)
-          ? res
-          : res?.data || res?.result || res?.content || [];
+    if (activeCategorySlug === "all") {
+      fetchProducts(currentPage);
+    } else {
+      setLoading(false);
+    }
+  }, [fetchProducts, currentPage, activeCategorySlug]);
 
-        if (isMounted) {
-          setProducts(Array.isArray(rawList) ? rawList : []);
-        }
-      } catch (error) {
-        console.error("Error loading products for SirenPage:", error);
-        if (isMounted) setProducts([]);
-      } finally {
-        if (isMounted) setLoading(false);
+  const handlePageChange = (newPage) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (newPage === 1) {
+        next.delete("page");
+      } else {
+        next.set("page", String(newPage));
       }
-    };
-
-    fetchProducts();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+      return next;
+    });
+    window.scrollTo({ top: 200, behavior: "smooth" });
+  };
 
   const guideCard = (
     <div className="tc-siren-guide-card">
@@ -65,25 +124,30 @@ export function SirenPage() {
     </div>
   );
 
+  const displayTitle = categoryName || (activeCategorySlug !== "all" ? activeCategorySlug : "Danh sách sản phẩm");
+
   return (
     <>
       <Seo
-        title="Sản phẩm còi hú báo động"
+        title={categoryName ? `${categoryName} | Thành Công Việt Nam` : "Sản phẩm còi hú báo động"}
         description="Danh mục còi hú báo động công suất lớn Lion King chính hãng cho thủy điện, quân đội, PCCC — Thành Công Việt Nam."
       />
       <ProductListingLayout
-        pageTitle="Danh sách sản phẩm"
+        pageTitle={displayTitle}
         breadcrumbItems={[
           { label: "Trang chủ", path: "/" },
           { label: "Sản phẩm", path: "/san-pham" },
           ...(activeCategorySlug && activeCategorySlug !== "all"
-            ? [{ label: activeCategorySlug, path: null }]
+            ? [{ label: categoryName || activeCategorySlug, path: null }]
             : []),
         ]}
         defaultCategoryId={activeCategorySlug}
         products={products}
         loading={loading}
         pageSize={12}
+        totalItems={pagination.total}
+        currentPage={pagination.page}
+        onPageChange={handlePageChange}
         guideCard={guideCard}
       />
     </>

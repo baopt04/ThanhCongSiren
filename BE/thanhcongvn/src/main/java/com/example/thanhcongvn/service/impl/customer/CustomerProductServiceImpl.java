@@ -15,12 +15,15 @@ import com.example.thanhcongvn.repository.ProductRepository;
 import com.example.thanhcongvn.repository.ProductSpecificationRepository;
 import com.example.thanhcongvn.service.customer.CustomerProductService;
 import com.example.thanhcongvn.service.impl.TelegramNotificationSericeImpl;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -46,16 +49,11 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     public Page<ListProductResponse> getAllProducts(Pageable pageable) {
         Page<Product> productPage = productRepository.findAllWithCategory(pageable);
 
-        List<String> productIds = productPage.getContent().stream()
-                .map(Product::getId)
-                .collect(Collectors.toList());
-        // lấy toàn bộ ảnh của sản phẩm  trong trang và nhóm theo nhóm ID của sản phẩm
         Map<String, List<ProductImageReponse>> imagesByProductId =
-                productImageRepository.findByProductIdIn(productIds).stream()
-                        .collect(Collectors.groupingBy(
-                                img -> img.getProduct().getId(),
-                                Collectors.mapping(this::mapToImageResponse, Collectors.toList())
-                        ));
+                loadListImagesByProductIds(productPage.getContent().stream()
+                        .map(Product::getId)
+                        .collect(Collectors.toList()));
+
         return productPage.map(product -> ListProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -71,9 +69,9 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         Product product = productRepository.findDetailById(id).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)
         );
-        List<ProductImageReponse> images = productImageRepository.findByProductIdOrderByDisplayOrderAsc(id)
+        List<ProductImageReponse> images = productImageRepository.findByProductIdOrderByDisplayOrderAsc(product.getId())
                 .stream().map(this::mapToImageResponse).collect(Collectors.toList());
-        List<ProductSpecification> specs = productSpecificationRepository.findByProductIdOrderByDisplayOrderAsc(id);
+        List<ProductSpecification> specs = productSpecificationRepository.findByProductIdOrderByDisplayOrderAsc(product.getId());
 
         // Gom theo nhóm dữ liệu
         Map<String, List<ProductSpecificationResponse>> groupedSpecs = specs.stream()
@@ -142,15 +140,15 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         Category category = categoryRepository.findBySlug(slug).orElseThrow(
                 () -> new AppException(ErrorCode.CATEGORY_NOT_FOUND)
         );
-        Page<Product> productPage = productRepository.findByCategoryId(category.getId(), pageable);
-        List<String> productIds = productPage.getContent().stream()
-                .map(Product::getId)
-                .collect(Collectors.toList());
-        Map<String, List<ProductImageReponse>> imagesProductId = productImageRepository.findByProductIdIn(productIds).stream()
-                .collect(Collectors.groupingBy(
-                        img -> img.getProduct().getId(),
-                        Collectors.mapping(this::mapToImageResponse, Collectors.toList())
-                ));
+        List<String> categoryIds = new ArrayList<>();
+        categoryIds.add(category.getId());
+
+        Page<Product> productPage = productRepository.findByCategoryIds(categoryIds, pageable);
+        Map<String, List<ProductImageReponse>> imagesProductId =
+                loadListImagesByProductIds(productPage.getContent().stream()
+                        .map(Product::getId)
+                        .collect(Collectors.toList()));
+
         return productPage.map(product -> ListProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -163,37 +161,70 @@ public class CustomerProductServiceImpl implements CustomerProductService {
 
     @Override
     public List<HomeCategorySectionResponse> getHomeCategorySection(int productLimitCategory) {
-
         List<String> slugs = Arrays.asList(FEATURED_CATEGORY_SLUGS.split(","));
 
         List<Category> featuredParentCategories = categoryRepository.findBySlugIn(slugs);
         featuredParentCategories.sort(Comparator.comparingInt(c -> slugs.indexOf(c.getSlug())));
 
-        return featuredParentCategories.stream()
-                .map(parentCategory -> {
-                    List<Category> childCategories = categoryRepository.findByParent_Id(parentCategory.getId());
+        if (featuredParentCategories.isEmpty()) {
+            return Collections.emptyList();
+        }
 
-                    List<String> categoryIds = new ArrayList<>();
-                    categoryIds.add(parentCategory.getId());
-                    childCategories.forEach(child -> categoryIds.add(child.getId()));
-
-                    Pageable limit = PageRequest.of(0, productLimitCategory);
-
-                    List<Product> products = productRepository
-                            .findByCategory_IdInAndIsActive(categoryIds, 1, limit);
-
-                    List<ListProductResponse> productResponses = products.stream()
-                            .map(this::mapToProductResponse)
-                            .collect(Collectors.toList());
-
-                    return HomeCategorySectionResponse.builder()
-                            .categoryId(parentCategory.getId())
-                            .categoryName(parentCategory.getName())
-                            .categorySlug(parentCategory.getSlug())
-                            .products(productResponses)
-                            .build();
-                })
+        List<String> parentIds = featuredParentCategories.stream()
+                .map(Category::getId)
                 .collect(Collectors.toList());
+
+        Map<String, List<Category>> childrenByParentId = categoryRepository.findByParent_IdIn(parentIds)
+                .stream()
+                .collect(Collectors.groupingBy(c -> c.getParent().getId()));
+
+        Pageable limit = PageRequest.of(0, productLimitCategory);
+        List<HomeCategorySectionResponse> sections = new ArrayList<>(featuredParentCategories.size());
+        List<Product> allProducts = new ArrayList<>();
+        Map<String, List<Product>> productsByParentId = new LinkedHashMap<>();
+
+        for (Category parentCategory : featuredParentCategories) {
+            List<String> categoryIds = new ArrayList<>();
+            categoryIds.add(parentCategory.getId());
+            childrenByParentId.getOrDefault(parentCategory.getId(), List.of())
+                    .forEach(child -> categoryIds.add(child.getId()));
+
+            List<Product> products = productRepository
+                    .findByCategory_IdInAndIsActive(categoryIds, 1, limit);
+            productsByParentId.put(parentCategory.getId(), products);
+            allProducts.addAll(products);
+        }
+
+        Map<String, List<ProductImageReponse>> imagesByProductId = loadListImagesByProductIds(
+                allProducts.stream().map(Product::getId).distinct().collect(Collectors.toList()));
+
+        for (Category parentCategory : featuredParentCategories) {
+            List<ListProductResponse> productResponses = productsByParentId
+                    .getOrDefault(parentCategory.getId(), List.of())
+                    .stream()
+                    .map(product -> ListProductResponse.builder()
+                            .id(product.getId())
+                            .name(product.getName())
+                            .price(product.getPrice())
+                            .categoryId(product.getCategory() != null
+                                    ? product.getCategory().getId()
+                                    : parentCategory.getId())
+                            .categoryName(product.getCategory() != null
+                                    ? product.getCategory().getName()
+                                    : parentCategory.getName())
+                            .image(imagesByProductId.getOrDefault(product.getId(), List.of()))
+                            .build())
+                    .collect(Collectors.toList());
+
+            sections.add(HomeCategorySectionResponse.builder()
+                    .categoryId(parentCategory.getId())
+                    .categoryName(parentCategory.getName())
+                    .categorySlug(parentCategory.getSlug())
+                    .products(productResponses)
+                    .build());
+        }
+
+        return sections;
     }
 
     @Override
@@ -232,6 +263,80 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         return quote;
     }
 
+    @Override
+    @Transactional
+    public Page<ListProductResponse> getProductsByCategory(String categoryId, Pageable pageable) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy danh mục"));
+
+        Page<Product> page = productRepository.findActiveByCategoryId(categoryId, pageable);
+
+        Map<String, List<ProductImageReponse>> imageMap = loadListImagesByProductIds(
+                page.getContent().stream().map(Product::getId).toList());
+
+        return page.map(p -> ListProductResponse.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .price(p.getPrice())
+                .categoryId(category.getId())
+                .categoryName(category.getName())
+                .image(imageMap.getOrDefault(p.getId(), List.of()))
+                .build());
+    }
+
+    /**
+     * Batch-load images then keep only primary + 1 hover candidate per product
+     * (same fields FE ProductCard needs; smaller JSON payload).
+     */
+    private Map<String, List<ProductImageReponse>> loadListImagesByProductIds(List<String> productIds) {
+        if (productIds == null || productIds.isEmpty()) {
+            return Map.of();
+        }
+        return productImageRepository.findByProductIdIn(productIds).stream()
+                .collect(Collectors.groupingBy(
+                        img -> img.getProduct().getId(),
+                        Collectors.collectingAndThen(
+                                Collectors.mapping(this::mapToImageResponse, Collectors.toList()),
+                                this::trimToListImages
+                        )
+                ));
+    }
+
+    /** Keep primary (or first) + one secondary for hover — FE catalog card contract. */
+    private List<ProductImageReponse> trimToListImages(List<ProductImageReponse> images) {
+        if (images == null || images.isEmpty()) {
+            return List.of();
+        }
+        if (images.size() == 1) {
+            return images;
+        }
+
+        ProductImageReponse primary = images.stream()
+                .filter(img -> img.getIsPrimary() != null
+                        && (img.getIsPrimary() == 1))
+                .findFirst()
+                .orElse(images.get(0));
+
+        ProductImageReponse hover = images.stream()
+                .filter(img -> img != primary)
+                .sorted(Comparator
+                        .comparing((ProductImageReponse img) -> {
+                            Integer order = img.getDisplayOrder();
+                            if (order != null && (order == 0 || order == 1)) {
+                                return 0;
+                            }
+                            return 1;
+                        })
+                        .thenComparing(img -> img.getDisplayOrder() == null ? Integer.MAX_VALUE : img.getDisplayOrder()))
+                .findFirst()
+                .orElse(null);
+
+        if (hover == null) {
+            return List.of(primary);
+        }
+        return List.of(primary, hover);
+    }
+
     private ProductImageReponse mapToImageResponse(ProductImage img) {
         return ProductImageReponse.builder()
                 .id(img.getId())
@@ -248,40 +353,6 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .specName(spec.getSpecName())
                 .specValue(spec.getSpecValue())
                 .displayOrder(spec.getDisplayOrder())
-                .build();
-    }
-
-    private List<ProductImageReponse> mapImages(List<ProductImage> images) {
-        if (images == null || images.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return images.stream()
-                // Ảnh primary lên đầu, sau đó sắp theo displayOrder
-                .sorted(Comparator
-                        .comparing((ProductImage img) -> img.getIsPrimary() != null && img.getIsPrimary() == 1 ? 0 : 1)
-                        .thenComparing(ProductImage::getDisplayOrder, Comparator.nullsLast(Comparator.naturalOrder())))
-                .map(img -> ProductImageReponse.builder()
-                        .id(img.getId())
-                        .productId(img.getProduct().getId())
-                        .imageUrl(img.getImageUrl())
-                        .altText(img.getAltText())
-                        .isPrimary(img.getIsPrimary())
-                        .displayOrder(img.getDisplayOrder())
-                        .build())
-                .collect(Collectors.toList());
-    }
-
-    private ListProductResponse mapToProductResponse(Product product) {
-        List<ProductImageReponse> images = mapImages(product.getImages());
-
-        return ListProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .price(product.getPrice())
-                .categoryId(product.getCategory().getId())
-                .categoryName(product.getCategory().getName())
-                .image(images)
                 .build();
     }
 

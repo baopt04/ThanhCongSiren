@@ -1,9 +1,9 @@
 import apiClient from "../api/client";
 const API_ENDPOINT = "/admin/category";
 
-export const getAllCategories = async () => {
+export const getAllCategories = async (params = { size: 1000 }) => {
     try {
-        const response = await apiClient.get(`${API_ENDPOINT}`);
+        const response = await apiClient.get(`${API_ENDPOINT}`, { params });
         return response.data;
     } catch (error) {
         console.error("Error fetching categories:", error);

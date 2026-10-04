@@ -15,7 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -95,11 +97,27 @@ Category category = categoryRepository.findById(id).orElseThrow(
 
     @Override
     public List<CategoryResponse> getCategoryTree() {
-        return categoryRepository.findAll()
-                .stream()
-                .filter(c -> c.getParent() == null)
-                .map(this::mapToResponseWithChildren)
-                .collect(Collectors.toList());
+        List<Category> all = categoryRepository.findAll();
+        Map<String, CategoryResponse> byId = all.stream()
+                .collect(Collectors.toMap(Category::getId, this::maptoResponse));
+
+        List<CategoryResponse> roots = new ArrayList<>();
+        for (Category category : all) {
+            CategoryResponse node = byId.get(category.getId());
+            String parentId = category.getParent() != null ? category.getParent().getId() : null;
+            if (parentId == null) {
+                roots.add(node);
+            } else {
+                CategoryResponse parent = byId.get(parentId);
+                if (parent != null) {
+                    if (parent.getChildren() == null) {
+                        parent.setChildren(new ArrayList<>());
+                    }
+                    parent.getChildren().add(node);
+                }
+            }
+        }
+        return roots;
     }
     private CategoryResponse maptoResponse(Category category) {
         CategoryResponse categoryResponse = new CategoryResponse();
@@ -114,18 +132,6 @@ Category category = categoryRepository.findById(id).orElseThrow(
             categoryResponse.setParentId(category.getParent().getId());
         }
 
-        return categoryResponse;
-    }
-    private CategoryResponse mapToResponseWithChildren(Category category) {
-        CategoryResponse categoryResponse = maptoResponse(category);
-        if (category.getChildren() != null){
-            categoryResponse.setChildren(
-                    category.getChildren()
-                            .stream()
-                            .map(this::mapToResponseWithChildren)
-                            .collect(Collectors.toList())
-            );
-        }
         return categoryResponse;
     }
 }

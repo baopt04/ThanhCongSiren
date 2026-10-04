@@ -63,7 +63,7 @@ export function HomePage() {
       ))}
 
       {/* Banner báo giá nhanh giữa trang */}
-      <FastQuoteBanner />
+      {/* <FastQuoteBanner /> */}
 
       {/* Hiển thị các section sản phẩm tiếp theo (Còi quay tay, Máy thổi khí & Đệm hơi,...) */}
       {secondHalf.map((sec) => (

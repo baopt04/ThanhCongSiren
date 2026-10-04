@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, lazy, Suspense, forwardRef } from "react";
 import {
   Table,
   Button,
@@ -31,6 +31,22 @@ import apiClient from "../../api/client";
 const RichTextEditor = lazy(() =>
   import("../../components/admin/RichTextEditor").then((m) => ({ default: m.RichTextEditor }))
 );
+
+const RichTextEditorControl = forwardRef(function RichTextEditorControl(
+  { value = "", onChange, ...props },
+  ref
+) {
+  return (
+    <Suspense fallback={<Spin tip="Đang tải trình soạn thảo..." />}>
+      <RichTextEditor
+        ref={ref}
+        value={value}
+        onChange={onChange}
+        {...props}
+      />
+    </Suspense>
+  );
+});
 import { getAllCategoriesNew } from "../../services/CategoryNewService";
 import { getAllUser } from "../../services/UserService";
 import {
@@ -789,12 +805,10 @@ export function PostsPage() {
           </Form.Item>
 
           <Form.Item name="content" label="Nội dung chi tiết bài viết">
-            <Suspense fallback={<Spin tip="Đang tải trình soạn thảo..." />}>
-              <RichTextEditor
-                onUploadImage={handleUploadPostImage}
-                onDeleteImage={handleDeletePostImage}
-              />
-            </Suspense>
+            <RichTextEditorControl
+              onUploadImage={handleUploadPostImage}
+              onDeleteImage={handleDeletePostImage}
+            />
           </Form.Item>
         </Form>
       </Modal>

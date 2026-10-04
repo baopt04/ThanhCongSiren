@@ -3,9 +3,10 @@ import { getAllCategories } from "./CategoryService";
 
 const API_ENDPOINT = "/admin/product";
 const API_ENDPOINT_IMAGES = "/admin/product-images";
-export const getAllProducts = async () => {
+export const getAllProducts = async (params = {}) => {
     try {
-        const response = await apiClient.get(`${API_ENDPOINT}`);
+        const queryParams = typeof params === "number" ? { page: params } : params;
+        const response = await apiClient.get(`${API_ENDPOINT}`, { params: queryParams });
         return response.data;
     } catch (error) {
         console.error("Error fetching products:", error);

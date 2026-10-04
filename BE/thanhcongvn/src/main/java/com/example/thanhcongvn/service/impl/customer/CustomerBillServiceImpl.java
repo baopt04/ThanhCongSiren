@@ -16,7 +16,7 @@ import com.example.thanhcongvn.repository.BillRepository;
 import com.example.thanhcongvn.repository.ProductRepository;
 import com.example.thanhcongvn.repository.UserRepository;
 import com.example.thanhcongvn.service.customer.CustomerBillService;
-import jakarta.persistence.ManyToOne;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,6 +36,7 @@ public class CustomerBillServiceImpl implements CustomerBillService {
     private final BillRepository billRepository;
     private final UserRepository userRepository;
     @Override
+    @Transactional
     public BillResponse create(CreateBillRequest request) {
         StringBuilder noteBuilder = new StringBuilder();
 //        if (Boolean.TRUE.equals(request.getRequestInvoice())) {

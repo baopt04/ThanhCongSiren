@@ -208,7 +208,6 @@ export function FastQuoteBanner() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="tc-quote-form" noValidate>
-              {/* Họ và tên */}
               <div className="tc-form-group">
                 <label>Họ và tên / Tên đơn vị *</label>
                 <input
@@ -224,7 +223,6 @@ export function FastQuoteBanner() {
                 {errors.name && <span className="tc-error-text">{errors.name}</span>}
               </div>
 
-              {/* Số điện thoại */}
               <div className="tc-form-group">
                 <label>Số điện thoại / Zalo *</label>
                 <input
@@ -240,7 +238,6 @@ export function FastQuoteBanner() {
                 {errors.numberPhone && <span className="tc-error-text">{errors.numberPhone}</span>}
               </div>
 
-              {/* Loại dự án / Công trình */}
               <div className="tc-form-group">
                 <label>Loại dự án / Công trình *</label>
                 <select

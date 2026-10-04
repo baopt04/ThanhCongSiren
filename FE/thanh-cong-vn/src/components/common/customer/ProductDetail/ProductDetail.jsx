@@ -1,12 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import {
   PhoneOutlined,
+  PhoneFilled,
   LeftOutlined,
   RightOutlined,
   LoadingOutlined,
   ShoppingCartOutlined,
-  ThunderboltOutlined
+  ThunderboltOutlined,
+  FileTextOutlined,
+  MailOutlined,
+  GlobalOutlined,
+  CarOutlined,
+  MessageOutlined
 } from "@ant-design/icons";
 import { message } from "antd";
 import { detailProductForId } from "../../../../services/customer/CustomerProductService";
@@ -14,6 +20,8 @@ import { embedYoutubeInHtml } from "../../../../utils/youtubeUtils";
 import { addToCart } from "../../../../utils/cartUtils";
 import { isCustomerAuthenticated } from "../../../../utils/auth";
 import { createCartItem } from "../../../../services/customer/CustomerCartService";
+import { QuoteModal } from "../QuoteModal/QuoteModal";
+import { CustomerDetailSkeleton } from "../../RouteSkeleton";
 import "./ProductDetail.css";
 
 export default function ProductDetail() {
@@ -27,6 +35,7 @@ export default function ProductDetail() {
   const [activeTab, setActiveTab] = useState("description");
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [quoteModalOpen, setQuoteModalOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -39,6 +48,14 @@ export default function ProductDetail() {
         if (isMounted) {
           setProduct(data);
           setActiveImgIndex(0);
+
+          // Tự động chuyển đổi URL thành /san-pham/:slug thân thiện SEO
+          if (data?.slug) {
+            const targetPath = `/san-pham/${data.slug}`;
+            if (window.location.pathname !== targetPath) {
+              window.history.replaceState(null, "", targetPath);
+            }
+          }
         }
       } catch (err) {
         console.error("Error loading product detail:", err);
@@ -51,29 +68,46 @@ export default function ProductDetail() {
     return () => { isMounted = false; };
   }, [productId]);
 
-  // === Derived data from API response ===
-  const productImages = product?.images
-    ? [...product.images].sort((a, b) => {
-      // isPrimary first, then by displayOrder
-      if (a.isPrimary !== b.isPrimary) return b.isPrimary - a.isPrimary;
-      return (a.displayOrder || 0) - (b.displayOrder || 0);
-    }).map(img => img.imageUrl)
-    : [];
+  useEffect(() => {
+    if (product?.name) {
+      document.title = `${product.name} | Thành Công Việt Nam`;
+    }
+  }, [product?.name]);
+
+  // === Derived data from API response (Memoized để tránh tính toán lại khi đổi ảnh/số lượng/tab) ===
+  const productImages = useMemo(() => {
+    return product?.images
+      ? [...product.images]
+          .sort((a, b) => {
+            if (a.isPrimary !== b.isPrimary) return b.isPrimary - a.isPrimary;
+            return (a.displayOrder || 0) - (b.displayOrder || 0);
+          })
+          .map((img) => img.imageUrl)
+      : [];
+  }, [product?.images]);
 
   const activeImg = productImages[activeImgIndex] || productImages[0] || "";
 
   // Build specifications list from API map
-  const technicalSpecs = [];
-  if (product?.specifications) {
-    Object.entries(product.specifications).forEach(([groupName, specs]) => {
-      specs.forEach(spec => {
-        technicalSpecs.push({
-          label: spec.specName,
-          value: spec.specValue,
+  const technicalSpecs = useMemo(() => {
+    const list = [];
+    if (product?.specifications) {
+      Object.entries(product.specifications).forEach(([groupName, specs]) => {
+        specs.forEach((spec) => {
+          list.push({
+            label: spec.specName,
+            value: spec.specValue,
+          });
         });
       });
-    });
-  }
+    }
+    return list;
+  }, [product?.specifications]);
+
+  const processedDescription = useMemo(
+    () => embedYoutubeInHtml(product?.longDescription || ""),
+    [product?.longDescription]
+  );
 
   // Format price
   const formatPrice = (price) => {
@@ -120,8 +154,8 @@ export default function ProductDetail() {
       console.error("Lỗi khi thêm vào giỏ hàng:", err);
       message.error(
         err?.response?.data?.message ||
-          err?.message ||
-          "Thêm sản phẩm vào giỏ hàng thất bại!"
+        err?.message ||
+        "Thêm sản phẩm vào giỏ hàng thất bại!"
       );
     } finally {
       setAddingToCart(false);
@@ -146,24 +180,17 @@ export default function ProductDetail() {
       console.error("Lỗi khi mua ngay:", err);
       message.error(
         err?.response?.data?.message ||
-          err?.message ||
-          "Không thể thực hiện mua ngay!"
+        err?.message ||
+        "Không thể thực hiện mua ngay!"
       );
     } finally {
       setAddingToCart(false);
     }
   };
 
-  // === Loading State ===
+  // === Loading State: Hiệu ứng làm mờ skeleton delay đợi server load ===
   if (loading) {
-    return (
-      <div className="pd-page">
-        <div className="pd-loading-state">
-          <LoadingOutlined style={{ fontSize: 40, color: "#d90429" }} />
-          <p>Đang tải thông tin sản phẩm...</p>
-        </div>
-      </div>
-    );
+    return <CustomerDetailSkeleton />;
   }
 
   // === Error State ===
@@ -187,7 +214,12 @@ export default function ProductDetail() {
           <span className="pd-crumb-sep">›</span>
           {product.categoryName && (
             <>
-              <span className="pd-crumb-link">{product.categoryName}</span>
+              <Link
+                to={product.categorySlug ? `/san-pham/${product.categorySlug}` : "/san-pham"}
+                className="pd-crumb-link"
+              >
+                {product.categoryName}
+              </Link>
               <span className="pd-crumb-sep">›</span>
             </>
           )}
@@ -213,7 +245,7 @@ export default function ProductDetail() {
                     onMouseEnter={() => setActiveImgIndex(i)}
                     title={`Xem ảnh ${i + 1}`}
                   >
-                    <img src={img} alt={`Ảnh nhỏ ${i + 1}`} />
+                    <img src={img} alt={`Ảnh nhỏ ${i + 1}`} loading="lazy" decoding="async" />
                   </button>
                 ))}
               </div>
@@ -223,7 +255,7 @@ export default function ProductDetail() {
             <div className="pd-main-image-wrap">
               {product.isActive === 1 && <span className="pd-image-badge">Nổi Bật</span>}
               {activeImg ? (
-                <img src={activeImg} alt={product.name} className="pd-main-image" />
+                <img src={activeImg} alt={product.name} className="pd-main-image" decoding="async" />
               ) : (
                 <div className="pd-no-image">Chưa có ảnh sản phẩm</div>
               )}
@@ -263,7 +295,7 @@ export default function ProductDetail() {
             <div className="pd-meta-bar">
               {product.slug && (
                 <>
-                  <span className="pd-meta-item">Mã SP: <strong>{product.slug}</strong></span>
+                  <span className="pd-meta-item">Mã SP: <strong>{product.sku}</strong></span>
                   <span className="pd-meta-divider">•</span>
                 </>
               )}
@@ -299,9 +331,34 @@ export default function ProductDetail() {
 
             {/* Tóm tắt ngắn gọn */}
             {product.description && (
-              <p className="pd-short-desc">
-                {product.description}
-              </p>
+              <div className="pd-short-desc">
+                {product.description.split("\n").map((line, idx) => {
+                  const trimmed = line.trim();
+                  if (!trimmed) return <div key={idx} className="pd-desc-empty-line" />;
+                  if (trimmed.startsWith("•") || trimmed.startsWith("-") || trimmed.startsWith("*")) {
+                    return (
+                      <div key={idx} className="pd-desc-bullet-item">
+                        <span className="pd-desc-bullet-dot">•</span>
+                        <span>{trimmed.replace(/^[•\-*]\s*/, "")}</span>
+                      </div>
+                    );
+                  }
+                  const numMatch = trimmed.match(/^(\d+)\.\s*(.*)$/);
+                  if (numMatch) {
+                    return (
+                      <div key={idx} className="pd-desc-bullet-item">
+                        <span className="pd-desc-bullet-num">{numMatch[1]}.</span>
+                        <span>{numMatch[2]}</span>
+                      </div>
+                    );
+                  }
+                  return (
+                    <p key={idx} className="pd-desc-text-line">
+                      {line}
+                    </p>
+                  );
+                })}
+              </div>
             )}
 
             {/* Bảng tóm tắt thông số nhanh từ specifications */}
@@ -341,17 +398,21 @@ export default function ProductDetail() {
                 <ShoppingCartOutlined /> {addingToCart ? "ĐANG THÊM..." : "THÊM VÀO GIỎ"}
               </button>
 
-              <button
+              {/* <button
                 type="button"
                 className="pd-btn-buy-now"
                 onClick={handleBuyNow}
                 disabled={addingToCart}
               >
                 <ThunderboltOutlined /> MUA NGAY
-              </button>
+              </button> */}
 
-              <button type="button" className="pd-btn-quote" onClick={() => window.location.href = "tel:0865130088"}>
-                BÁO GIÁ DỰ ÁN
+              <button
+                type="button"
+                className="pd-btn-quote"
+                onClick={() => setQuoteModalOpen(true)}
+              >
+                <FileTextOutlined /> BÁO GIÁ DỰ ÁN
               </button>
 
               <a href="tel:0865130088" className="pd-btn-hotline" title="Gọi kỹ thuật tư vấn">
@@ -388,7 +449,7 @@ export default function ProductDetail() {
                 {product.longDescription ? (
                   <div
                     className="pd-long-description"
-                    dangerouslySetInnerHTML={{ __html: embedYoutubeInHtml(product.longDescription) }}
+                    dangerouslySetInnerHTML={{ __html: processedDescription }}
                   />
                 ) : (
                   <p>Chưa có mô tả chi tiết cho sản phẩm này.</p>
@@ -420,23 +481,93 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Khối liên hệ tư vấn cuối trang (Đơn giản, tinh tế) */}
-        <div className="pd-bottom-contact">
-          <div className="pd-bcontact-text">
-            <h4>Cần tư vấn thiết kế hệ thống & Báo giá dự án?</h4>
-            <p>Đội ngũ kỹ sư giàu kinh nghiệm của Thành Công Việt Nam luôn sẵn sàng hỗ trợ kỹ thuật và bản vẽ 24/7.</p>
-          </div>
-          <div className="pd-bcontact-actions">
-            <a href="tel:0865130088" className="pd-bcontact-btn">
-              Hotline: 0865.130.088
-            </a>
-            <a href="https://zalo.me/0865130088" target="_blank" rel="noreferrer" className="pd-bzalo-btn">
-              Chat Zalo Kỹ Thuật
-            </a>
+        {/* Khối liên hệ tư vấn cuối trang - Thiết kế thân thiện theo mẫu */}
+        <div className="pd-consult-section">
+          <div className="pd-consult-card">
+            <h3 className="pd-consult-title">HÃY LIÊN HỆ VỚI CHÚNG TÔI ĐỂ ĐƯỢC TƯ VẤN</h3>
+
+            {/* Hotline Badge Lớn Nổi Bật */}
+            <div className="pd-consult-hotline-wrap">
+              <a href="tel:0865130088" className="pd-consult-hotline-badge" title="Bấm để gọi ngay Hotline 0865 130 088">
+                <span className="pd-consult-phone-icon">
+                  <PhoneFilled />
+                </span>
+                <span className="pd-consult-hotline-num">0865 130 088</span>
+              </a>
+            </div>
+
+            {/* Thông tin liên hệ chi tiết */}
+            <div className="pd-consult-info-list">
+              <p className="pd-consult-info-item">
+                <span className="pd-consult-item-label">
+                  <PhoneOutlined className="pd-consult-ic" /> Điện thoại:
+                </span>{" "}
+                <a href="tel:0865130088" className="pd-consult-link">
+                  0865 130 088
+                </a>
+                <span className="pd-consult-divider">-</span>
+                <span className="pd-consult-item-label">
+                  <MailOutlined className="pd-consult-ic" /> Email:
+                </span>{" "}
+                <a href="mailto:coibaodongvn@gmail.com" className="pd-consult-link">
+                  coibaodongvn@gmail.com
+                </a>
+              </p>
+
+              <p className="pd-consult-info-item">
+                <span className="pd-consult-item-label">
+                  <GlobalOutlined className="pd-consult-ic" /> Website:
+                </span>{" "}
+                <a href="https://coihubaodong.com" target="_blank" rel="noreferrer" className="pd-consult-link">
+                  coihubaodong.com
+                </a>
+                <span className="pd-consult-space">hoặc</span>
+                <a href="https://anninhthanhcong.com" target="_blank" rel="noreferrer" className="pd-consult-link">
+                  anninhthanhcong.com
+                </a>
+              </p>
+
+              <p className="pd-consult-shipping">
+                <CarOutlined className="pd-consult-shipping-ic" /> Giao hàng toàn quốc - Miễn phí vận chuyển trong nội thành Hà Nội
+              </p>
+            </div>
+
+            {/* Các nút liên hệ & báo giá nhanh */}
+            <div className="pd-consult-actions">
+              <button
+                type="button"
+                className="pd-cbtn pd-cbtn-quote"
+                onClick={() => setQuoteModalOpen(true)}
+              >
+                <FileTextOutlined /> Yêu cầu báo giá dự án
+              </button>
+              <a
+                href="https://zalo.me/0865130088"
+                target="_blank"
+                rel="noreferrer"
+                className="pd-cbtn pd-cbtn-zalo"
+              >
+                <MessageOutlined /> Chat Zalo tư vấn
+              </a>
+              <a
+                href="tel:0865130088"
+                className="pd-cbtn pd-cbtn-call"
+              >
+                <PhoneFilled /> Gọi 0865 130 088
+              </a>
+            </div>
           </div>
         </div>
 
       </div>
+
+      {/* Modal Báo Giá Dự Án Nhanh */}
+      <QuoteModal
+        isOpen={quoteModalOpen}
+        onClose={() => setQuoteModalOpen(false)}
+        product={product}
+        quantity={quantity}
+      />
     </div>
   );
 }

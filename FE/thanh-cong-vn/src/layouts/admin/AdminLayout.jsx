@@ -16,6 +16,7 @@ import {
   LogoutOutlined,
   FileDoneOutlined,
   CloseOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
 import { clearAuth, getAdminUser } from "../../utils/auth";
 import { RouteSkeleton } from "../../components/common/RouteSkeleton";
@@ -33,6 +34,7 @@ const routeNames = {
   "/admin/brands": "Thương hiệu",
   "/admin/categories": "Danh mục sản phẩm",
   "/admin/products": "Quản lý sản phẩm",
+  "/admin/product-categories": "Đa danh mục sản phẩm",
   "/admin/product-specs": "Thông số sản phẩm",
   "/admin/news-categories": "Danh mục tin tức",
   "/admin/posts": "Quản lý bài viết",
@@ -55,6 +57,7 @@ const menuItems = [
     children: [
       { key: "/admin/bills", icon: <FileDoneOutlined />, label: "Hóa đơn / Đơn hàng" },
       { key: "/admin/products", icon: <ShoppingOutlined />, label: "Sản phẩm" },
+      { key: "/admin/product-categories", icon: <ApartmentOutlined />, label: "Đa danh mục SP" },
       { key: "/admin/product-specs", icon: <UnorderedListOutlined />, label: "Thông số SP" },
       { key: "/admin/categories", icon: <FolderOutlined />, label: "Danh mục SP" },
       { key: "/admin/brands", icon: <TagsOutlined />, label: "Thương hiệu" },

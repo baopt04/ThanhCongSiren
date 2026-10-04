@@ -2002,7 +2002,7 @@ export function AccountPage() {
                 {detailOrderModal.items?.map((it, i) => (
                   <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #f1f5f9" }}>
                     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                      <img src={it.image || PLACEHOLDER_IMAGE} alt={it.name} style={{ width: 44, height: 44, borderRadius: 6, objectFit: "cover" }} />
+                      <img src={it.image || PLACEHOLDER_IMAGE} alt={it.name} loading="lazy" decoding="async" style={{ width: 44, height: 44, borderRadius: 6, objectFit: "cover" }} />
                       <div>
                         <div style={{ fontSize: 13, fontWeight: 600 }}>{it.name}</div>
                         <div style={{ fontSize: 12, color: "#64748b" }}>Số lượng: x{it.quantity}</div>

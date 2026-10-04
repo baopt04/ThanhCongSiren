@@ -34,20 +34,12 @@ import { getAllProducts } from "../../services/ProductService";
 
 const { Text } = Typography;
 
-// Suggested common spec names for quick typing
 const COMMON_SPECS = [
-  { value: "Cường độ âm thanh" },
-  { value: "Công suất động cơ" },
-  { value: "Điện áp hoạt động" },
-  { value: "Tầm xa hiệu quả" },
-  { value: "Tần số âm thanh" },
-  { value: "Tiêu chuẩn chống nước" },
-  { value: "Khối lượng" },
-  { value: "Kích thước (D x R x C)" },
-  { value: "Chất liệu vỏ" },
-  { value: "Thời gian hoạt động liên tục" },
-  { value: "Bảo hành" },
-  { value: "Xuất xứ" },
+  { value: "Cân nặng" },
+  { value: "Chiều dài" },
+  { value: "Chiều rộng" },
+  { value: "Chiều cao" },
+
 ];
 
 const FILTER_STATUS_OPTIONS = [
@@ -72,9 +64,33 @@ export function ProductSpecsPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await getAllProducts();
-      setProducts(res.data || []);
-    } catch {
+      let res = await getAllProducts({ page: 0, size: 1000 });
+      let list = Array.isArray(res) ? res : res?.data || [];
+
+      if ((!list || list.length === 0) && res?.pagination?.totalElements > 0) {
+        res = await getAllProducts({ size: 1000 });
+        list = Array.isArray(res) ? res : res?.data || [];
+      }
+
+      if (res?.pagination && res.pagination.totalPages > 1 && list.length < res.pagination.totalElements) {
+        const totalPages = res.pagination.totalPages;
+        const pageSize = res.pagination.size || 10;
+        const startPage = res.pagination.page === 0 ? 1 : 2;
+        const endPage = res.pagination.page === 0 ? totalPages - 1 : totalPages;
+        const promises = [];
+        for (let p = startPage; p <= endPage; p++) {
+          promises.push(getAllProducts({ page: p, size: pageSize }));
+        }
+        const results = await Promise.all(promises);
+        results.forEach((r) => {
+          const pageData = Array.isArray(r) ? r : r?.data || [];
+          list = list.concat(pageData);
+        });
+      }
+
+      setProducts(list);
+    } catch (err) {
+      console.error("Lỗi khi tải danh sách sản phẩm:", err);
       setProducts([]);
     }
   };
@@ -178,7 +194,6 @@ export function ProductSpecsPage() {
     });
   }, [groupedProducts, selectedProductId, filterMode, searchKeyword]);
 
-  // Expand / collapse all toggle
   const allCurrentKeys = useMemo(
     () => filteredData.map((item) => item.id),
     [filteredData]
@@ -252,6 +267,9 @@ export function ProductSpecsPage() {
     }
     setEditingId(null);
     setModalOpen(true);
+    if (products.length <= 10) {
+      fetchProducts();
+    }
   };
 
   const handleAddSpecForProduct = (productId) => {
@@ -259,6 +277,9 @@ export function ProductSpecsPage() {
     form.setFieldsValue({ productId, displayOrder: 0 });
     setEditingId(null);
     setModalOpen(true);
+    if (products.length <= 10) {
+      fetchProducts();
+    }
   };
 
   const handleEdit = (record) => {
@@ -539,7 +560,14 @@ export function ProductSpecsPage() {
         </div>
 
         <Space>
-          <Button icon={<ReloadOutlined />} onClick={fetchData} loading={loading}>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() => {
+              fetchProducts();
+              fetchData();
+            }}
+            loading={loading}
+          >
             Tải lại
           </Button>
           <Button onClick={toggleExpandAll} style={{ borderRadius: 8 }}>

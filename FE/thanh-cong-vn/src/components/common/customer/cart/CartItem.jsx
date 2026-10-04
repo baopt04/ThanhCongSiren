@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { getProductPath } from "../../../../utils/slugUtils";
 
 export default function CartItem({ item, onUpdateQty, onRemove }) {
   const [localQty, setLocalQty] = useState(item.quantity || 1);
@@ -47,24 +48,26 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
   return (
     <div className="cart-item-card">
       {/* 1. Thumbnail Image */}
-      <div className="cart-item-img-wrap">
+      <Link to={getProductPath(item)} className="cart-item-img-wrap">
         <img
           src={
             item.image ||
             "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg"
           }
           alt={item.name}
+          loading="lazy"
+          decoding="async"
           onError={(e) => {
             e.target.src =
-              "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-bao-dong-lk-jdw245pk-lap-tai-nha-may-thuy-dien-song-hinh.jpg";
+            "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-bao-dong-lk-jdw245pk-lap-tai-nha-may-thuy-dien-song-hinh.jpg";
           }}
         />
-      </div>
+      </Link>
 
       {/* 2. Product Information */}
       <div className="cart-item-info">
         <Link
-          to={`/san-pham/${item.productId || item.id || item.slug || ""}`}
+          to={getProductPath(item)}
           className="cart-item-title"
         >
           {item.name}

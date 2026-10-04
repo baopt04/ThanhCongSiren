@@ -99,7 +99,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse getById(String id) {
-        return mapToResponse(postRepository.findById(id)
+        return mapToResponse(postRepository.findDetailedById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.POST_NOT_FOUND)));
     }
 
@@ -111,7 +111,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page<PostResponse> getAll(Pageable pageable) {
-        return postRepository.findAll(pageable)
+        return postRepository.findAllWithCategoryAndAuthor(pageable)
                 .map(this::mapToResponse);
     }
 

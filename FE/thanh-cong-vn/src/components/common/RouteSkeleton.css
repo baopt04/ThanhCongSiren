@@ -94,11 +94,13 @@
 
 @keyframes tcContentFadeIn {
   from {
-    opacity: 0;
-    transform: translateY(4px);
+    opacity: 0.35;
+    filter: blur(2px);
+    transform: translateY(3px);
   }
   to {
     opacity: 1;
+    filter: blur(0);
     transform: translateY(0);
   }
 }

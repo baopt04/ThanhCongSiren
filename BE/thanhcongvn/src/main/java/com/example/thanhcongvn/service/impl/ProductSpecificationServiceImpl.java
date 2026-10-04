@@ -74,7 +74,7 @@ public class ProductSpecificationServiceImpl implements ProductSpecificationServ
 
     @Override
     public List<ProductSpecificationResponse> getAll() {
-        return specificationRepository.findAll()
+        return specificationRepository.findAllWithProduct()
                 .stream()
                 .map(this::mapToResponse)
                 .toList();

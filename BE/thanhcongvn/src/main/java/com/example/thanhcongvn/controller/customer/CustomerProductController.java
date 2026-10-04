@@ -6,6 +6,7 @@ import com.example.thanhcongvn.dto.response.error.ApiFeResponse;
 import com.example.thanhcongvn.dto.response.error.ApiResponse;
 import com.example.thanhcongvn.dto.response.pagination.PaginationResponse;
 import com.example.thanhcongvn.entity.Product;
+import com.example.thanhcongvn.infrastructure.listener.PageResponse;
 import com.example.thanhcongvn.service.impl.customer.CustomerProductServiceImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerProductController {
     private final CustomerProductServiceImpl customerProductService;
+
     @GetMapping
     public ResponseEntity< ApiFeResponse<List<ListProductResponse>>> getAllListProduct(
             @PageableDefault(size = 10 , sort = "createdAt" , direction = Sort.Direction.DESC)Pageable pageable) {
@@ -110,5 +112,13 @@ public class CustomerProductController {
                         .data(response)
                         .build()
         );
+
+    }
+    @GetMapping("/{categoryId}/products")
+    public ResponseEntity<PageResponse<ListProductResponse>> getProducts(
+            @PathVariable String categoryId,
+            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(PageResponse.of(
+                customerProductService.getProductsByCategory(categoryId, pageable)));
     }
 }

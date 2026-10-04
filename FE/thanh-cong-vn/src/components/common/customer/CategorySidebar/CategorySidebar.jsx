@@ -15,6 +15,7 @@ import {
 import { getCachedCustomerCategories } from "../../../../utils/categoriesCache";
 import { searchCategoryBySlug } from "../../../../services/customer/CustomerProductService";
 import { PLACEHOLDER_IMAGE } from '../../../../utils/placeholder';
+import { getProductPath } from "../../../../utils/slugUtils";
 
 function getProductPrimaryImage(prod) {
   if (Array.isArray(prod?.image) && prod.image.length > 0) {
@@ -150,13 +151,15 @@ function CategoryTreeItem({
                   {productsList.map((prod) => (
                     <Link
                       key={prod.id}
-                      to={`/san-pham/${prod.id}`}
+                      to={getProductPath(prod)}
                       className="tc-cat-flyout-item"
                     >
                       <div className="tc-cat-flyout-thumb">
                         <img
                           src={getProductPrimaryImage(prod)}
                           alt={prod.name}
+                          loading="lazy"
+                          decoding="async"
                           onError={(e) => {
                             e.target.src = PLACEHOLDER_IMAGE;
                           }}

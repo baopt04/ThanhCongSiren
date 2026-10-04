@@ -82,7 +82,7 @@ export function NewsSection() {
                 {item.image && (
                   <div className="tc-news-item-thumb">
                     <Link to={`/tin-tuc/${item.slug}`}>
-                      <img src={item.image} alt={item.title} loading="lazy" />
+                      <img src={item.image} alt={item.title} loading="lazy" decoding="async" />
                     </Link>
                   </div>
                 )}
@@ -99,6 +99,7 @@ export function NewsSection() {
                     alt={activeVideo.title}
                     className="tc-video-thumb"
                     loading="lazy"
+                    decoding="async"
                   />
                   <Link
                     to={`/tin-tuc/${activeVideo.slug}`}

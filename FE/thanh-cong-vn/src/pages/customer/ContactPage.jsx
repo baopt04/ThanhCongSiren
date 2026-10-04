@@ -129,7 +129,7 @@ export function ContactPage() {
                 <div className="contact-item-text">
                   <span className="contact-item-label">Điện thoại văn phòng:</span>
                   <p>
-                    <a href="tel:02466873822">024.6687.3822</a> — <a href="tel:0865130088">0865.130.088</a>
+                    <a href="tel:0364862148">0364.862.148</a> — <a href="tel:0865130088">0865.130.088</a>
                   </p>
                 </div>
               </div>
@@ -145,7 +145,7 @@ export function ContactPage() {
                 <div className="contact-item-text">
                   <span className="contact-item-label">Email báo giá & dự án:</span>
                   <p>
-                    <a href="mailto:sieuthianninhviet@gmail.com">sieuthianninhviet@gmail.com</a>
+                    <a href="mailto:coihubaodongvn@gmail.com">coihubaodongvn@gmail.com</a>
                     <br />
                     <a href="mailto:thanhcongvietnamco@gmail.com">thanhcongvietnamco@gmail.com</a>
                   </p>

@@ -1,13 +1,180 @@
 import { useEditor, EditorContent } from "@tiptap/react";
+import { Extension, Mark, mergeAttributes } from "@tiptap/core";
 import StarterKit from "@tiptap/starter-kit";
 import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import Youtube from "@tiptap/extension-youtube";
 import { useState, useEffect, useRef, useMemo } from "react";
-import { Modal, Popconfirm } from "antd";
-import { DeleteOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
+import { Modal, Popconfirm, ColorPicker, Input, Checkbox, Button, Space, Tooltip } from "antd";
+import {
+  DeleteOutlined,
+  ExclamationCircleOutlined,
+  AlignLeftOutlined,
+  AlignCenterOutlined,
+  AlignRightOutlined,
+  LinkOutlined,
+  DisconnectOutlined,
+} from "@ant-design/icons";
 import { getYouTubeVideoId } from "../../utils/youtubeUtils";
 import "./RichTextEditor.css";
+
+// Extension hỗ trợ căn lề (Trái, Giữa, Phải) cho paragraph, heading, blockquote, listItem
+const TextAlign = Extension.create({
+  name: "textAlign",
+
+  addOptions() {
+    return {
+      types: ["heading", "paragraph", "blockquote", "listItem"],
+      alignments: ["left", "center", "right"],
+      defaultAlignment: null,
+    };
+  },
+
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          textAlign: {
+            default: this.options.defaultAlignment,
+            parseHTML: (element) => {
+              const alignment = element.style?.textAlign;
+              return this.options.alignments.includes(alignment)
+                ? alignment
+                : this.options.defaultAlignment;
+            },
+            renderHTML: (attributes) => {
+              if (
+                !attributes.textAlign ||
+                !this.options.alignments.includes(attributes.textAlign)
+              ) {
+                return {};
+              }
+              return { style: `text-align: ${attributes.textAlign}` };
+            },
+          },
+        },
+      },
+    ];
+  },
+
+  addCommands() {
+    return {
+      setTextAlign:
+        (alignment) =>
+        ({ commands }) => {
+          if (!this.options.alignments.includes(alignment)) {
+            return false;
+          }
+          return this.options.types
+            .map((type) => commands.updateAttributes(type, { textAlign: alignment }))
+            .some((response) => response);
+        },
+
+      unsetTextAlign:
+        () =>
+        ({ commands }) => {
+          return this.options.types
+            .map((type) => commands.resetAttributes(type, "textAlign"))
+            .some((response) => response);
+        },
+
+      toggleTextAlign:
+        (alignment) =>
+        ({ editor, commands }) => {
+          if (!this.options.alignments.includes(alignment)) {
+            return false;
+          }
+          if (editor.isActive({ textAlign: alignment })) {
+            return commands.unsetTextAlign();
+          }
+          return commands.setTextAlign(alignment);
+        },
+    };
+  },
+
+  addKeyboardShortcuts() {
+    return {
+      "Mod-Shift-l": () => this.editor.commands.setTextAlign("left"),
+      "Mod-Shift-e": () => this.editor.commands.setTextAlign("center"),
+      "Mod-Shift-r": () => this.editor.commands.setTextAlign("right"),
+    };
+  },
+});
+
+// Mark hỗ trợ đổi màu chữ (Text Color)
+const TextColorMark = Mark.create({
+  name: "textColor",
+
+  addOptions() {
+    return {
+      HTMLAttributes: {},
+    };
+  },
+
+  addAttributes() {
+    return {
+      color: {
+        default: null,
+        parseHTML: (element) => element.style.color || null,
+        renderHTML: (attributes) => {
+          if (!attributes.color) {
+            return {};
+          }
+          return {
+            style: `color: ${attributes.color}`,
+          };
+        },
+      },
+    };
+  },
+
+  parseHTML() {
+    return [
+      {
+        tag: "span[style*='color']",
+        getAttrs: (element) => {
+          const color = element.style.color;
+          return color ? { color } : false;
+        },
+      },
+    ];
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ["span", mergeAttributes(this.options.HTMLAttributes, HTMLAttributes), 0];
+  },
+
+  addCommands() {
+    return {
+      setColor:
+        (color) =>
+        ({ chain }) => {
+          return chain().setMark(this.name, { color }).run();
+        },
+      unsetColor:
+        () =>
+        ({ chain }) => {
+          return chain().unsetMark(this.name).run();
+        },
+    };
+  },
+});
+
+const COLOR_PRESETS = [
+  {
+    label: "Màu phổ biến",
+    colors: [
+      "#0f172a",
+      "#d90429",
+      "#2563eb",
+      "#16a34a",
+      "#d97706",
+      "#7c3aed",
+      "#475569",
+    ],
+  },
+];
 
 const CustomImage = Image.extend({
   addAttributes() {
@@ -39,15 +206,40 @@ export function RichTextEditor({
   const [deletingImageMap, setDeletingImageMap] = useState({});
   const fileInputRef = useRef(null);
 
+  // Link state
+  const [linkModalOpen, setLinkModalOpen] = useState(false);
+  const [linkUrl, setLinkUrl] = useState("");
+  const [linkText, setLinkText] = useState("");
+  const [linkOpenInNewTab, setLinkOpenInNewTab] = useState(true);
+  const [savedSelectionRange, setSavedSelectionRange] = useState(null);
+  const [isEditingExistingLink, setIsEditingExistingLink] = useState(false);
+  const handleOpenLinkModalRef = useRef(null);
+
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        bulletList: {
+          HTMLAttributes: {
+            class: "editor-bullet-list",
+          },
+        },
+        orderedList: {
+          HTMLAttributes: {
+            class: "editor-ordered-list",
+          },
+        },
+      }),
+      TextAlign.configure({
+        types: ["heading", "paragraph", "blockquote", "listItem"],
+      }),
+      TextColorMark,
       CustomImage.configure({
         inline: false,
         allowBase64: true,
       }),
       Link.configure({
         openOnClick: false,
+        isAllowedUri: () => true,
         HTMLAttributes: {
           target: "_blank",
           rel: "noopener noreferrer",
@@ -70,6 +262,14 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class: "rich-editor-content",
+      },
+      handleKeyDown: (view, event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+          event.preventDefault();
+          handleOpenLinkModalRef.current?.();
+          return true;
+        }
+        return false;
       },
     },
   });
@@ -220,15 +420,137 @@ export function RichTextEditor({
     }
   };
 
-  const addLink = () => {
-    const previousUrl = editor?.getAttributes("link").href;
-    const url = window.prompt("Nhập đường dẫn URL liên kết:", previousUrl || "https://");
-    if (url === null) return;
-    if (url === "") {
-      editor?.chain().focus().extendMarkRange("link").unsetLink().run();
+  const handleOpenLinkModal = () => {
+    if (!editor) return;
+
+    const { state } = editor;
+    const { from, to, empty } = state.selection;
+    setSavedSelectionRange({ from, to });
+
+    const isLinkActive = editor.isActive("link");
+    setIsEditingExistingLink(isLinkActive);
+
+    const existingAttrs = editor.getAttributes("link");
+    setLinkUrl(existingAttrs?.href || "");
+    setLinkOpenInNewTab(existingAttrs?.target !== "_self");
+
+    if (!empty) {
+      const selectedText = state.doc.textBetween(from, to, " ");
+      setLinkText(selectedText);
+    } else if (isLinkActive) {
+      const node = state.doc.nodeAt(from);
+      setLinkText(node?.text || "");
+    } else {
+      setLinkText("");
+    }
+
+    setLinkModalOpen(true);
+  };
+
+  handleOpenLinkModalRef.current = handleOpenLinkModal;
+
+  const handleUnlink = () => {
+    if (!editor) return;
+    if (savedSelectionRange) {
+      const { from, to } = savedSelectionRange;
+      editor
+        .chain()
+        .focus()
+        .setTextSelection({ from, to })
+        .extendMarkRange("link")
+        .unsetLink()
+        .run();
+    } else {
+      editor.chain().focus().extendMarkRange("link").unsetLink().run();
+    }
+    setLinkModalOpen(false);
+  };
+
+  const handleApplyLink = () => {
+    if (!editor) return;
+    const trimmedUrl = linkUrl.trim();
+    if (!trimmedUrl) {
+      handleUnlink();
       return;
     }
-    editor?.chain().focus().extendMarkRange("link").setLink({ href: url }).run();
+
+    // Auto-prefix https:// if no protocol and not a relative link
+    let finalUrl = trimmedUrl;
+    if (
+      !/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(finalUrl) &&
+      !finalUrl.startsWith("/") &&
+      !finalUrl.startsWith("#") &&
+      !finalUrl.startsWith("./") &&
+      !finalUrl.startsWith("../")
+    ) {
+      finalUrl = "https://" + finalUrl;
+    }
+
+    const target = linkOpenInNewTab ? "_blank" : "_self";
+    const rel = linkOpenInNewTab ? "noopener noreferrer" : undefined;
+
+    if (savedSelectionRange) {
+      const { from, to } = savedSelectionRange;
+      const isTextSelected = from !== to;
+      const originalText = isTextSelected ? editor.state.doc.textBetween(from, to, " ") : "";
+
+      if (linkText && linkText.trim() !== originalText) {
+        editor
+          .chain()
+          .focus()
+          .setTextSelection({ from, to })
+          .insertContent({
+            type: "text",
+            text: linkText.trim(),
+            marks: [
+              {
+                type: "link",
+                attrs: {
+                  href: finalUrl,
+                  target,
+                  rel,
+                },
+              },
+            ],
+          })
+          .run();
+      } else if (isTextSelected) {
+        editor
+          .chain()
+          .focus()
+          .setTextSelection({ from, to })
+          .setLink({ href: finalUrl, target, rel })
+          .run();
+      } else {
+        editor
+          .chain()
+          .focus()
+          .insertContent({
+            type: "text",
+            text: linkText.trim() || finalUrl,
+            marks: [
+              {
+                type: "link",
+                attrs: {
+                  href: finalUrl,
+                  target,
+                  rel,
+                },
+              },
+            ],
+          })
+          .run();
+      }
+    } else {
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: finalUrl, target, rel })
+        .run();
+    }
+
+    setLinkModalOpen(false);
   };
 
   const addYoutubeVideo = () => {
@@ -259,6 +581,7 @@ export function RichTextEditor({
           <>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleBold().run()}
               className={editor?.isActive("bold") ? "active" : ""}
               title="In đậm (Bold - Ctrl+B)"
@@ -267,6 +590,7 @@ export function RichTextEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleItalic().run()}
               className={editor?.isActive("italic") ? "active" : ""}
               title="In nghiêng (Italic - Ctrl+I)"
@@ -275,6 +599,7 @@ export function RichTextEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleStrike().run()}
               className={editor?.isActive("strike") ? "active" : ""}
               title="Gạch ngang"
@@ -282,10 +607,71 @@ export function RichTextEditor({
               <s>S</s>
             </button>
 
+            {/* Đổi màu chữ */}
+            <ColorPicker
+              size="small"
+              presets={COLOR_PRESETS}
+              value={editor?.getAttributes("textColor")?.color || "#0f172a"}
+              onChangeComplete={(color) => {
+                editor?.chain().focus().setColor(color.toHexString()).run();
+              }}
+              onClear={() => {
+                editor?.chain().focus().unsetColor().run();
+              }}
+              allowClear
+            >
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                className={`toolbar-btn-color ${editor?.isActive("textColor") ? "active" : ""}`}
+                title="Đổi màu chữ (Text Color)"
+              >
+                <span className="toolbar-color-letter">A</span>
+                <span
+                  className="toolbar-color-bar"
+                  style={{
+                    backgroundColor: editor?.getAttributes("textColor")?.color || "#d90429",
+                  }}
+                />
+              </button>
+            </ColorPicker>
+
+            <span className="toolbar-divider" />
+
+            {/* Căn lề: Trái, Giữa, Phải */}
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => editor?.chain().focus().setTextAlign("left").run()}
+              className={editor?.isActive({ textAlign: "left" }) ? "active" : ""}
+              title="Căn lề trái"
+            >
+              <AlignLeftOutlined />
+            </button>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => editor?.chain().focus().toggleTextAlign("center").run()}
+              className={editor?.isActive({ textAlign: "center" }) ? "active" : ""}
+              title="Căn giữa nội dung"
+            >
+              <AlignCenterOutlined />
+            </button>
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => editor?.chain().focus().toggleTextAlign("right").run()}
+              className={editor?.isActive({ textAlign: "right" }) ? "active" : ""}
+              title="Căn lề phải"
+            >
+              <AlignRightOutlined />
+            </button>
+
             <span className="toolbar-divider" />
 
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
               className={editor?.isActive("heading", { level: 2 }) ? "active" : ""}
               title="Tiêu đề H2"
@@ -294,6 +680,7 @@ export function RichTextEditor({
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleHeading({ level: 3 }).run()}
               className={editor?.isActive("heading", { level: 3 }) ? "active" : ""}
               title="Tiêu đề H3"
@@ -305,28 +692,55 @@ export function RichTextEditor({
 
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleBulletList().run()}
               className={editor?.isActive("bulletList") ? "active" : ""}
-              title="Danh sách gạch đầu dòng (ul/li)"
+              title="Danh sách gạch đầu dòng (•)"
             >
               • Danh sách
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleOrderedList().run()}
               className={editor?.isActive("orderedList") ? "active" : ""}
-              title="Danh sách số thứ tự (ol/li)"
+              title="Danh sách số thứ tự (1, 2, 3...)"
             >
               1. Thứ tự
             </button>
             <button
               type="button"
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => editor?.chain().focus().toggleBlockquote().run()}
               className={editor?.isActive("blockquote") ? "active" : ""}
               title="Trích dẫn (Blockquote)"
             >
               &ldquo;
             </button>
+
+            <span className="toolbar-divider" />
+
+            {/* Gắn link / Liên kết */}
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleOpenLinkModal}
+              className={`toolbar-btn-link ${editor?.isActive("link") ? "active" : ""}`}
+              title="Gắn liên kết (Bôi đen đoạn chữ rồi bấm để chèn link, hoặc phím tắt Ctrl+K)"
+            >
+              <LinkOutlined /> Gắn link
+            </button>
+            {editor?.isActive("link") && (
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleUnlink}
+                className="toolbar-btn-unlink"
+                title="Gỡ liên kết khỏi đoạn chữ này"
+              >
+                <DisconnectOutlined /> Gỡ link
+              </button>
+            )}
 
             <span className="toolbar-divider" />
 
@@ -351,24 +765,6 @@ export function RichTextEditor({
                 />
               </>
             )}
-
-            <button
-              type="button"
-              onClick={addImageUrl}
-              title="Chèn hình ảnh qua liên kết URL (<img src='...' />)"
-              className="toolbar-btn-highlight"
-            >
-              🌐 Ảnh URL
-            </button>
-
-            <button
-              type="button"
-              onClick={addLink}
-              className={editor?.isActive("link") ? "active" : ""}
-              title="Chèn liên kết URL (<a href='...'>)"
-            >
-              🔗 Link
-            </button>
 
             <button
               type="button"
@@ -455,7 +851,7 @@ export function RichTextEditor({
             className={`btn-html-mode ${isHtmlMode ? "active-html" : ""}`}
             title="Chuyển đổi giữa chế độ Soạn thảo trực quan và Mã nguồn HTML"
           >
-            {isHtmlMode ? "👁️ Soạn thảo trực quan" : "&lt;/&gt; Mã nguồn HTML"}
+            {isHtmlMode ? "👁️ Soạn thảo trực quan" : "</> Mã nguồn HTML"}
           </button>
         </div>
       </div>
@@ -522,6 +918,84 @@ export function RichTextEditor({
           </div>
         </div>
       )}
+
+      {/* Modal gắn liên kết / chèn link */}
+      <Modal
+        title={
+          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 16, fontWeight: 600, color: "#0f172a" }}>
+            <LinkOutlined style={{ color: "#2563eb" }} />
+            {isEditingExistingLink ? "Chỉnh sửa liên kết" : "Gắn liên kết tới trang"}
+          </div>
+        }
+        open={linkModalOpen}
+        onCancel={() => setLinkModalOpen(false)}
+        footer={
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              {isEditingExistingLink && (
+                <Button danger type="text" icon={<DisconnectOutlined />} onClick={handleUnlink}>
+                  Gỡ liên kết
+                </Button>
+              )}
+            </div>
+            <Space>
+              <Button onClick={() => setLinkModalOpen(false)}>Hủy</Button>
+              <Button type="primary" onClick={handleApplyLink} disabled={!linkUrl.trim()}>
+                {isEditingExistingLink ? "Cập nhật" : "Gắn link"}
+              </Button>
+            </Space>
+          </div>
+        }
+        width={480}
+        destroyOnClose
+      >
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, paddingTop: 8 }}>
+          <div>
+            <label style={{ display: "block", marginBottom: 6, fontSize: 13, fontWeight: 500, color: "#334155" }}>
+              Văn bản hiển thị:
+            </label>
+            <Input
+              value={linkText}
+              onChange={(e) => setLinkText(e.target.value)}
+              placeholder="Đoạn chữ được hiển thị có chứa link..."
+              allowClear
+            />
+            <span style={{ fontSize: 12, color: "#64748b", marginTop: 4, display: "block" }}>
+              {savedSelectionRange && savedSelectionRange.from !== savedSelectionRange.to
+                ? "💡 Đoạn chữ bạn vừa bôi đen trong bài viết."
+                : "💡 Nhập chữ muốn hiển thị hoặc để trống để hiển thị đường dẫn."}
+            </span>
+          </div>
+
+          <div>
+            <label style={{ display: "block", marginBottom: 6, fontSize: 13, fontWeight: 500, color: "#334155" }}>
+              Đường dẫn liên kết (URL): <span style={{ color: "#ef4444" }}>*</span>
+            </label>
+            <Input
+              value={linkUrl}
+              onChange={(e) => setLinkUrl(e.target.value)}
+              placeholder="Ví dụ: https://thanhcong.vn hoặc /san-pham/coi-bao-dong"
+              allowClear
+              onPressEnter={handleApplyLink}
+              autoFocus
+            />
+            <span style={{ fontSize: 12, color: "#64748b", marginTop: 4, display: "block" }}>
+              Hỗ trợ link ngoài trang (<code>https://...</code>) hoặc link trong trang (<code>/san-pham/...</code>).
+            </span>
+          </div>
+
+          <div style={{ marginTop: 2 }}>
+            <Checkbox
+              checked={linkOpenInNewTab}
+              onChange={(e) => setLinkOpenInNewTab(e.target.checked)}
+            >
+              <span style={{ fontSize: 13, color: "#334155" }}>
+                Mở liên kết trong tab mới (khuyên dùng khi trỏ đến trang khác)
+              </span>
+            </Checkbox>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 package com.example.thanhcongvn.service.impl.customer;
 
-import com.example.thanhcongvn.dto.response.customer.category.ListCategoryCustomerReponse;
+import com.example.thanhcongvn.dto.response.customer.category.ListCategoryCustomerResponse;
 import com.example.thanhcongvn.entity.Category;
 import com.example.thanhcongvn.repository.CategoryRepository;
 import com.example.thanhcongvn.service.customer.CustomerCategorySerivce;
@@ -18,21 +18,21 @@ public class CustomerCategoryServiceImpl implements CustomerCategorySerivce {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<ListCategoryCustomerReponse> getListCategoryTree() {
+    public List<ListCategoryCustomerResponse> getListCategoryTree() {
         List<Category> categoryTree = categoryRepository.findAll();
-        Map<String , ListCategoryCustomerReponse> response = categoryTree.stream()
+        Map<String , ListCategoryCustomerResponse> response = categoryTree.stream()
                 .collect(Collectors.toMap(
                         Category::getId,
                         this::mapToResponseWithoutChildren
                 ));
-        List<ListCategoryCustomerReponse> listCategory = new ArrayList<>();
+        List<ListCategoryCustomerResponse> listCategory = new ArrayList<>();
         for (Category category : categoryTree) {
-            ListCategoryCustomerReponse categoryCustomerReponse = response.get(category.getId());
+            ListCategoryCustomerResponse categoryCustomerReponse = response.get(category.getId());
             String parentId = category.getParent() != null ? category.getParent().getId() : null;
             if (parentId == null) {
                 listCategory.add(categoryCustomerReponse);
             } else {
-                ListCategoryCustomerReponse parentCategoryResponse = response.get(parentId);
+                ListCategoryCustomerResponse parentCategoryResponse = response.get(parentId);
                 if (parentCategoryResponse != null) {
                     if (parentCategoryResponse.getChildren() == null) {
                         parentCategoryResponse.setChildren(new ArrayList<>());
@@ -44,8 +44,8 @@ public class CustomerCategoryServiceImpl implements CustomerCategorySerivce {
         }
         return listCategory;
     }
-    private ListCategoryCustomerReponse mapToResponseWithoutChildren(Category category) {
-        return ListCategoryCustomerReponse.builder()
+    private ListCategoryCustomerResponse mapToResponseWithoutChildren(Category category) {
+        return ListCategoryCustomerResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
                 .slug(category.getSlug())

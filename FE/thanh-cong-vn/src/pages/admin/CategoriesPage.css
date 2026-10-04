@@ -1,0 +1,308 @@
+/* ═══════════════════════════════════════════════════
+   ADMIN CATEGORIES MANAGEMENT STYLES
+   Visual tree hierarchy, distinct grouping & clear indentation
+   ═══════════════════════════════════════════════════ */
+
+/* ── Toolbar & Stats ── */
+.cat-toolbar-stats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  padding: 4px 12px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.cat-stats-number {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.cat-stats-sub {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+.cat-expand-toggle-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── Table Container & Row Styling ── */
+.categories-table-wrapper {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+/* Base row transition */
+.categories-table-wrapper .ant-table-tbody > tr > td {
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Parent Category Row (Level 0) */
+.category-row-parent > td {
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  font-weight: 500;
+}
+
+/* Parent row when expanded */
+.category-row-parent.category-row-expanded > td {
+  background-color: #f8faff !important;
+  border-bottom: 1px dashed #bfdbfe !important;
+}
+
+.category-row-parent.category-row-expanded > td:first-child {
+  border-left: 4px solid #2563eb !important;
+}
+
+/* Child Category Row (Level 1) */
+.category-row-child > td {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #eef2f6 !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
+
+.category-row-child > td:first-child {
+  border-left: 4px solid #94a3b8 !important;
+}
+
+/* Hover effects */
+.category-row-parent:hover > td {
+  background-color: #f1f5f9 !important;
+}
+
+.category-row-parent.category-row-expanded:hover > td {
+  background-color: #eff6ff !important;
+}
+
+.category-row-child:hover > td {
+  background-color: #eff6ff !important;
+}
+
+.category-row-child:hover > td:first-child {
+  border-left-color: #3b82f6 !important;
+}
+
+/* Last child in a group gets a solid border to cleanly separate from next parent */
+.category-row-child.is-last-child > td {
+  border-bottom: 2px solid #cbd5e1 !important;
+}
+
+/* ── STT Column Styling ── */
+.cat-stt-parent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #1e293b;
+  font-weight: 700;
+  font-size: 13px;
+  border: 1px solid #e2e8f0;
+}
+
+.cat-stt-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #0284c7;
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  border-radius: 4px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+.cat-stt-arrow {
+  font-size: 11px;
+  color: #0284c7;
+}
+
+/* ── Custom Expand/Collapse Button ── */
+.cat-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.cat-expand-btn:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+  transform: scale(1.08);
+}
+
+.cat-expand-btn.is-expanded {
+  background: #eff6ff;
+  color: #2563eb;
+  border-color: #93c5fd;
+}
+
+.cat-expand-btn.is-expanded:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.cat-expand-spacer {
+  display: inline-block;
+  width: 22px;
+  margin-right: 8px;
+}
+
+/* ── Category Name Column Layout ── */
+.cat-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Parent Name */
+.cat-name-parent {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cat-icon-parent {
+  font-size: 16px;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.cat-title-parent {
+  font-weight: 700;
+  font-size: 14px;
+  color: #0f172a;
+  letter-spacing: 0.2px;
+}
+
+.cat-badge-children {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  border-radius: 12px !important;
+  padding: 1px 8px !important;
+  background: #eff6ff !important;
+  color: #2563eb !important;
+  border: 1px solid #bfdbfe !important;
+}
+
+/* Child Name */
+.cat-name-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cat-branch-connector {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+  color: #94a3b8;
+  font-weight: 700;
+  user-select: none;
+  margin-right: -2px;
+}
+
+.cat-icon-child {
+  font-size: 14px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.cat-title-child {
+  font-weight: 600;
+  font-size: 13.5px;
+  color: #334155;
+}
+
+.cat-parent-tag {
+  font-size: 11px !important;
+  background: #e2e8f0 !important;
+  color: #475569 !important;
+  border-radius: 4px !important;
+  padding: 1px 6px !important;
+  border: none !important;
+}
+
+.cat-parent-tag strong {
+  color: #0f172a;
+}
+
+/* ── Slug Styling ── */
+.cat-slug-parent {
+  font-family: 'Consolas', monospace;
+  font-size: 12.5px;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid #dbeafe;
+}
+
+.cat-slug-child {
+  font-family: 'Consolas', monospace;
+  font-size: 12px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ── Action Buttons ── */
+.admin-btn-add-sub {
+  background: #eff6ff;
+  color: #2563eb;
+  border: 1px solid #bfdbfe;
+}
+
+.admin-btn-add-sub:hover {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+/* ── Modal Parent Context Hint ── */
+.cat-modal-parent-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  color: #1e40af;
+  font-size: 13.5px;
+}
+
+.cat-modal-parent-hint strong {
+  color: #1d4ed8;
+}

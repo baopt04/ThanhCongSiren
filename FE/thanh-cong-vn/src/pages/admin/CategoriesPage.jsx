@@ -22,15 +22,17 @@ import {
   SearchOutlined,
   ReloadOutlined,
   FolderOutlined,
+  FolderOpenOutlined,
   ExclamationCircleOutlined,
+  ApartmentOutlined,
 } from "@ant-design/icons";
-import apiClient from "../../api/client";
 import {
   createCategory,
   updateCategory,
   deleteCategory,
   categoryTree,
 } from "../../services/CategoryService";
+import "./CategoriesPage.css";
 
 function toSlug(str) {
   if (!str) return "";
@@ -50,17 +52,51 @@ const STATUS_OPTIONS = [
   { value: 0, label: "Ngưng hoạt động" },
 ];
 
+/**
+ * Hàm đệ quy bổ sung metadata hiển thị cây danh mục:
+ * - displayStt: Số thứ tự dạng phân cấp: 1, 1.1, 1.2, 2, 2.1...
+ * - level: Cấp độ danh mục (0: gốc, 1: con...)
+ * - parentName: Tên danh mục cha để hiển thị rõ ngữ cảnh
+ * - isLastChild: Đánh dấu phần tử con cuối cùng để vẽ nhánh cây và đường phân cách
+ */
+const enrichTree = (nodes, parentStt = "", level = 0, parentName = "") => {
+  if (!Array.isArray(nodes)) return [];
+  const count = nodes.length;
+  return nodes.map((node, index) => {
+    const currentStt = parentStt ? `${parentStt}.${index + 1}` : `${index + 1}`;
+    const hasChildren = Array.isArray(node.children) && node.children.length > 0;
+    const isLastChild = index === count - 1;
+    const children = hasChildren
+      ? enrichTree(node.children, currentStt, level + 1, node.name)
+      : undefined;
+
+    return {
+      ...node,
+      displayStt: currentStt,
+      level,
+      parentName,
+      isLastChild,
+      childrenCount: hasChildren ? node.children.length : 0,
+      children: children && children.length > 0 ? children : undefined,
+    };
+  });
+};
+
 export function CategoriesPage() {
   const [data, setData] = useState([]);
   const [parents, setParents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [selectedParent, setSelectedParent] = useState(null);
   const [form] = Form.useForm();
 
   // Filters
   const [searchKeyword, setSearchKeyword] = useState("");
   const [filterStatus, setFilterStatus] = useState(null);
+
+  // Expanded row keys
+  const [expandedRowKeys, setExpandedRowKeys] = useState([]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -80,14 +116,14 @@ export function CategoriesPage() {
     fetchData();
   }, []);
 
-  const convertTree = (nodes) =>
+  const convertTree = (nodes, currentEditingId) =>
     nodes.map((n) => ({
       title: n.name,
       value: n.id,
       key: n.id,
-      children: n.children ? convertTree(n.children) : [],
+      disabled: n.id === currentEditingId,
+      children: n.children ? convertTree(n.children, currentEditingId) : [],
     }));
-
 
   const filterTree = (nodes, kw, status) => {
     return nodes
@@ -116,9 +152,86 @@ export function CategoriesPage() {
   };
 
   const filteredData = useMemo(() => {
-    if (!searchKeyword && filterStatus === null) return data;
-    return filterTree(data, searchKeyword.toLowerCase(), filterStatus);
+    let result = data;
+    if (searchKeyword || filterStatus !== null) {
+      result = filterTree(data, searchKeyword.toLowerCase(), filterStatus);
+    }
+    return enrichTree(result);
   }, [data, searchKeyword, filterStatus]);
+
+  // Danh sách toàn bộ id các nhóm có phần tử con
+  const allParentKeys = useMemo(() => {
+    const keys = [];
+    const collectKeys = (nodes) => {
+      nodes.forEach((n) => {
+        if (n.children && n.children.length > 0) {
+          keys.push(n.id);
+          collectKeys(n.children);
+        }
+      });
+    };
+    collectKeys(filteredData);
+    return keys;
+  }, [filteredData]);
+
+  // Thống kê tổng số lượng danh mục gốc và danh mục con
+  const stats = useMemo(() => {
+    const rootCount = filteredData.length;
+    let childCount = 0;
+    const countSub = (nodes) => {
+      nodes.forEach((n) => {
+        if (n.children && n.children.length > 0) {
+          childCount += n.children.length;
+          countSub(n.children);
+        }
+      });
+    };
+    countSub(filteredData);
+    return { rootCount, childCount, total: rootCount + childCount };
+  }, [filteredData]);
+
+  // Khi tìm kiếm, tự động bung tất cả các nhóm để người dùng thấy ngay kết quả con
+  useEffect(() => {
+    if (searchKeyword.trim() && allParentKeys.length > 0) {
+      setExpandedRowKeys(allParentKeys);
+    }
+  }, [searchKeyword, allParentKeys]);
+
+  const handleAddRoot = () => {
+    form.resetFields();
+    form.setFieldsValue({ status: 1 });
+    setEditingId(null);
+    setSelectedParent(null);
+    setModalOpen(true);
+  };
+
+  const handleAddSub = (parentRecord) => {
+    form.resetFields();
+    form.setFieldsValue({
+      parentId: parentRecord.id,
+      status: 1,
+    });
+    setEditingId(null);
+    setSelectedParent(parentRecord);
+    setModalOpen(true);
+  };
+
+  const handleEdit = (record) => {
+    form.setFieldsValue({
+      name: record.name,
+      slug: record.slug,
+      description: record.description,
+      status: record.status,
+      parentId: record.parentId || undefined,
+    });
+    setEditingId(record.id);
+    setSelectedParent(
+      record.parentId
+        ? { id: record.parentId, name: record.parentName || "Danh mục cha" }
+        : null
+    );
+    setModalOpen(true);
+  };
 
   const doSubmit = async () => {
     try {
@@ -142,6 +255,7 @@ export function CategoriesPage() {
       setModalOpen(false);
       form.resetFields();
       setEditingId(null);
+      setSelectedParent(null);
       fetchData();
     } catch (err) {
       if (err.errorFields) return;
@@ -158,6 +272,8 @@ export function CategoriesPage() {
     Modal.confirm({
       title: editingId
         ? "Xác nhận cập nhật danh mục"
+        : selectedParent
+        ? `Xác nhận thêm danh mục con vào "${selectedParent.name}"`
         : "Xác nhận thêm danh mục mới",
       icon: <ExclamationCircleOutlined />,
       content: editingId
@@ -168,6 +284,7 @@ export function CategoriesPage() {
       onOk: doSubmit,
     });
   };
+
   const handleDelete = async (id) => {
     try {
       await deleteCategory(id);
@@ -178,19 +295,6 @@ export function CategoriesPage() {
     }
   };
 
-  const handleEdit = (record) => {
-    form.setFieldsValue({
-      name: record.name,
-      slug: record.slug,
-      description: record.description,
-      status: record.status,
-      parentId: record.parentId || undefined,
-    });
-    setEditingId(record.id);
-    setModalOpen(true);
-  };
-
- 
   const handleNameChange = (e) => {
     const val = e.target.value;
     if (!editingId) {
@@ -202,29 +306,79 @@ export function CategoriesPage() {
     {
       title: "STT",
       key: "stt",
-      width: 60,
+      width: 75,
       align: "center",
-      render: (_, __, index) => (
-        <span style={{ color: "#64748b" }}>{index + 1}</span>
-      ),
+      render: (_, record) => {
+        if (record.level === 0) {
+          return <span className="cat-stt-parent">{record.displayStt}</span>;
+        }
+        return (
+          <span className="cat-stt-child" title={`Mục con thứ ${record.displayStt}`}>
+            <span className="cat-stt-arrow">↳</span>
+            {record.displayStt}
+          </span>
+        );
+      },
     },
     {
       title: "Tên danh mục",
       dataIndex: "name",
       key: "name",
-      render: (name) => (
-        <span style={{ fontWeight: 600, color: "#0f172a", fontSize: 14 }}>
-          <FolderOutlined style={{ color: "#2563eb", marginRight: 8 }} />
-          {name}
-        </span>
-      ),
+      render: (name, record) => {
+        const isParent = record.level === 0;
+        const isExpanded = expandedRowKeys.includes(record.id);
+        const hasChildren = record.childrenCount > 0;
+
+        if (isParent) {
+          return (
+            <div className="cat-name-cell">
+              <span className="cat-name-parent">
+                {hasChildren ? (
+                  isExpanded ? (
+                    <FolderOpenOutlined className="cat-icon-parent" />
+                  ) : (
+                    <FolderOutlined className="cat-icon-parent" />
+                  )
+                ) : (
+                  <FolderOutlined className="cat-icon-parent" style={{ color: "#3b82f6" }} />
+                )}
+                <span className="cat-title-parent">{name}</span>
+              </span>
+              {hasChildren && (
+                <Tag className="cat-badge-children">
+                  {record.childrenCount} nhóm con
+                </Tag>
+              )}
+            </div>
+          );
+        }
+
+        return (
+          <div className="cat-name-cell">
+            <span className="cat-name-child">
+              <span className="cat-branch-connector">
+                {record.isLastChild ? "└──" : "├──"}
+              </span>
+              <FolderOutlined className="cat-icon-child" />
+              <span className="cat-title-child">{name}</span>
+            </span>
+            {record.parentName && (
+              <Tag className="cat-parent-tag">
+                Thuộc: <strong>{record.parentName}</strong>
+              </Tag>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: "Slug",
       dataIndex: "slug",
       key: "slug",
-      render: (slug) => (
-        <span style={{ color: "#64748b", fontSize: 13 }}>/{slug}</span>
+      render: (slug, record) => (
+        <span className={record.level === 0 ? "cat-slug-parent" : "cat-slug-child"}>
+          /{slug}
+        </span>
       ),
     },
     {
@@ -242,11 +396,11 @@ export function CategoriesPage() {
       width: 140,
       render: (v) =>
         v === 1 ? (
-          <Tag color="green" style={{ padding: "2px 8px" }}>
+          <Tag color="green" style={{ padding: "2px 8px", borderRadius: 4 }}>
             ● Hoạt động
           </Tag>
         ) : (
-          <Tag color="red" style={{ padding: "2px 8px" }}>
+          <Tag color="red" style={{ padding: "2px 8px", borderRadius: 4 }}>
             ● Ngưng hoạt động
           </Tag>
         ),
@@ -254,35 +408,51 @@ export function CategoriesPage() {
     {
       title: "Thao tác",
       key: "actions",
-      width: 100,
+      width: 130,
       align: "center",
-      render: (_, record) => (
-        <Space size={8}>
-          <Tooltip title="Chỉnh sửa danh mục">
-            <button
-              className="admin-btn-action admin-btn-edit"
-              onClick={() => handleEdit(record)}
-            >
-              <EditOutlined />
-            </button>
-          </Tooltip>
+      render: (_, record) => {
+        const isParent = record.level === 0;
+        return (
+          <Space size={6}>
+            {isParent && (
+              <Tooltip title="Thêm danh mục con vào nhóm này">
+                <button
+                  className="admin-btn-action admin-btn-add-sub"
+                  onClick={() => handleAddSub(record)}
+                >
+                  <PlusOutlined style={{ fontSize: 12 }} />
+                </button>
+              </Tooltip>
+            )}
 
-          <Popconfirm
-            title="Xác nhận xóa danh mục"
-            description={`Bạn có chắc muốn xóa danh mục "${record.name}"?`}
-            okText="Xóa"
-            cancelText="Hủy"
-            okButtonProps={{ danger: true }}
-            onConfirm={() => handleDelete(record.id)}
-          >
-            <Tooltip title="Xóa danh mục">
-              <button className="admin-btn-action admin-btn-delete">
-                <DeleteOutlined />
+            <Tooltip title="Chỉnh sửa danh mục">
+              <button
+                className="admin-btn-action admin-btn-edit"
+                onClick={() => handleEdit(record)}
+              >
+                <EditOutlined />
               </button>
             </Tooltip>
-          </Popconfirm>
-        </Space>
-      ),
+
+            <Popconfirm
+              title="Xác nhận xóa danh mục"
+              description={`Bạn có chắc muốn xóa danh mục "${record.name}"?${
+                record.childrenCount ? " Các danh mục con cũng có thể bị ảnh hưởng!" : ""
+              }`}
+              okText="Xóa"
+              cancelText="Hủy"
+              okButtonProps={{ danger: true }}
+              onConfirm={() => handleDelete(record.id)}
+            >
+              <Tooltip title="Xóa danh mục">
+                <button className="admin-btn-action admin-btn-delete">
+                  <DeleteOutlined />
+                </button>
+              </Tooltip>
+            </Popconfirm>
+          </Space>
+        );
+      },
     },
   ];
 
@@ -292,7 +462,7 @@ export function CategoriesPage() {
       <div className="admin-page-header">
         <div className="admin-page-title-group">
           <h2>Quản lý danh mục sản phẩm</h2>
-          <p>Cấu trúc cây danh mục hiển thị trên thanh menu và bộ lọc của gian hàng</p>
+          <p>Phân cấp danh mục đa tầng hiển thị trên thanh menu và bộ lọc của gian hàng</p>
         </div>
 
         <Space>
@@ -302,14 +472,10 @@ export function CategoriesPage() {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => {
-              form.resetFields();
-              setEditingId(null);
-              setModalOpen(true);
-            }}
+            onClick={handleAddRoot}
             style={{ borderRadius: 8 }}
           >
-            Thêm danh mục
+            Thêm danh mục gốc
           </Button>
         </Space>
       </div>
@@ -330,7 +496,7 @@ export function CategoriesPage() {
             placeholder="Tất cả trạng thái"
             value={filterStatus}
             onChange={setFilterStatus}
-            style={{ width: 180 }}
+            style={{ width: 170 }}
             allowClear
             options={STATUS_OPTIONS}
           />
@@ -346,46 +512,79 @@ export function CategoriesPage() {
               Đặt lại
             </Button>
           )}
+
+          {/* Expand / Collapse All */}
+          <div className="cat-expand-toggle-group">
+            <Button
+              size="small"
+              onClick={() => setExpandedRowKeys(allParentKeys)}
+              disabled={allParentKeys.length === 0 || expandedRowKeys.length === allParentKeys.length}
+            >
+              Mở rộng tất cả
+            </Button>
+            <Button
+              size="small"
+              onClick={() => setExpandedRowKeys([])}
+              disabled={expandedRowKeys.length === 0}
+            >
+              Thu gọn tất cả
+            </Button>
+          </div>
         </div>
 
         <div className="admin-toolbar-right">
-          <span style={{ fontSize: 13, color: "#64748b" }}>
-            Hiển thị <strong>{filteredData.length}</strong> danh mục gốc
-          </span>
+          <div className="cat-toolbar-stats">
+            <span>Gốc: <strong className="cat-stats-number">{stats.rootCount}</strong></span>
+            <span>•</span>
+            <span>Con: <strong className="cat-stats-sub">{stats.childCount}</strong></span>
+            <span>•</span>
+            <span>Tổng: <strong className="cat-stats-number">{stats.total}</strong></span>
+          </div>
         </div>
       </div>
 
       {/* Main Table */}
-      <div className="admin-table">
+      <div className="categories-table-wrapper">
         <Table
           dataSource={filteredData}
           columns={columns}
           rowKey="id"
           loading={loading}
           pagination={false}
-          scroll={{ x: 800 }}
+          scroll={{ x: 850 }}
+          rowClassName={(record) => {
+            if (record.level === 0) {
+              const isExpanded = expandedRowKeys.includes(record.id);
+              return isExpanded
+                ? "category-row-parent category-row-expanded"
+                : "category-row-parent";
+            }
+            return `category-row-child ${record.isLastChild ? "is-last-child" : ""}`;
+          }}
           expandable={{
-            expandIcon: ({ expanded, onExpand, record }) =>
-              record.children && record.children.length > 0 ? (
-                <span
+            expandIconColumnIndex: 1,
+            indentSize: 22,
+            expandedRowKeys,
+            onExpandedRowsChange: (keys) => setExpandedRowKeys(keys),
+            expandIcon: ({ expanded, onExpand, record }) => {
+              if (!record.children || record.children.length === 0) {
+                return <span className="cat-expand-spacer" />;
+              }
+              return (
+                <button
+                  type="button"
+                  className={`cat-expand-btn ${expanded ? "is-expanded" : ""}`}
                   onClick={(e) => onExpand(record, e)}
-                  style={{
-                    marginRight: 8,
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: 18,
-                    height: 18,
-                    borderRadius: 4,
-                    background: "#f1f5f9",
-                  }}
+                  title={expanded ? "Thu gọn danh mục" : "Mở rộng danh mục con"}
                 >
-                  {expanded ? <DownOutlined style={{ fontSize: 10 }} /> : <RightOutlined style={{ fontSize: 10 }} />}
-                </span>
-              ) : (
-                <span style={{ display: "inline-block", width: 26 }} />
-              ),
+                  {expanded ? (
+                    <DownOutlined style={{ fontSize: 10 }} />
+                  ) : (
+                    <RightOutlined style={{ fontSize: 10 }} />
+                  )}
+                </button>
+              );
+            },
           }}
         />
       </div>
@@ -394,7 +593,11 @@ export function CategoriesPage() {
       <Modal
         title={
           <div style={{ fontSize: 18, fontWeight: 700, color: "#0f172a" }}>
-            {editingId ? "✏️ Chỉnh sửa danh mục" : "✨ Thêm danh mục mới"}
+            {editingId
+              ? "✏️ Chỉnh sửa danh mục"
+              : selectedParent
+              ? `✨ Thêm danh mục con (${selectedParent.name})`
+              : "✨ Thêm danh mục gốc mới"}
           </div>
         }
         open={modalOpen}
@@ -403,11 +606,21 @@ export function CategoriesPage() {
           setModalOpen(false);
           form.resetFields();
           setEditingId(null);
+          setSelectedParent(null);
         }}
         okText={editingId ? "Cập nhật" : "Tạo mới"}
         cancelText="Hủy"
         destroyOnClose
       >
+        {selectedParent && !editingId && (
+          <div className="cat-modal-parent-hint">
+            <ApartmentOutlined style={{ fontSize: 16 }} />
+            <span>
+              Đang tạo danh mục con thuộc: <strong>{selectedParent.name}</strong>
+            </span>
+          </div>
+        )}
+
         <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
           <Form.Item
             name="name"
@@ -425,7 +638,7 @@ export function CategoriesPage() {
             ]}
           >
             <Input
-              placeholder="Ví dụ: Còi Hú Báo Động"
+              placeholder="Ví dụ: Còi Báo Động Công Suất Nhỏ"
               onChange={handleNameChange}
               maxLength={100}
               showCount
@@ -445,13 +658,13 @@ export function CategoriesPage() {
               },
             ]}
           >
-            <Input placeholder="coi-hu-bao-dong" maxLength={100} showCount />
+            <Input placeholder="coi-bao-dong-cong-suat-nho" maxLength={100} showCount />
           </Form.Item>
 
           <Form.Item name="parentId" label="Danh mục cha">
             <TreeSelect
               allowClear
-              treeData={convertTree(parents)}
+              treeData={convertTree(parents, editingId)}
               placeholder="Không có (Danh mục gốc cấp 1)"
               treeDefaultExpandAll
             />

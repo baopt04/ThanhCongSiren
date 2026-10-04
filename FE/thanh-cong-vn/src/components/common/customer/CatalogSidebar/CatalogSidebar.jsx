@@ -8,9 +8,9 @@ import { getCachedCustomerCategories } from "../../../../utils/categoriesCache";
 export const DEFAULT_CATEGORIES = [
   { id: "tu-dieu-khien", name: "Tủ điều khiển", slug: "tu-dieu-khien", path: "/san-pham/tu-dieu-khien" },
   { id: "bo-dieu-khien", name: "Bộ điều khiển", slug: "bo-dieu-khien", path: "/san-pham/bo-dieu-khien" },
-  { 
-    id: "coi-bao-dong", 
-    name: "Còi báo động", 
+  {
+    id: "coi-bao-dong",
+    name: "Còi báo động",
     slug: "coi-hu-bao-dong",
     path: "/san-pham/coi-hu-bao-dong",
     children: [
@@ -20,9 +20,9 @@ export const DEFAULT_CATEGORIES = [
       { id: "co-nho", name: "Còi hú cỡ nhỏ", slug: "coi-hu-co-nho", path: "/san-pham/coi-hu-co-nho" }
     ]
   },
-  { 
-    id: "may-thoi-khi", 
-    name: "Máy thổi khí", 
+  {
+    id: "may-thoi-khi",
+    name: "Máy thổi khí",
     slug: "may-thoi-khi",
     path: "/san-pham/may-thoi-khi",
     children: [
@@ -71,15 +71,15 @@ function mapApiCategoriesToSidebar(apiCategories) {
             // Hỗ trợ cháu (grandchildren) nếu có
             ...(child.children && child.children.length > 0
               ? {
-                  children: child.children
-                    .filter((gc) => gc.status === 1)
-                    .map((gc) => ({
-                      id: gc.id,
-                      name: gc.name,
-                      slug: gc.slug,
-                      path: `/san-pham/${gc.slug}`,
-                    })),
-                }
+                children: child.children
+                  .filter((gc) => gc.status === 1)
+                  .map((gc) => ({
+                    id: gc.id,
+                    name: gc.name,
+                    slug: gc.slug,
+                    path: `/san-pham/${gc.slug}`,
+                  })),
+              }
               : {}),
           }));
       }
@@ -165,7 +165,7 @@ export function CatalogSidebar({
   const handleCategoryClick = (cat, e) => {
     if (onSelectCategory) {
       e.preventDefault();
-      onSelectCategory(cat.slug || cat.id, cat);
+      onSelectCategory(cat.id, cat);
     }
   };
 
@@ -183,7 +183,7 @@ export function CatalogSidebar({
           <ul className="tc-sidebar-cat-list">
             <li className="tc-sidebar-cat-item">
               <div className={`tc-sidebar-cat-row ${activeCategoryId === "all" ? "active" : ""}`}>
-                <button 
+                <button
                   type="button"
                   className="tc-sidebar-cat-btn"
                   onClick={(e) => handleCategoryClick({ id: "all", slug: "all", name: "Tất cả sản phẩm" }, e)}
@@ -201,15 +201,15 @@ export function CatalogSidebar({
                 <li key={cat.id} className="tc-sidebar-cat-item">
                   <div className={`tc-sidebar-cat-row ${isActive ? "active" : ""}`}>
                     {cat.path ? (
-                      <Link 
-                        to={cat.path} 
+                      <Link
+                        to={cat.path}
                         className="tc-sidebar-cat-link"
                         onClick={(e) => handleCategoryClick(cat, e)}
                       >
                         {cat.name}
                       </Link>
                     ) : (
-                      <button 
+                      <button
                         type="button"
                         className="tc-sidebar-cat-btn"
                         onClick={(e) => handleCategoryClick(cat, e)}
@@ -263,8 +263,8 @@ export function CatalogSidebar({
           {PRICE_RANGES.map((range) => {
             const isChecked = selectedPriceRange === range.id;
             return (
-              <label 
-                key={range.id} 
+              <label
+                key={range.id}
                 className={`tc-price-radio-label ${isChecked ? "active" : ""}`}
               >
                 <input
