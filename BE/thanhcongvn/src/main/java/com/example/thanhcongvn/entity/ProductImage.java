@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "product_images", indexes = {
-        @Index(name = "idx_product_images_product", columnList = "id_product")
+        @Index(name = "idx_product_images_product", columnList = "id_product"),
+        @Index(name = "idx_product_images_product_primary", columnList = "id_product, is_primary")
 })
 @Data
 @NoArgsConstructor

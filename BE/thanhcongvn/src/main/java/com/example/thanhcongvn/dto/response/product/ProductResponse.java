@@ -25,6 +25,7 @@ public class ProductResponse {
     private String longDescription;
     private BigDecimal costPrice;
     private BigDecimal weight;
+    private String thumbnailUrl;
 
     private String categoryId;
     private String categoryName;

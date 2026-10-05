@@ -12,6 +12,7 @@ import java.util.List;
 public class ProductSearchResponse {
     private String id;
     private String name;
+    private String slug;
     private BigDecimal price;
     private ProductImageReponse images;
 }

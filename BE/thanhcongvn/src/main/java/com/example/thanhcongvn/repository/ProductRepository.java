@@ -3,6 +3,7 @@ package com.example.thanhcongvn.repository;
 import com.example.thanhcongvn.dto.projection.ProductCardView;
 import com.example.thanhcongvn.dto.projection.ProductIdNamePriceView;
 import com.example.thanhcongvn.dto.projection.ProductListView;
+import com.example.thanhcongvn.dto.projection.ProductSearchView;
 import com.example.thanhcongvn.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,13 +67,13 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     Optional<Product> findDetailById(@Param("idOrSlug") String idOrSlug);
 
     @Query("""
-            SELECT p.id AS id, p.name AS name, p.price AS price
+            SELECT p.id AS id, p.name AS name, p.slug AS slug, p.price AS price
             FROM Product p
             WHERE p.isActive = 1
             AND LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%'))
             ORDER BY p.name ASC
             """)
-    List<ProductIdNamePriceView> searchCardsByKeyword(@Param("keyword") String keyword, Pageable pageable);
+    List<ProductSearchView> searchCardsByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("""
             SELECT p FROM Product p

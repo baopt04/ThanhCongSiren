@@ -14,6 +14,7 @@ import java.util.Map;
 public class ProductDetailResponse {
     private String id;
     private String name;
+    private String sku;
     private String slug;
     private BigDecimal price;
     private BigDecimal salePrice;
@@ -22,6 +23,7 @@ public class ProductDetailResponse {
     private String longDescription;
     private String categoryId;
     private String categoryName;
+    private String categorySlug;
     private String brandId;
     private String brandName;
     private List<ProductImageReponse> images;

@@ -2,6 +2,8 @@ package com.example.thanhcongvn.service.impl.customer;
 
 import com.example.thanhcongvn.dto.projection.ProductCardView;
 import com.example.thanhcongvn.dto.projection.ProductIdNamePriceView;
+import com.example.thanhcongvn.dto.projection.ProductImageCardView;
+import com.example.thanhcongvn.dto.projection.ProductSearchView;
 import com.example.thanhcongvn.dto.response.customer.product.*;
 import com.example.thanhcongvn.dto.response.image.ProductImageReponse;
 import com.example.thanhcongvn.dto.response.specification.ProductSpecificationResponse;
@@ -84,6 +86,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         return ProductDetailResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
+                .sku(product.getSku())
                 .slug(product.getSlug())
                 .price(product.getPrice())
                 .salePrice(product.getSalePrice())
@@ -92,6 +95,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .longDescription(product.getLongDescription())
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : null)
                 .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
+                .categorySlug(product.getCategory() != null ? product.getCategory().getSlug() : null)
                 .brandId(product.getBrand() != null ? product.getBrand().getId() : null)
                 .brandName(product.getBrand() != null ? product.getBrand().getName() : null)
                 .images(images)
@@ -106,14 +110,14 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         }
 
         Pageable limit = PageRequest.of(0, 10);
-        List<ProductIdNamePriceView> products = productRepository.searchCardsByKeyword(keyword.trim(), limit);
+        List<ProductSearchView> products = productRepository.searchCardsByKeyword(keyword.trim(), limit);
 
         if (products.isEmpty()) {
             return Collections.emptyList();
         }
 
         List<String> productIds = products.stream()
-                .map(ProductIdNamePriceView::getId)
+                .map(ProductSearchView::getId)
                 .collect(Collectors.toList());
 
         List<ProductImage> primaryImages = productImageRepository.findPrimaryImagesByProductIds(productIds);
@@ -129,6 +133,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .map(product -> ProductSearchResponse.builder()
                         .id(product.getId())
                         .name(product.getName())
+                        .slug(product.getSlug())
                         .price(product.getPrice())
                         .images(imageByProductId.get(product.getId()))
                         .build())
@@ -288,47 +293,19 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         if (productIds == null || productIds.isEmpty()) {
             return Map.of();
         }
-        return productImageRepository.findByProductIdIn(productIds).stream()
+        return productImageRepository.findCardImagesByProductIds(productIds).stream()
                 .collect(Collectors.groupingBy(
-                        ProductImage::getProductId,
-                        Collectors.collectingAndThen(
-                                Collectors.mapping(this::mapToImageResponse, Collectors.toList()),
-                                this::trimToListImages
-                        )
+                        ProductImageCardView::getProductId,
+                        Collectors.mapping(this::mapCardImage, Collectors.toList())
                 ));
     }
 
-    private List<ProductImageReponse> trimToListImages(List<ProductImageReponse> images) {
-        if (images == null || images.isEmpty()) {
-            return List.of();
-        }
-        if (images.size() == 1) {
-            return images;
-        }
-
-        ProductImageReponse primary = images.stream()
-                .filter(img -> img.getIsPrimary() != null && img.getIsPrimary() == 1)
-                .findFirst()
-                .orElse(images.get(0));
-
-        ProductImageReponse hover = images.stream()
-                .filter(img -> img != primary)
-                .sorted(Comparator
-                        .comparing((ProductImageReponse img) -> {
-                            Integer order = img.getDisplayOrder();
-                            if (order != null && (order == 0 || order == 1)) {
-                                return 0;
-                            }
-                            return 1;
-                        })
-                        .thenComparing(img -> img.getDisplayOrder() == null ? Integer.MAX_VALUE : img.getDisplayOrder()))
-                .findFirst()
-                .orElse(null);
-
-        if (hover == null) {
-            return List.of(primary);
-        }
-        return List.of(primary, hover);
+    private ProductImageReponse mapCardImage(ProductImageCardView img) {
+        return ProductImageReponse.builder()
+                .imageUrl(img.getImageUrl())
+                .isPrimary(img.getIsPrimary())
+                .displayOrder(img.getDisplayOrder())
+                .build();
     }
 
     private ProductImageReponse mapToImageResponse(ProductImage img) {
