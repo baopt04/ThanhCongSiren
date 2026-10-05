@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ProductListingLayout } from "../../components/common/customer/ProductListingLayout/ProductListingLayout";
 import { SafetyCertificateOutlined, PhoneOutlined } from "@ant-design/icons";
-import { getAllProductsForCustomer } from "../../services/customer/CustomerProductService";
+import { useCustomerProductsQuery } from "../../hooks/queries/customerQueries";
 import { Seo } from "../../components/common/Seo";
 
 function isBlowerProduct(p) {
@@ -27,35 +27,16 @@ function isBlowerProduct(p) {
 export function AirBlowerPage() {
   const [searchParams] = useSearchParams();
   const typeParam = searchParams.get("type") || "all";
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  const { data: res, isLoading: loading } = useCustomerProductsQuery(0, 50);
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const res = await getAllProductsForCustomer();
-        const rawList = Array.isArray(res)
-          ? res
-          : res?.data || res?.result || res?.content || [];
-        if (isMounted) {
-          const list = Array.isArray(rawList) ? rawList : [];
-          const filtered = list.filter(isBlowerProduct);
-          setProducts(filtered);
-        }
-      } catch (error) {
-        console.error("Error loading products for AirBlowerPage:", error);
-        if (isMounted) setProducts([]);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-    fetchProducts();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const products = useMemo(() => {
+    const rawList = Array.isArray(res)
+      ? res
+      : res?.data || res?.result || res?.content || [];
+    const list = Array.isArray(rawList) ? rawList : [];
+    return list.filter(isBlowerProduct);
+  }, [res]);
 
   const guideCard = (
     <div className="tc-siren-guide-card">

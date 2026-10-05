@@ -6,6 +6,8 @@ import { ProductCard } from "../ProductCard/ProductCard";
 import { CatalogSidebar, DEFAULT_CATEGORIES, PRICE_RANGES } from "../CatalogSidebar/CatalogSidebar";
 import { getByProductForCategeroy } from "../../../../services/customer/CustomerProductService";
 import { getCachedCustomerCategories, findCategoryInTree } from "../../../../utils/categoriesCache";
+import { queryClient } from "../../../../config/queryClient";
+import { categoryProductsQueryKey } from "../../../../hooks/queries/customerQueries";
 import "./ProductListingLayout.css";
 
 export function ProductListingLayout({
@@ -111,20 +113,27 @@ export function ProductListingLayout({
       navigate(`/san-pham/${slug || categoryId}`);
     }
 
-    // 3. Nếu đã có trong cache theo categoryId
-    if (categoryCacheRef.current[categoryId]) {
-      setCurrentProducts(categoryCacheRef.current[categoryId]);
+    // 3. Kiểm tra trong TanStack Query cache trước (hiển thị tức thì 0ms khi quay lại)
+    const cached = queryClient.getQueryData(categoryProductsQueryKey(categoryId));
+    if (cached && Array.isArray(cached) && cached.length > 0) {
+      setCurrentProducts(cached);
       return;
     }
 
     // 4. Lấy id danh mục đó truyền vào api getByProductForCategeroy để lấy ra sản phẩm cho người dùng xem
     setIsLoadingCategory(true);
     try {
-      const res = await getByProductForCategeroy(categoryId);
-      const list = res?.data || (Array.isArray(res) ? res : []);
-      const validList = Array.isArray(list) ? list : [];
-      categoryCacheRef.current[categoryId] = validList;
-      setCurrentProducts(validList);
+      const list = await queryClient.fetchQuery({
+        queryKey: categoryProductsQueryKey(categoryId),
+        queryFn: async () => {
+          const res = await getByProductForCategeroy(categoryId);
+          const raw = res?.data || (Array.isArray(res) ? res : []);
+          return Array.isArray(raw) ? raw : [];
+        },
+        staleTime: 5 * 60 * 1000,
+        gcTime: 20 * 60 * 1000,
+      });
+      setCurrentProducts(list);
     } catch (error) {
       console.error(`Error loading products for category id "${categoryId}":`, error);
       setCurrentProducts([]);

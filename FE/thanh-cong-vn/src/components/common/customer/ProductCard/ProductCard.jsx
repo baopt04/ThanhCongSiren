@@ -8,6 +8,7 @@ import {
   StarFilled,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
+import { prefetchProductDetail } from "../../../../hooks/queries/customerQueries";
 
 export const ProductCard = memo(function ProductCard({
   id,
@@ -26,6 +27,13 @@ export const ProductCard = memo(function ProductCard({
   variant = "catalog",
 }) {
   const productLink = id ? `/san-pham/${id}` : (slug ? `/san-pham/${slug}` : "#");
+
+  const handlePrefetch = () => {
+    const target = id || slug;
+    if (target) {
+      prefetchProductDetail(target);
+    }
+  };
 
   // Resolve Primary Image (isPrimary === 1) & Hover Image (displayOrder === 0 or secondary image)
   let primaryImageUrl = defaultImg;
@@ -81,7 +89,12 @@ export const ProductCard = memo(function ProductCard({
   // Catalog variant matching user's photo & ProductCard.css
   if (variant === "catalog") {
     return (
-      <div className="tc-catalog-card" id={`product-${code || name}`}>
+      <div
+        className="tc-catalog-card"
+        id={`product-${code || name}`}
+        onMouseEnter={handlePrefetch}
+        onTouchStart={handlePrefetch}
+      >
         {/* Top-Left Badge (Green "Nổi Bật" as in image) */}
         {badge && <div className="tc-catalog-badge">{badge}</div>}
 
@@ -164,7 +177,12 @@ export const ProductCard = memo(function ProductCard({
 
   // Classic default card
   return (
-    <div className="tc-product-card" id={`product-${code || name}`}>
+    <div
+      className="tc-product-card"
+      id={`product-${code || name}`}
+      onMouseEnter={handlePrefetch}
+      onTouchStart={handlePrefetch}
+    >
       {/* Badges */}
       <div className="tc-product-badges">
         {badge && <span className="tc-badge tc-badge-sale">{badge}</span>}

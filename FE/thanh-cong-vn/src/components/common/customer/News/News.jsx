@@ -15,7 +15,7 @@ import {
   ReadOutlined
 } from "@ant-design/icons";
 import { Pagination } from "antd";
-import { getAllPostsForCustomer } from "../../../../services/customer/CustomerPostService";
+import { useCustomerPostsQuery } from "../../../../hooks/queries/customerQueries";
 
 // Helper định dạng ngày DD/MM/YYYY
 function formatDate(dateStr) {
@@ -80,50 +80,21 @@ export default function News() {
     );
   });
 
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: rawArticles = [], isLoading: loading } = useCustomerPostsQuery();
   const pageSize = 6;
 
-  // Tải danh sách bài viết
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const res = await getAllPostsForCustomer();
-        const rawList =
-          res?.data?.content ||
-          res?.data ||
-          res?.content ||
-          (Array.isArray(res) ? res : []);
-
-        const list = Array.isArray(rawList) ? rawList : [];
-
-        if (isMounted) {
-          const publishedList = list.filter(
-            (item) =>
-              !item.status ||
-              item.status === "PUBLISHED" ||
-              item.status === 1 ||
-              item.status === "1"
-          );
-          setArticles(publishedList.length > 0 ? publishedList : list);
-        }
-      } catch (error) {
-        console.error("Error loading posts from API:", error);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchPosts();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  // Lấy các bài viết đã xuất bản
+  const articles = useMemo(() => {
+    if (!rawArticles || rawArticles.length === 0) return [];
+    const publishedList = rawArticles.filter(
+      (item) =>
+        !item.status ||
+        item.status === "PUBLISHED" ||
+        item.status === 1 ||
+        item.status === "1"
+    );
+    return publishedList.length > 0 ? publishedList : rawArticles;
+  }, [rawArticles]);
 
   // Cuộn nhẹ tới danh sách nếu đang ở trang > 1 khi quay lại
   useEffect(() => {

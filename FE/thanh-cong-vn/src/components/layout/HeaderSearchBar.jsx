@@ -6,6 +6,7 @@ import {
   CloseOutlined,
 } from "@ant-design/icons";
 import { searchProducts } from "../../services/customer/CustomerProductService";
+import { queryClient } from "../../config/queryClient";
 import { PLACEHOLDER_IMAGE } from "../../utils/placeholder";
 import { getProductPath } from "../../utils/slugUtils";
 
@@ -57,6 +58,15 @@ export const HeaderSearchBar = memo(function HeaderSearchBar({
       return;
     }
 
+    const cacheKey = ["customer", "search", trimmed.toLowerCase()];
+    const cached = queryClient.getQueryData(cacheKey);
+    if (cached) {
+      setSearchResults(cached);
+      setShowSearchResults(true);
+      setIsSearching(false);
+      return;
+    }
+
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -68,8 +78,10 @@ export const HeaderSearchBar = memo(function HeaderSearchBar({
     const timer = setTimeout(async () => {
       try {
         const res = await searchProducts(trimmed, controller.signal);
-        const list = res?.data || (Array.isArray(res) ? res : []);
-        setSearchResults(Array.isArray(list) ? list : []);
+        const raw = res?.data || (Array.isArray(res) ? res : []);
+        const list = Array.isArray(raw) ? raw : [];
+        queryClient.setQueryData(cacheKey, list);
+        setSearchResults(list);
         setShowSearchResults(true);
       } catch (err) {
         if (

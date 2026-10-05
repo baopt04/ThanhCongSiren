@@ -1,8 +1,11 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useParams } from "react-router-dom";
 import { ProductListingLayout } from "../../components/common/customer/ProductListingLayout/ProductListingLayout";
 import { SafetyCertificateOutlined, PhoneOutlined } from "@ant-design/icons";
-import { getAllProductsForCustomer } from "../../services/customer/CustomerProductService";
+import {
+  useCustomerProductsQuery,
+  prefetchCustomerProductsPage,
+} from "../../hooks/queries/customerQueries";
 import { getCachedCustomerCategories, findCategoryInTree } from "../../utils/categoriesCache";
 import { Seo } from "../../components/common/Seo";
 
@@ -14,76 +17,65 @@ export function SirenPage() {
 
   const pageFromUrl = parseInt(searchParams.get("page") || "1", 10);
   const currentPage = isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
+  const backendPage = Math.max(0, currentPage - 1);
+  const isAllCategory = activeCategorySlug === "all";
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(activeCategorySlug === "all");
-  const [pagination, setPagination] = useState({
-    page: currentPage,
-    size: 10,
-    total: 0,
-    totalPages: 1,
-  });
+  // Tải sản phẩm phân trang qua TanStack Query cache
+  const { data: res, isLoading: loading } = useCustomerProductsQuery(
+    backendPage,
+    12,
+    { enabled: isAllCategory }
+  );
+
+  const rawList = useMemo(() => {
+    if (!res) return [];
+    return Array.isArray(res)
+      ? res
+      : res?.data || res?.result || res?.content || [];
+  }, [res]);
+
+  const products = Array.isArray(rawList) ? rawList : [];
+
+  const pagination = useMemo(() => {
+    if (res?.pagination) {
+      return {
+        page: (res.pagination.page ?? backendPage) + 1,
+        size: res.pagination.size ?? 12,
+        total: res.pagination.totalElements ?? rawList.length,
+        totalPages: res.pagination.totalPages ?? 1,
+      };
+    }
+    return {
+      page: currentPage,
+      size: 12,
+      total: rawList.length,
+      totalPages: Math.ceil(rawList.length / 12) || 1,
+    };
+  }, [res, backendPage, currentPage, rawList.length]);
+
+  // Prefetch trang kế tiếp (Next page) ở background để khi bấm là hiển thị tức thì
+  useEffect(() => {
+    if (isAllCategory && pagination.page < pagination.totalPages) {
+      prefetchCustomerProductsPage(backendPage + 1, 12);
+    }
+  }, [isAllCategory, backendPage, pagination.page, pagination.totalPages]);
 
   // Tải tên danh mục để hiển thị breadcrumb và title thân thiện
   useEffect(() => {
     if (activeCategorySlug && activeCategorySlug !== "all") {
       getCachedCustomerCategories()
-        .then((res) => {
-          const raw = res?.data || res?.result || res || [];
+        .then((treeRes) => {
+          const raw = treeRes?.data || treeRes?.result || treeRes || [];
           const found = findCategoryInTree(Array.isArray(raw) ? raw : [], activeCategorySlug);
           if (found?.name) {
             setCategoryName(found.name);
           }
         })
-        .catch(() => { });
+        .catch(() => {});
     } else {
       setCategoryName("");
     }
   }, [activeCategorySlug]);
-
-
-  const fetchProducts = useCallback(async (targetPage = currentPage) => {
-    setLoading(true);
-    try {
-      // Backend customer API uses 0-based page index (page 0 is page 1 in UI)
-      const backendPage = Math.max(0, targetPage - 1);
-      const res = await getAllProductsForCustomer({ page: backendPage, size: 12 });
-      const rawList = Array.isArray(res)
-        ? res
-        : res?.data || res?.result || res?.content || [];
-
-      setProducts(Array.isArray(rawList) ? rawList : []);
-
-      if (res?.pagination) {
-        setPagination({
-          page: (res.pagination.page ?? backendPage) + 1, // Convert 0-based to 1-based for UI
-          size: res.pagination.size ?? 10,
-          total: res.pagination.totalElements ?? rawList.length,
-          totalPages: res.pagination.totalPages ?? 1,
-        });
-      } else {
-        setPagination({
-          page: targetPage,
-          size: 10,
-          total: rawList.length,
-          totalPages: Math.ceil(rawList.length / 10) || 1,
-        });
-      }
-    } catch (error) {
-      console.error("Error loading products for SirenPage:", error);
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage]);
-
-  useEffect(() => {
-    if (activeCategorySlug === "all") {
-      fetchProducts(currentPage);
-    } else {
-      setLoading(false);
-    }
-  }, [fetchProducts, currentPage, activeCategorySlug]);
 
   const handlePageChange = (newPage) => {
     setSearchParams((prev) => {

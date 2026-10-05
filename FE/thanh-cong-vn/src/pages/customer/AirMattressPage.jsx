@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ProductListingLayout } from "../../components/common/customer/ProductListingLayout/ProductListingLayout";
 import { SafetyCertificateOutlined, PhoneOutlined } from "@ant-design/icons";
-import { getAllProductsForCustomer } from "../../services/customer/CustomerProductService";
+import { useCustomerProductsQuery } from "../../hooks/queries/customerQueries";
 import { Seo } from "../../components/common/Seo";
 
 function isRescueMattressProduct(p) {
@@ -25,34 +25,16 @@ function isRescueMattressProduct(p) {
 export function AirMattressPage() {
   const [searchParams] = useSearchParams();
   const typeParam = searchParams.get("type") || "all";
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let isMounted = true;
-    const fetchProducts = async () => {
-      setLoading(true);
-      try {
-        const res = await getAllProductsForCustomer();
-        const rawList = Array.isArray(res)
-          ? res
-          : res?.data || res?.result || res?.content || [];
-        if (isMounted) {
-          const list = Array.isArray(rawList) ? rawList : [];
-          setProducts(list.filter(isRescueMattressProduct));
-        }
-      } catch (error) {
-        console.error("Error loading products for AirMattressPage:", error);
-        if (isMounted) setProducts([]);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-    fetchProducts();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { data: res, isLoading: loading } = useCustomerProductsQuery(0, 50);
+
+  const products = useMemo(() => {
+    const rawList = Array.isArray(res)
+      ? res
+      : res?.data || res?.result || res?.content || [];
+    const list = Array.isArray(rawList) ? rawList : [];
+    return list.filter(isRescueMattressProduct);
+  }, [res]);
 
   const guideCard = (
     <div className="tc-siren-guide-card">

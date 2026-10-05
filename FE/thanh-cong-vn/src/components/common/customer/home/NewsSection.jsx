@@ -2,56 +2,40 @@ import "./NewsSection.css";
 import { Link } from "react-router-dom";
 import { PlayCircleFilled, PlayCircleOutlined, RightOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import { getAllPostsForCustomer } from "../../../../services/customer/CustomerPostService";
+import { useCustomerPostsQuery } from "../../../../hooks/queries/customerQueries";
 
 export function NewsSection() {
   const [activeVideo, setActiveVideo] = useState(null);
   const [newsList, setNewsList] = useState([]);
   const [videoProjects, setVideoProjects] = useState([]);
 
+  const { data: postsList = [] } = useCustomerPostsQuery();
+
   useEffect(() => {
-    let isMounted = true;
-    const fetchPosts = async () => {
-      try {
-        const res = await getAllPostsForCustomer();
-        const rawList =
-          res?.data?.content ||
-          res?.data ||
-          res?.content ||
-          (Array.isArray(res) ? res : []);
-        const list = Array.isArray(rawList) ? rawList : [];
-        if (!isMounted || list.length === 0) return;
+    if (!postsList || postsList.length === 0) return;
 
-        setNewsList(
-          list.slice(0, 5).map((item) => ({
-            id: item.id,
-            title: item.title,
-            slug: item.slug || item.id,
-            image: item.thumbnailUrl || item.image || "",
-          }))
-        );
+    setNewsList(
+      postsList.slice(0, 5).map((item) => ({
+        id: item.id,
+        title: item.title,
+        slug: item.slug || item.id,
+        image: item.thumbnailUrl || item.image || "",
+      }))
+    );
 
-        // Dùng bài có thumbnail làm danh sách "video dự án" (không hardcode ảnh giả)
-        const videos = list
-          .filter((item) => item.thumbnailUrl || item.image)
-          .slice(0, 3)
-          .map((item) => ({
-            id: item.id,
-            title: item.title,
-            videoUrl: item.thumbnailUrl || item.image,
-            slug: item.slug || item.id,
-          }));
-        setVideoProjects(videos);
-        if (videos.length > 0) setActiveVideo(videos[0]);
-      } catch (err) {
-        console.error("Error fetching homepage posts:", err);
-      }
-    };
-    fetchPosts();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    // Dùng bài có thumbnail làm danh sách "video dự án"
+    const videos = postsList
+      .filter((item) => item.thumbnailUrl || item.image)
+      .slice(0, 3)
+      .map((item) => ({
+        id: item.id,
+        title: item.title,
+        videoUrl: item.thumbnailUrl || item.image,
+        slug: item.slug || item.id,
+      }));
+    setVideoProjects(videos);
+    if (videos.length > 0 && !activeVideo) setActiveVideo(videos[0]);
+  }, [postsList]);
 
   if (newsList.length === 0 && videoProjects.length === 0) {
     return null;

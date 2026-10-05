@@ -15,7 +15,7 @@ import {
   FacebookOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
-import { getAllPostsForCustomer } from "../../services/customer/CustomerPostService";
+import { useCustomerPostsQuery } from "../../hooks/queries/customerQueries";
 import { embedYoutubeInHtml } from "../../utils/youtubeUtils";
 import { Seo } from "../../components/common/Seo";
 import "./NewsDetailPage.css";
@@ -106,93 +106,73 @@ export function NewsDetailPage() {
     }
   };
 
+  const { data: postsList = [], isLoading: postsLoading } = useCustomerPostsQuery();
+
   useEffect(() => {
-    let isMounted = true;
-    const fetchArticle = async () => {
+    if (postsLoading) {
       setLoading(true);
-      setNotFound(false);
-      try {
-        const res = await getAllPostsForCustomer();
-        const rawList =
-          res?.data?.content ||
-          res?.data ||
-          res?.content ||
-          (Array.isArray(res) ? res : []);
-        const list = Array.isArray(rawList) ? rawList : [];
+      return;
+    }
+    setLoading(false);
+    setNotFound(false);
 
-        const foundIndex = list.findIndex(
-          (item) => item.slug === slug || String(item.id) === String(slug)
-        );
+    const list = Array.isArray(postsList) ? postsList : [];
+    const foundIndex = list.findIndex(
+      (item) => item.slug === slug || String(item.id) === String(slug)
+    );
 
-        if (!isMounted) return;
+    if (foundIndex !== -1) {
+      const found = list[foundIndex];
+      setArticle(mapPost(found));
 
-        if (foundIndex !== -1) {
-          const found = list[foundIndex];
-          setArticle(mapPost(found));
+      // Bài trước và bài tiếp theo
+      setPrevPost(
+        foundIndex > 0
+          ? {
+              slug: list[foundIndex - 1].slug || list[foundIndex - 1].id,
+              title: list[foundIndex - 1].title,
+            }
+          : null
+      );
+      setNextPost(
+        foundIndex < list.length - 1
+          ? {
+              slug: list[foundIndex + 1].slug || list[foundIndex + 1].id,
+              title: list[foundIndex + 1].title,
+            }
+          : null
+      );
 
-          // Bài trước và bài tiếp theo
-          setPrevPost(
-            foundIndex > 0
-              ? {
-                  slug: list[foundIndex - 1].slug || list[foundIndex - 1].id,
-                  title: list[foundIndex - 1].title,
-                }
-              : null
-          );
-          setNextPost(
-            foundIndex < list.length - 1
-              ? {
-                  slug: list[foundIndex + 1].slug || list[foundIndex + 1].id,
-                  title: list[foundIndex + 1].title,
-                }
-              : null
-          );
+      // Các bài viết khác cho Sidebar & Related
+      const otherPosts = list.filter(
+        (item) => item.slug !== found.slug && item.id !== found.id
+      );
 
-          // Các bài viết khác cho Sidebar & Related
-          const otherPosts = list.filter(
-            (item) => item.slug !== found.slug && item.id !== found.id
-          );
-
-          setRelated(
-            otherPosts.map((item) => ({
-              slug: item.slug || item.id,
-              title: item.title,
-              date: formatPubDate(item.publishedAt),
-              image: item.thumbnailUrl || "",
-              category: item.categoryNews?.[0]?.name || "Tin tức PCCC",
-            }))
-          );
-        } else {
-          setArticle(null);
-          setNotFound(true);
-          setPrevPost(null);
-          setNextPost(null);
-          setRelated(
-            list.slice(0, 6).map((item) => ({
-              slug: item.slug || item.id,
-              title: item.title,
-              date: formatPubDate(item.publishedAt),
-              image: item.thumbnailUrl || "",
-              category: item.categoryNews?.[0]?.name || "Tin tức PCCC",
-            }))
-          );
-        }
-      } catch (err) {
-        console.error("Error fetching article detail:", err);
-        if (isMounted) {
-          setNotFound(true);
-          setArticle(null);
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    fetchArticle();
-    return () => {
-      isMounted = false;
-    };
-  }, [slug]);
+      setRelated(
+        otherPosts.map((item) => ({
+          slug: item.slug || item.id,
+          title: item.title,
+          date: formatPubDate(item.publishedAt),
+          image: item.thumbnailUrl || "",
+          category: item.categoryNews?.[0]?.name || "Tin tức PCCC",
+        }))
+      );
+    } else if (list.length > 0) {
+      setArticle(null);
+      setNotFound(true);
+      setPrevPost(null);
+      setNextPost(null);
+      setRelated(
+        list.slice(0, 6).map((item) => ({
+          slug: item.slug || item.id,
+          title: item.title,
+          date: formatPubDate(item.publishedAt),
+          image: item.thumbnailUrl || "",
+          category: item.categoryNews?.[0]?.name || "Tin tức PCCC",
+        }))
+      );
+    }
+  }, [slug, postsList, postsLoading]);
 
   const handleCopyLink = () => {
     try {

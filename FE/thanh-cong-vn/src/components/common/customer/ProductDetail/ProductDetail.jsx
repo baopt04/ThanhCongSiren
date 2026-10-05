@@ -22,15 +22,22 @@ import { isCustomerAuthenticated } from "../../../../utils/auth";
 import { createCartItem } from "../../../../services/customer/CustomerCartService";
 import { QuoteModal } from "../QuoteModal/QuoteModal";
 import { CustomerDetailSkeleton } from "../../RouteSkeleton";
+import { useProductDetailQuery } from "../../../../hooks/queries/customerQueries";
 import "./ProductDetail.css";
 
 export default function ProductDetail() {
   const navigate = useNavigate();
   const { id, param } = useParams();
   const productId = id || param;
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  
+  const {
+    data: productData,
+    isLoading: loading,
+    error: queryError,
+  } = useProductDetailQuery(productId);
+  const product = productData?.data || productData;
+  const error = queryError ? "Không thể tải thông tin sản phẩm. Vui lòng thử lại sau." : null;
+
   const [activeImgIndex, setActiveImgIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("description");
   const [quantity, setQuantity] = useState(1);
@@ -38,35 +45,13 @@ export default function ProductDetail() {
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
 
   useEffect(() => {
-    let isMounted = true;
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const res = await detailProductForId(productId);
-        const data = res?.data || res;
-        if (isMounted) {
-          setProduct(data);
-          setActiveImgIndex(0);
-
-          // Tự động chuyển đổi URL thành /san-pham/:slug thân thiện SEO
-          if (data?.slug) {
-            const targetPath = `/san-pham/${data.slug}`;
-            if (window.location.pathname !== targetPath) {
-              window.history.replaceState(null, "", targetPath);
-            }
-          }
-        }
-      } catch (err) {
-        console.error("Error loading product detail:", err);
-        if (isMounted) setError("Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.");
-      } finally {
-        if (isMounted) setLoading(false);
+    if (product?.slug) {
+      const targetPath = `/san-pham/${product.slug}`;
+      if (window.location.pathname !== targetPath) {
+        window.history.replaceState(null, "", targetPath);
       }
-    };
-    if (productId) fetchProduct();
-    return () => { isMounted = false; };
-  }, [productId]);
+    }
+  }, [product?.slug]);
 
   useEffect(() => {
     if (product?.name) {

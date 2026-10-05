@@ -1,41 +1,13 @@
-import { useState, useEffect } from "react";
 import { HeroBanner } from "../../components/common/customer/home/HeroBanner";
 import { InfoStrip } from "../../components/common/customer/home/InfoStrip";
 import { ProductSection } from "../../components/common/customer/home/ProductSection";
 import { FastQuoteBanner } from "../../components/common/customer/home/FastQuoteBanner";
 import { NewsSection } from "../../components/common/customer/home/NewsSection";
-import { categorySections } from "../../services/customer/CustomerProductService";
+import { useHomeSectionsQuery } from "../../hooks/queries/customerQueries";
 import { Seo } from "../../components/common/Seo";
 
 export function HomePage() {
-  const [sections, setSections] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchSections = async () => {
-      try {
-        setLoading(true);
-        const res = await categorySections();
-        const data = res?.data || (Array.isArray(res) ? res : []);
-        if (isMounted) {
-          setSections(Array.isArray(data) ? data : []);
-        }
-      } catch (error) {
-        console.error("Error loading home category sections:", error);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchSections();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  const { data: sections = [], isLoading: loading } = useHomeSectionsQuery();
 
   // Chia 2 section đầu trước banner báo giá và các section còn lại sau banner báo giá
   const firstHalf = sections.slice(0, 2);

@@ -1,28 +1,35 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigationType } from "react-router-dom";
 
 /**
- * Tự động cuộn lên đầu trang mỗi khi chuyển route / URL
+ * Tự động cuộn lên đầu trang khi người dùng click điều hướng trang mới (PUSH).
+ * Khi người dùng bấm nút Quay lại (Back - POP) hoặc Tiến tới (Forward),
+ * giữ nguyên vị trí cuộn cũ để mang lại trải nghiệm mượt mà chuẩn thương mại điện tử.
  */
 export function ScrollToTop() {
   const { pathname, search } = useLocation();
+  const navType = useNavigationType();
 
   useEffect(() => {
-    // Cuộn ngay lập tức lên đầu trang
+    // Chỉ cuộn lên đầu nếu là thao tác điều hướng trang mới (PUSH)
+    // Nếu là POP (Quay lại trang trước), bảo lưu vị trí cuộn cũ
+    if (navType === "POP") {
+      return;
+    }
+
     window.scrollTo({
       top: 0,
       left: 0,
       behavior: "instant",
     });
 
-    // Fallback cho mọi trình duyệt
     if (document.documentElement) {
       document.documentElement.scrollTop = 0;
     }
     if (document.body) {
       document.body.scrollTop = 0;
     }
-  }, [pathname, search]);
+  }, [pathname, search, navType]);
 
   return null;
 }
