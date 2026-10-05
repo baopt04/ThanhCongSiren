@@ -42,7 +42,7 @@ export function MainLayout() {
     <div className="tc-layout">
       <Header />
       <main className="tc-layout-main">
-        <RouteSkeleton layout="customer" duration={400}>
+        <RouteSkeleton layout="customer" duration={180}>
           <Outlet />
         </RouteSkeleton>
       </main>

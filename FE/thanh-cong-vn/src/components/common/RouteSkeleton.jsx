@@ -208,9 +208,9 @@ export function CustomerDetailSkeleton() {
 
 /**
  * RouteSkeleton: Tự động phát hiện khi chuyển route:
- * Click chuyển → Skeleton loading 300-500ms (mặc định 400ms) → Dữ liệu mới xuất hiện
+ * Click chuyển → Skeleton loading siêu mượt 150-200ms (mặc định 180ms) → Dữ liệu mới xuất hiện
  */
-export function RouteSkeleton({ layout = "admin", duration = 400, children }) {
+export function RouteSkeleton({ layout = "admin", duration = 180, children }) {
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const isFirstRender = useRef(true);

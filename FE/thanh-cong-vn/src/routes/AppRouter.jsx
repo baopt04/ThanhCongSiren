@@ -181,7 +181,7 @@ function ProductRouteHandler() {
 
 function LazyPage({ children, layout = "customer" }) {
   return (
-    <Suspense fallback={<RouteSkeleton layout={layout} duration={400} />}>
+    <Suspense fallback={<RouteSkeleton layout={layout} duration={180} />}>
       {children}
     </Suspense>
   );
