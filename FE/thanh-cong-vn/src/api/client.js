@@ -124,8 +124,8 @@ apiClient.interceptors.request.use(
       } else {
         config.headers.Authorization = `Bearer ${token}`;
       }
-    } else {
-      console.warn(`[apiClient] Gọi API ${config.url} nhưng chưa có accessToken trong storage!`);
+    } else if (config.url?.startsWith("/admin") || config.url?.includes("/admin/")) {
+      console.warn(`[apiClient] Gọi API admin ${config.url} nhưng chưa có accessToken trong storage!`);
     }
 
     return config;

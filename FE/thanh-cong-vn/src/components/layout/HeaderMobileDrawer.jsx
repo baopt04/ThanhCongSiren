@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, useEffect, memo } from "react";
 import { Link } from "react-router-dom";
 import {
   CloseOutlined,
@@ -16,6 +16,17 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
 }) {
   const [productsExpanded, setProductsExpanded] = useState(false);
   const [expandedMobileCat, setExpandedMobileCat] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add("mobile-menu-open");
+    } else {
+      document.body.classList.remove("mobile-menu-open");
+    }
+    return () => {
+      document.body.classList.remove("mobile-menu-open");
+    };
+  }, [isOpen]);
 
   const handleClose = () => {
     setProductsExpanded(false);

@@ -293,9 +293,11 @@ export default function ProductDetail() {
             </h1>
 
             <div className="pd-meta-bar">
-              {product.slug && (
+              {(product.sku || product.productCode || product.code) && (
                 <>
-                  <span className="pd-meta-item">Mã SP: <strong>{product.sku}</strong></span>
+                  <span className="pd-meta-item">
+                    Mã SP: <strong>{product.sku || product.productCode || product.code}</strong>
+                  </span>
                   <span className="pd-meta-divider">•</span>
                 </>
               )}

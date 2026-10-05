@@ -222,9 +222,46 @@
   }
 }
 
+/* Khi menu mobile drawer đang mở, ẩn toàn bộ floating widgets để không che menu */
+body.mobile-menu-open .tc-floating-widget,
+body.mobile-menu-open .tc-zalo-chat-widget {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 @media (max-width: 768px) {
+  /* Trên điện thoại, ẩn widget chat Zalo trùng lặp để tránh che 40% màn hình */
+  .tc-zalo-chat-widget {
+    display: none !important;
+  }
+
+  /* Đưa bộ nút liên hệ xuống góc dưới phải, không đè ngang giữa các banner */
   .tc-floating-widget {
-    right: max(8px, env(safe-area-inset-right, 0px));
+    top: auto;
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
+    transform: none;
+    right: max(12px, env(safe-area-inset-right, 0px));
+    gap: 10px;
+    z-index: 990;
+  }
+
+  .tc-float-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 18px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  }
+
+  .tc-float-tooltip {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .tc-floating-widget {
+    bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    right: max(10px, env(safe-area-inset-right, 0px));
     gap: 8px;
   }
 
@@ -232,46 +269,5 @@
     width: 40px;
     height: 40px;
     font-size: 16px;
-  }
-
-  .tc-float-tooltip {
-    display: none;
-  }
-
-  .tc-zalo-chat-widget {
-    right: max(10px, env(safe-area-inset-right, 0px));
-    bottom: max(12px, env(safe-area-inset-bottom, 0px));
-  }
-
-  .tc-zalo-chat-launcher {
-    width: 50px;
-    height: 50px;
-  }
-
-  .tc-zalo-chat-bubble {
-    font-size: 12.5px;
-    padding: 12px 32px 12px 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .tc-floating-widget {
-    right: max(6px, env(safe-area-inset-right, 0px));
-  }
-
-  .tc-float-btn {
-    width: 36px;
-    height: 36px;
-    font-size: 15px;
-  }
-
-  .tc-zalo-chat-launcher {
-    width: 46px;
-    height: 46px;
-  }
-
-  .tc-zalo-chat-icon svg {
-    width: 24px;
-    height: 24px;
   }
 }

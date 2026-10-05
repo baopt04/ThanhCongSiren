@@ -23,13 +23,23 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (!id.includes("node_modules")) return;
-          if (id.includes("react-dom") || id.includes("/react/") || id.includes("react-router")) {
-            return "react-vendor";
-          }
           if (id.includes("@tiptap") || id.includes("prosemirror")) {
             return "tiptap-vendor";
           }
-          if (id.includes("antd") || id.includes("@ant-design") || id.includes("rc-")) {
+          if (
+            id.includes("/react/") ||
+            id.includes("/react-dom/") ||
+            id.includes("/react-router/") ||
+            id.includes("/react-router-dom/") ||
+            id.includes("/scheduler/")
+          ) {
+            return "react-vendor";
+          }
+          if (
+            id.includes("antd") ||
+            id.includes("@ant-design") ||
+            id.includes("rc-")
+          ) {
             return "antd-vendor";
           }
           if (id.includes("axios")) {

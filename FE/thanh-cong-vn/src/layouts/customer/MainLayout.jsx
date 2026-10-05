@@ -32,11 +32,6 @@ export function MainLayout() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!showFloatWidgets) return;
-    const timer = window.setTimeout(() => setChatOpen(true), 1500);
-    return () => window.clearTimeout(timer);
-  }, [showFloatWidgets]);
 
   return (
     <div className="tc-layout">
