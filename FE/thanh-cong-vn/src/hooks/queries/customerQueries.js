@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { queryClient } from "../../config/queryClient";
 import {
   getAllProductsForCustomer,
@@ -9,7 +9,11 @@ import {
 import { getAllCategoriesForCustomer } from "../../services/customer/CustomerCategoryService";
 import { getAllPostsForCustomer } from "../../services/customer/CustomerPostService";
 
-// ─── 1. CATEGORIES (DANH MỤC KHÁCH HÀNG) ──────────────────────
+// ══════════════════════════════════════════════════════════════
+// NHÓM 1: DỮ LIỆU TĨNH / ÍT THAY ĐỔI (Categories, Home Sections)
+// ══════════════════════════════════════════════════════════════
+
+// 1.1 Cây danh mục khách hàng
 export const CATEGORIES_QUERY_KEY = ["customer", "categories"];
 
 export function useCustomerCategoriesQuery() {
@@ -21,7 +25,7 @@ export function useCustomerCategoriesQuery() {
       return Array.isArray(raw) ? raw : [];
     },
     staleTime: 15 * 60 * 1000, // 15 phút không cần gọi lại
-    gcTime: 60 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,    // Giữ trong RAM 60 phút
   });
 }
 
@@ -29,8 +33,8 @@ export function getCachedCategoriesDirect() {
   return queryClient.getQueryData(CATEGORIES_QUERY_KEY);
 }
 
-export function fetchCategoriesPromise() {
-  return queryClient.fetchQuery({
+export function prefetchCustomerCategories() {
+  return queryClient.prefetchQuery({
     queryKey: CATEGORIES_QUERY_KEY,
     queryFn: async () => {
       const res = await getAllCategoriesForCustomer();
@@ -41,7 +45,40 @@ export function fetchCategoriesPromise() {
   });
 }
 
-// ─── 2. PRODUCTS PHÂN TRANG (TẤT CẢ SẢN PHẨM) ───────────────────
+// 1.2 Sections sản phẩm trang chủ
+export const HOME_SECTIONS_QUERY_KEY = ["customer", "home-sections"];
+
+export function useHomeSectionsQuery() {
+  return useQuery({
+    queryKey: HOME_SECTIONS_QUERY_KEY,
+    queryFn: async () => {
+      const res = await categorySections();
+      const data = res?.data || (Array.isArray(res) ? res : []);
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 10 * 60 * 1000, // 10 phút
+    gcTime: 30 * 60 * 1000,
+  });
+}
+
+export function prefetchHomeSections() {
+  return queryClient.prefetchQuery({
+    queryKey: HOME_SECTIONS_QUERY_KEY,
+    queryFn: async () => {
+      const res = await categorySections();
+      const data = res?.data || (Array.isArray(res) ? res : []);
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
+
+// ══════════════════════════════════════════════════════════════
+// NHÓM 2: DANH SÁCH & CHI TIẾT (Products, Category Products, Posts)
+// ══════════════════════════════════════════════════════════════
+
+// 2.1 Tất cả sản phẩm phân trang
 export const productListQueryKey = (page = 0, size = 12) => [
   "customer",
   "products",
@@ -56,15 +93,12 @@ export function useCustomerProductsQuery(page = 0, size = 12, options = {}) {
       return res;
     },
     staleTime: 3 * 60 * 1000, // 3 phút
-    gcTime: 15 * 60 * 1000,
-    placeholderData: (previousData) => previousData, // Giữ trang cũ hiển thị mượt mà trong khi nạp trang mới
+    gcTime: 20 * 60 * 1000,
+    placeholderData: keepPreviousData, // Giữ trang cũ hiển thị mượt mà khi đổi trang
     ...options,
   });
 }
 
-/**
- * Prefetch trang sản phẩm kế tiếp (Next Page) ở background
- */
 export function prefetchCustomerProductsPage(page, size = 12) {
   if (typeof page !== "number" || page < 0) return;
   return queryClient.prefetchQuery({
@@ -77,12 +111,12 @@ export function prefetchCustomerProductsPage(page, size = 12) {
   });
 }
 
-// ─── 3. SẢN PHẨM THEO DANH MỤC ─────────────────────────────────
+// 2.2 Sản phẩm theo danh mục
 export const categoryProductsQueryKey = (categoryId) => [
   "customer",
   "products",
   "category",
-  categoryId,
+  String(categoryId),
 ];
 
 export function useCategoryProductsQuery(categoryId, options = {}) {
@@ -95,8 +129,9 @@ export function useCategoryProductsQuery(categoryId, options = {}) {
       return Array.isArray(list) ? list : [];
     },
     enabled: Boolean(categoryId && categoryId !== "all"),
-    staleTime: 3 * 60 * 1000,
-    gcTime: 15 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 phút
+    gcTime: 25 * 60 * 1000,
+    placeholderData: keepPreviousData,
     ...options,
   });
 }
@@ -110,11 +145,11 @@ export function prefetchCategoryProducts(categoryId) {
       const list = res?.data || (Array.isArray(res) ? res : []);
       return Array.isArray(list) ? list : [];
     },
-    staleTime: 3 * 60 * 1000,
+    staleTime: 5 * 60 * 1000,
   });
 }
 
-// ─── 4. CHI TIẾT SẢN PHẨM (PRODUCT DETAIL) ──────────────────────
+// 2.3 Chi tiết sản phẩm
 export const productDetailQueryKey = (productId) => [
   "customer",
   "product",
@@ -130,15 +165,12 @@ export function useProductDetailQuery(productId, options = {}) {
       return res?.data || res;
     },
     enabled: Boolean(productId),
-    staleTime: 5 * 60 * 1000,
-    gcTime: 20 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 phút
+    gcTime: 30 * 60 * 1000,
     ...options,
   });
 }
 
-/**
- * Prefetch thông tin chi tiết sản phẩm khi người dùng di chuột (hover) vào card
- */
 export function prefetchProductDetail(productId) {
   if (!productId) return;
   return queryClient.prefetchQuery({
@@ -151,26 +183,10 @@ export function prefetchProductDetail(productId) {
   });
 }
 
-// ─── 5. TRANG CHỦ: SECTIONS SẢN PHẨM ────────────────────────────
-export const HOME_SECTIONS_QUERY_KEY = ["customer", "home-sections"];
-
-export function useHomeSectionsQuery() {
-  return useQuery({
-    queryKey: HOME_SECTIONS_QUERY_KEY,
-    queryFn: async () => {
-      const res = await categorySections();
-      const data = res?.data || (Array.isArray(res) ? res : []);
-      return Array.isArray(data) ? data : [];
-    },
-    staleTime: 5 * 60 * 1000,
-    gcTime: 20 * 60 * 1000,
-  });
-}
-
-// ─── 6. BÀI VIẾT TIN TỨC (DÙNG CHUNG CHO NEWS, HOME & DETAIL) ───
+// 2.4 Bài viết tin tức
 export const NEWS_LIST_QUERY_KEY = ["customer", "posts"];
 
-export function useCustomerPostsQuery() {
+export function useCustomerPostsQuery(options = {}) {
   return useQuery({
     queryKey: NEWS_LIST_QUERY_KEY,
     queryFn: async () => {
@@ -184,12 +200,38 @@ export function useCustomerPostsQuery() {
     },
     staleTime: 5 * 60 * 1000, // 5 phút
     gcTime: 20 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    ...options,
   });
 }
 
-/**
- * Lấy danh sách posts từ cache nếu đã có, tránh fetch lặp
- */
+export function prefetchCustomerPosts() {
+  return queryClient.prefetchQuery({
+    queryKey: NEWS_LIST_QUERY_KEY,
+    queryFn: async () => {
+      const res = await getAllPostsForCustomer();
+      const rawList =
+        res?.data?.content ||
+        res?.data ||
+        res?.content ||
+        (Array.isArray(res) ? res : []);
+      return Array.isArray(rawList) ? rawList : [];
+    },
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function getCachedPostsDirect() {
   return queryClient.getQueryData(NEWS_LIST_QUERY_KEY);
+}
+
+// ══════════════════════════════════════════════════════════════
+// 3. PREFETCH TRANG CHỦ & APP START (Chạy song song, không block UI)
+// ══════════════════════════════════════════════════════════════
+export function prefetchHomepageCriticalData() {
+  // Nạp ngầm song song 3 API chính mà không block bất kỳ render UI nào
+  prefetchCustomerCategories();
+  prefetchHomeSections();
+  prefetchCustomerPosts();
+  prefetchCustomerProductsPage(0, 12);
 }

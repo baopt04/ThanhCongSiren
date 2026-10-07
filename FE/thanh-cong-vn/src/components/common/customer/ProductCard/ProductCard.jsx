@@ -9,6 +9,7 @@ import {
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import { prefetchProductDetail } from "../../../../hooks/queries/customerQueries";
+import { preloadRouteChunks } from "../../../../utils/preloadChunks";
 
 export const ProductCard = memo(function ProductCard({
   id,
@@ -29,6 +30,11 @@ export const ProductCard = memo(function ProductCard({
   const productLink = id ? `/san-pham/${id}` : (slug ? `/san-pham/${slug}` : "#");
 
   const handlePrefetch = () => {
+    try {
+      preloadRouteChunks.productDetail?.();
+    } catch {
+      // Ignore prefetch error
+    }
     const target = id || slug;
     if (target) {
       prefetchProductDetail(target);

@@ -1,6 +1,25 @@
 import { useState, memo } from "react";
 import { Link } from "react-router-dom";
 import { UnorderedListOutlined, DownOutlined } from "@ant-design/icons";
+import { preloadRouteChunks } from "../../utils/preloadChunks";
+import {
+  prefetchCustomerProductsPage,
+  prefetchCustomerPosts,
+} from "../../hooks/queries/customerQueries";
+
+function handleHoverLink(path) {
+  try {
+    if (path === "/san-pham" || path?.startsWith("/san-pham")) {
+      preloadRouteChunks.siren?.();
+      prefetchCustomerProductsPage(0, 12);
+    } else if (path === "/tin-tuc") {
+      preloadRouteChunks.news?.();
+      prefetchCustomerPosts();
+    }
+  } catch {
+    // Ignore prefetch error
+  }
+}
 
 export const HeaderNav = memo(function HeaderNav({
   categories,
@@ -35,7 +54,11 @@ export const HeaderNav = memo(function HeaderNav({
                       cat.children && cat.children.length > 0 ? "has-sub" : ""
                     }`}
                   >
-                    <Link to={cat.path} onClick={() => setShowCategories(false)}>
+                    <Link
+                      to={cat.path}
+                      onClick={() => setShowCategories(false)}
+                      onMouseEnter={() => handleHoverLink(cat.path)}
+                    >
                       <span>{cat.label}</span>
                       {cat.children && cat.children.length > 0 && (
                         <span className="tc-sub-arrow">›</span>
@@ -51,6 +74,7 @@ export const HeaderNav = memo(function HeaderNav({
                             to={sub.path}
                             className="tc-sub-item"
                             onClick={() => setShowCategories(false)}
+                            onMouseEnter={() => handleHoverLink(sub.path)}
                           >
                             {sub.label}
                           </Link>
@@ -71,7 +95,12 @@ export const HeaderNav = memo(function HeaderNav({
               key={item.label}
               className={currentPath === item.path ? "active" : ""}
             >
-              <Link to={item.path}>{item.label}</Link>
+              <Link
+                to={item.path}
+                onMouseEnter={() => handleHoverLink(item.path)}
+              >
+                {item.label}
+              </Link>
             </li>
           ))}
         </ul>

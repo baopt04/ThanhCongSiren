@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Pagination } from "antd";
 import { LoadingOutlined, FilterOutlined, CloseOutlined } from "@ant-design/icons";
 import { ProductCard } from "../ProductCard/ProductCard";
@@ -8,6 +8,7 @@ import { getByProductForCategeroy } from "../../../../services/customer/Customer
 import { getCachedCustomerCategories, findCategoryInTree } from "../../../../utils/categoriesCache";
 import { queryClient } from "../../../../config/queryClient";
 import { categoryProductsQueryKey } from "../../../../hooks/queries/customerQueries";
+import { useScrollRestoration } from "../../../../hooks/useScrollRestoration";
 import "./ProductListingLayout.css";
 
 export function ProductListingLayout({
@@ -29,15 +30,23 @@ export function ProductListingLayout({
   onPageChange
 }) {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageFromUrl = parseInt(searchParams.get("page") || "1", 10);
+  const urlPage = isNaN(pageFromUrl) || pageFromUrl < 1 ? 1 : pageFromUrl;
+
   const [activeCategory, setActiveCategory] = useState(defaultCategoryId);
   const [selectedPriceRange, setSelectedPriceRange] = useState("all");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(urlPage);
   const [filterOpen, setFilterOpen] = useState(false);
 
   // Danh sách sản phẩm hiện tại (tất cả hoặc theo ID danh mục)
   const [currentProducts, setCurrentProducts] = useState(products);
   const [isLoadingCategory, setIsLoadingCategory] = useState(false);
+  const [isInitialCategoryLoaded, setIsInitialCategoryLoaded] = useState(
+    !defaultCategoryId || defaultCategoryId === "all"
+  );
   const categoryCacheRef = useRef({});
+  const isFirstMountRef = useRef(true);
 
   // Đồng bộ sản phẩm ban đầu khi props products thay đổi và chưa chọn danh mục
   useEffect(() => {
@@ -69,6 +78,7 @@ export function ProductListingLayout({
       setActiveCategory("all");
       setCurrentPage(1);
       setFilterOpen(false);
+      setIsInitialCategoryLoaded(true);
       if (shouldNavigate) {
         navigate("/san-pham");
       }
@@ -117,6 +127,7 @@ export function ProductListingLayout({
     const cached = queryClient.getQueryData(categoryProductsQueryKey(categoryId));
     if (cached && Array.isArray(cached) && cached.length > 0) {
       setCurrentProducts(cached);
+      setIsInitialCategoryLoaded(true);
       return;
     }
 
@@ -139,13 +150,33 @@ export function ProductListingLayout({
       setCurrentProducts([]);
     } finally {
       setIsLoadingCategory(false);
+      setIsInitialCategoryLoaded(true);
     }
   };
 
-  // Reset page to 1 whenever filters change
+  // Reset page to 1 whenever filters change (bỏ qua lần đầu mount để giữ page từ URL)
   useEffect(() => {
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      return;
+    }
     setCurrentPage(1);
   }, [activeCategory, selectedPriceRange]);
+
+  // Server vs Client pagination logic
+  const isServerPaginated = Boolean(onPageChange && (!activeCategory || activeCategory === "all"));
+  const activeCurrentPage = isServerPaginated && typeof serverCurrentPage === "number" ? serverCurrentPage : currentPage;
+
+  // Đồng bộ currentPage với urlPage khi URL thay đổi (Back/Forward)
+  useEffect(() => {
+    if (!isServerPaginated) {
+      setCurrentPage(urlPage);
+    }
+  }, [urlPage, isServerPaginated]);
+
+  // Kích hoạt scroll restoration khi dữ liệu đã render đầy đủ
+  const isReady = !loading && !isLoadingCategory && isInitialCategoryLoaded;
+  useScrollRestoration(isReady);
 
   // Filtering products by Price Range
   const filteredProducts = useMemo(() => {
@@ -169,9 +200,7 @@ export function ProductListingLayout({
     });
   }, [currentProducts, selectedPriceRange]);
 
-  // Server vs Client pagination logic
-  const isServerPaginated = Boolean(onPageChange && (!activeCategory || activeCategory === "all"));
-  const activeCurrentPage = isServerPaginated && typeof serverCurrentPage === "number" ? serverCurrentPage : currentPage;
+  // Server vs Client pagination logic (already defined above)
   const totalItems = isServerPaginated && typeof serverTotalItems === "number" ? serverTotalItems : filteredProducts.length;
 
   // Pagination calculation
@@ -180,6 +209,24 @@ export function ProductListingLayout({
     ? filteredProducts
     : filteredProducts.slice(startIndex, startIndex + pageSize);
 
+  const handlePageChangeInternal = (newPage) => {
+    if (isServerPaginated && onPageChange) {
+      onPageChange(newPage);
+    } else {
+      setCurrentPage(newPage);
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (newPage === 1) {
+          next.delete("page");
+        } else {
+          next.set("page", String(newPage));
+        }
+        return next;
+      });
+      window.scrollTo({ top: 200, behavior: "smooth" });
+    }
+  };
+
   const handleResetFilters = () => {
     setActiveCategory("all");
     setSelectedPriceRange("all");
@@ -187,6 +234,11 @@ export function ProductListingLayout({
       onPageChange(1);
     } else {
       setCurrentPage(1);
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        next.delete("page");
+        return next;
+      });
     }
     setCurrentProducts(products);
     navigate("/san-pham");
@@ -304,14 +356,7 @@ export function ProductListingLayout({
                   current={activeCurrentPage}
                   pageSize={pageSize}
                   total={totalItems}
-                  onChange={(page) => {
-                    if (isServerPaginated && onPageChange) {
-                      onPageChange(page);
-                    } else {
-                      setCurrentPage(page);
-                    }
-                    window.scrollTo({ top: 200, behavior: "smooth" });
-                  }}
+                  onChange={handlePageChangeInternal}
                   showSizeChanger={false}
                 />
               </div>

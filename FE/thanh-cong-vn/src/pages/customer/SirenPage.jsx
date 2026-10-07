@@ -71,7 +71,7 @@ export function SirenPage() {
             setCategoryName(found.name);
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     } else {
       setCategoryName("");
     }

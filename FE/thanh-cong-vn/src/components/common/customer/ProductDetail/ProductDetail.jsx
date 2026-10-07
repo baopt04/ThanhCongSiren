@@ -29,7 +29,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const { id, param } = useParams();
   const productId = id || param;
-  
+
   const {
     data: productData,
     isLoading: loading,
@@ -48,7 +48,7 @@ export default function ProductDetail() {
     if (product?.slug) {
       const targetPath = `/san-pham/${product.slug}`;
       if (window.location.pathname !== targetPath) {
-        window.history.replaceState(null, "", targetPath);
+        window.history.replaceState(window.history.state, "", targetPath);
       }
     }
   }, [product?.slug]);
@@ -63,11 +63,11 @@ export default function ProductDetail() {
   const productImages = useMemo(() => {
     return product?.images
       ? [...product.images]
-          .sort((a, b) => {
-            if (a.isPrimary !== b.isPrimary) return b.isPrimary - a.isPrimary;
-            return (a.displayOrder || 0) - (b.displayOrder || 0);
-          })
-          .map((img) => img.imageUrl)
+        .sort((a, b) => {
+          if (a.isPrimary !== b.isPrimary) return b.isPrimary - a.isPrimary;
+          return (a.displayOrder || 0) - (b.displayOrder || 0);
+        })
+        .map((img) => img.imageUrl)
       : [];
   }, [product?.images]);
 
@@ -195,6 +195,22 @@ export default function ProductDetail() {
       {/* Breadcrumb Navigation */}
       <nav className="pd-breadcrumb" aria-label="Breadcrumb">
         <div className="pd-breadcrumb-inner">
+          <button
+            type="button"
+            className="pd-back-btn"
+            id="pd-btn-back-history"
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate(product?.categorySlug ? `/san-pham/${product.categorySlug}` : "/san-pham");
+              }
+            }}
+            title="Quay lại danh sách sản phẩm"
+          >
+            <LeftOutlined /> Quay lại
+          </button>
+          <span className="pd-crumb-sep">|</span>
           <Link to="/" className="pd-crumb-link">Trang chủ</Link>
           <span className="pd-crumb-sep">›</span>
           {product.categoryName && (

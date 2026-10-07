@@ -16,6 +16,8 @@ import {
 } from "@ant-design/icons";
 import { Pagination } from "antd";
 import { useCustomerPostsQuery } from "../../../../hooks/queries/customerQueries";
+import { useScrollRestoration } from "../../../../hooks/useScrollRestoration";
+import { preloadRouteChunks } from "../../../../utils/preloadChunks";
 
 // Helper định dạng ngày DD/MM/YYYY
 function formatDate(dateStr) {
@@ -96,18 +98,21 @@ export default function News() {
     return publishedList.length > 0 ? publishedList : rawArticles;
   }, [rawArticles]);
 
-  // Cuộn nhẹ tới danh sách nếu đang ở trang > 1 khi quay lại
+  // Đồng bộ URL params khi user bấm Back / Forward
   useEffect(() => {
-    if (currentPage > 1) {
-      const timer = setTimeout(() => {
-        const feedEl = document.querySelector(".tc-news-feed-col");
-        if (feedEl) {
-          feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
-        }
-      }, 250);
-      return () => clearTimeout(timer);
-    }
-  }, []);
+    const pUrl = parseInt(searchParams.get("page"), 10);
+    const targetPage = !isNaN(pUrl) && pUrl > 0 ? pUrl : 1;
+    setCurrentPage(targetPage);
+
+    const catUrl = searchParams.get("category") || "all";
+    setSelectedCategory(catUrl);
+
+    const searchUrl = searchParams.get("search") || "";
+    setSearchKeyword(searchUrl);
+  }, [searchParams]);
+
+  // Khôi phục vị trí cuộn khi dữ liệu bài viết đã sẵn sàng
+  useScrollRestoration(!loading);
 
   // Trích xuất danh sách các chuyên mục duy nhất từ bài viết
   const categoriesList = useMemo(() => {
@@ -301,6 +306,11 @@ export default function News() {
                     <article
                       key={article.id || articleSlug || idx}
                       className="tc-news-feed-card"
+                      onMouseEnter={() => {
+                        try {
+                          preloadRouteChunks.newsDetail?.();
+                        } catch {}
+                      }}
                     >
                       {/* Ảnh bài viết bên trái */}
                       <div className="tc-news-card-thumb-wrap">

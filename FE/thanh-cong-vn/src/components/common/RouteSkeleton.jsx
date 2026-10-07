@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigationType } from "react-router-dom";
 import "./RouteSkeleton.css";
 
 /**
@@ -212,6 +212,7 @@ export function CustomerDetailSkeleton() {
  */
 export function RouteSkeleton({ layout = "admin", duration = 60, children }) {
   const location = useLocation();
+  const navType = useNavigationType();
   const [loading, setLoading] = useState(false);
   const isFirstRender = useRef(true);
   const timerRef = useRef(null);
@@ -241,6 +242,13 @@ export function RouteSkeleton({ layout = "admin", duration = 60, children }) {
       return;
     }
 
+    // Khi người dùng bấm Back/Forward (POP), KHÔNG làm sập chiều cao/ẩn nội dung
+    // để hook useScrollRestoration và trình duyệt khôi phục vị trí cuộn mượt mà
+    if (navType === "POP") {
+      setLoading(false);
+      return;
+    }
+
     // duration = 0 → không ép skeleton delay (điều hướng tức thì)
     if (!duration || duration <= 0) {
       setLoading(false);
@@ -257,7 +265,7 @@ export function RouteSkeleton({ layout = "admin", duration = 60, children }) {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [location.pathname, location.search, duration]);
+  }, [location.pathname, location.search, duration, navType]);
 
   return (
     <div className="tc-route-skeleton-container">

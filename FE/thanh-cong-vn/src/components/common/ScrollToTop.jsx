@@ -10,6 +10,13 @@ export function ScrollToTop() {
   const { pathname, search } = useLocation();
   const navType = useNavigationType();
 
+  // Đặt manual scroll restoration toàn cục ngay từ khi app khởi động
+  useEffect(() => {
+    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
   useEffect(() => {
     // Chỉ cuộn lên đầu nếu là thao tác điều hướng trang mới (PUSH)
     // Nếu là POP (Quay lại trang trước), bảo lưu vị trí cuộn cũ

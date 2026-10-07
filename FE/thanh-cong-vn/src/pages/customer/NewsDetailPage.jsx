@@ -129,17 +129,17 @@ export function NewsDetailPage() {
       setPrevPost(
         foundIndex > 0
           ? {
-              slug: list[foundIndex - 1].slug || list[foundIndex - 1].id,
-              title: list[foundIndex - 1].title,
-            }
+            slug: list[foundIndex - 1].slug || list[foundIndex - 1].id,
+            title: list[foundIndex - 1].title,
+          }
           : null
       );
       setNextPost(
         foundIndex < list.length - 1
           ? {
-              slug: list[foundIndex + 1].slug || list[foundIndex + 1].id,
-              title: list[foundIndex + 1].title,
-            }
+            slug: list[foundIndex + 1].slug || list[foundIndex + 1].id,
+            title: list[foundIndex + 1].title,
+          }
           : null
       );
 

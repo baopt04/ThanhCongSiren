@@ -1,32 +1,35 @@
 import { getAllCategoriesForCustomer as fetchCategoriesApi } from "../services/customer/CustomerCategoryService";
+import { queryClient } from "../config/queryClient";
 
-let cache = null;
-let inflight = null;
+export const CATEGORIES_QUERY_KEY = ["customer", "categories"];
 
 /**
- * Fetch danh mục 1 lần, tái sử dụng cho Header / sidebar (tránh gọi API trùng).
+ * Fetch danh mục tập trung qua TanStack Query cache:
+ * Tái sử dụng 100% cùng 1 bộ nhớ cache trong RAM với useCustomerCategoriesQuery,
+ * deduplicate toàn bộ các request song song giữa Header, RouteHandler, Sidebar.
  */
 export async function getCachedCustomerCategories({ force = false } = {}) {
-  if (!force && cache) return cache;
-  if (!force && inflight) return inflight;
+  if (!force) {
+    const existing = queryClient.getQueryData(CATEGORIES_QUERY_KEY);
+    if (existing && Array.isArray(existing) && existing.length > 0) {
+      return existing;
+    }
+  }
 
-  inflight = fetchCategoriesApi()
-    .then((res) => {
-      cache = res;
-      inflight = null;
-      return res;
-    })
-    .catch((err) => {
-      inflight = null;
-      throw err;
-    });
-
-  return inflight;
+  return queryClient.fetchQuery({
+    queryKey: CATEGORIES_QUERY_KEY,
+    queryFn: async () => {
+      const res = await fetchCategoriesApi();
+      const raw = res?.data || res?.result || res || [];
+      return Array.isArray(raw) ? raw : [];
+    },
+    staleTime: 15 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  });
 }
 
 export function clearCustomerCategoriesCache() {
-  cache = null;
-  inflight = null;
+  queryClient.removeQueries({ queryKey: CATEGORIES_QUERY_KEY });
 }
 
 /**
@@ -45,4 +48,3 @@ export function findCategoryInTree(categories, identifier) {
   }
   return null;
 }
-
