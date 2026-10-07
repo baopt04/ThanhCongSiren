@@ -11,6 +11,10 @@
   width: 100%;
   position: relative;
   overflow: hidden;
+  aspect-ratio: 2078 / 757;
+  min-height: 280px;
+  max-height: min(72vh, 680px);
+  background: #0f172a;
 }
 
 .tc-hero-slider .ant-carousel {
@@ -165,6 +169,7 @@
 /* ═══ Responsive ═══ */
 
 @media (max-width: 1024px) {
+  .tc-hero-slider,
   .tc-slide-media {
     max-height: min(52vh, 480px);
     min-height: 240px;
@@ -192,6 +197,7 @@
 }
 
 @media (max-width: 768px) {
+  .tc-hero-slider,
   .tc-slide-media {
     aspect-ratio: 16 / 9;
     max-height: min(42vh, 320px);
@@ -231,6 +237,7 @@
 }
 
 @media (max-width: 480px) {
+  .tc-hero-slider,
   .tc-slide-media {
     aspect-ratio: 2 / 1;
     max-height: 220px;

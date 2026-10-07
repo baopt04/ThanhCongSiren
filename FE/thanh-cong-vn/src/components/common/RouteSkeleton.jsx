@@ -224,6 +224,11 @@ export function RouteSkeleton({ layout = "admin", duration = 60, children }) {
       return isDashboard ? <AdminDashboardSkeleton /> : <AdminTableSkeleton />;
     }
 
+    // Không hiển thị listing skeleton trên trang chủ
+    if (location.pathname === "/" || location.pathname === "") {
+      return null;
+    }
+
     // Customer
     const isDetail =
       location.pathname.includes("/chi-tiet/") ||
@@ -234,6 +239,20 @@ export function RouteSkeleton({ layout = "admin", duration = 60, children }) {
 
     return isDetail ? <CustomerDetailSkeleton /> : <CustomerListingSkeleton />;
   };
+
+  // Khi được dùng trực tiếp làm Suspense fallback (không bọc children)
+  if (!children) {
+    const skeleton = renderSkeleton();
+    if (!skeleton) return null;
+    return (
+      <div className="tc-route-skeleton-container">
+        <div className="tc-route-progress-bar" />
+        <div className="tc-skeleton-wrapper tc-skeleton-fade-enter">
+          {skeleton}
+        </div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     // Tránh lag khi mới mount trang đầu tiên

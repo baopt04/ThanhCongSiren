@@ -5,10 +5,7 @@ import { ScrollToTop } from "../components/common/ScrollToTop";
 import { MainLayout } from "../layouts/customer/MainLayout";
 import { RouteSkeleton } from "../components/common/RouteSkeleton";
 import { PrivateRoute } from "../components/common/PrivateRoute";
-
-const HomePage = lazy(() =>
-  import("../pages/customer/HomePage").then((m) => ({ default: m.HomePage }))
-);
+import { HomePage } from "../pages/customer/HomePage";
 const SirenPage = lazy(() =>
   import("../pages/customer/SirenPage").then((m) => ({ default: m.SirenPage }))
 );
@@ -193,7 +190,7 @@ export function AppRouter() {
       <ScrollToTop />
       <Routes>
         <Route element={<MainLayout />}>
-          <Route path="/" element={<LazyPage><HomePage /></LazyPage>} />
+          <Route path="/" element={<HomePage />} />
           <Route path="/gioi-thieu" element={<LazyPage><AboutPage /></LazyPage>} />
           <Route path="/cong-ty-tnhh-thanh-cong-viet-nam" element={<LazyPage><AboutPage /></LazyPage>} />
           <Route path="/san-pham" element={<LazyPage><SirenPage /></LazyPage>} />

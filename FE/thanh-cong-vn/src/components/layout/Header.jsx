@@ -7,7 +7,6 @@ import {
   MenuOutlined,
   CloseOutlined,
 } from "@ant-design/icons";
-import { message } from "antd";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { getCachedCustomerCategories } from "../../utils/categoriesCache";
@@ -19,6 +18,7 @@ import { HeaderTopBar } from "./HeaderTopBar";
 import { HeaderSearchBar } from "./HeaderSearchBar";
 import { HeaderNav } from "./HeaderNav";
 import { HeaderMobileDrawer } from "./HeaderMobileDrawer";
+import logoImg from "../../assets/logo.webp";
 
 // Fallback danh mục khi API không trả dữ liệu
 const fallbackCategories = [
@@ -214,13 +214,12 @@ export function Header() {
 
         <Link to="/" className="tc-header-logo" onClick={closeMobileMenu}>
           <img
-            src="https://cdn0344.cdn4s.com/media/logo/cropped-logo-coihubaodong-2.png"
+            src={logoImg}
             alt="Thành Công Việt Nam - Còi hú báo động"
+            width={180}
+            height={52}
+            fetchPriority="high"
             decoding="async"
-            onError={(e) => {
-              e.target.src =
-                "https://coihubaodong.com/templates/fashion01/assets/media/cropped-logo-coihubaodong-2.png";
-            }}
           />
           <div className="tc-logo-text">
             <span className="tc-logo-brand">THÀNH CÔNG VIỆT NAM</span>

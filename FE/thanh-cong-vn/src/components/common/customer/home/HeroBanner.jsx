@@ -4,11 +4,29 @@ import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import banner1 from "../../../../assets/Banner_1.webp";
 import banner2 from "../../../../assets/Banner_2.webp";
 import banner3 from "../../../../assets/Banner_3.webp";
+import banner1Mobile from "../../../../assets/Banner_1_mobile.jpg";
+import banner2Mobile from "../../../../assets/Banner_2_mobile.jpg";
+import banner3Mobile from "../../../../assets/Banner_3_mobile.jpg";
 
 const banners = [
-  { src: banner1, alt: "Còi hú báo động Thành Công Việt Nam - Banner 1", priority: true },
-  { src: banner2, alt: "Còi hú báo động Thành Công Việt Nam - Banner 2", priority: false },
-  { src: banner3, alt: "Còi hú báo động Thành Công Việt Nam - Banner 3", priority: false },
+  {
+    src: banner1,
+    srcMobile: banner1Mobile,
+    alt: "Còi hú báo động Thành Công Việt Nam - Banner 1",
+    priority: true,
+  },
+  {
+    src: banner2,
+    srcMobile: banner2Mobile,
+    alt: "Còi hú báo động Thành Công Việt Nam - Banner 2",
+    priority: false,
+  },
+  {
+    src: banner3,
+    srcMobile: banner3Mobile,
+    alt: "Còi hú báo động Thành Công Việt Nam - Banner 3",
+    priority: false,
+  },
 ];
 
 function PrevArrow({ className, style, onClick }) {
@@ -57,17 +75,25 @@ export function HeroBanner() {
           {banners.map((banner, index) => (
             <div key={banner.alt} className="tc-slide-item">
               <div className="tc-slide-media">
-                <img
-                  src={banner.src}
-                  alt={banner.alt}
-                  className="tc-slide-img"
-                  draggable={false}
-                  loading={index === 0 ? "eager" : "lazy"}
-                  decoding={index === 0 ? "sync" : "async"}
-                  fetchPriority={index === 0 ? "high" : "low"}
-                  width={1920}
-                  height={700}
-                />
+                <picture>
+                  <source
+                    media="(max-width: 768px)"
+                    srcSet={banner.srcMobile}
+                    width={768}
+                    height={280}
+                  />
+                  <img
+                    src={banner.src}
+                    alt={banner.alt}
+                    className="tc-slide-img"
+                    draggable={false}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    decoding={index === 0 ? "sync" : "async"}
+                    fetchPriority={index === 0 ? "high" : "low"}
+                    width={1920}
+                    height={700}
+                  />
+                </picture>
               </div>
             </div>
           ))}

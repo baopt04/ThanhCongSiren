@@ -111,9 +111,23 @@ export const ProductSection = memo(function ProductSection({
         </div>
 
         {isLoading ? (
-          <div className="tc-product-loading">
-            <LoadingOutlined spin style={{ fontSize: 28, color: "#d90429" }} />
-            <p>Đang tải sản phẩm...</p>
+          <div className="tc-product-slider-wrap">
+            <div className="tc-product-slider" style={{ overflow: "hidden" }}>
+              {[1, 2, 3, 4].map((i) => (
+                <div className="tc-product-slide" key={i}>
+                  <div className="tc-catalog-card tc-card-skeleton">
+                    <div className="tc-catalog-thumb-box tc-sk-thumb">
+                      <div className="tc-skeleton-shimmer" style={{ width: "100%", height: "100%" }} />
+                    </div>
+                    <div className="tc-catalog-content" style={{ padding: 12 }}>
+                      <div className="tc-skeleton-shimmer" style={{ height: 16, width: "85%", marginBottom: 8 }} />
+                      <div className="tc-skeleton-shimmer" style={{ height: 12, width: "50%", marginBottom: 12 }} />
+                      <div className="tc-skeleton-shimmer" style={{ height: 18, width: "60%" }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="tc-product-slider-wrap">
@@ -155,3 +169,37 @@ export const ProductSection = memo(function ProductSection({
     </section>
   );
 });
+
+export function ProductSectionSkeleton({ title = "SẢN PHẨM" }) {
+  return (
+    <section className="tc-home-section" aria-hidden="true">
+      <div className="tc-section-container">
+        <div className="tc-section-header">
+          <div className="tc-section-tab-badge">
+            <span>{title}</span>
+          </div>
+          <div className="tc-section-header-line"></div>
+        </div>
+
+        <div className="tc-product-slider-wrap">
+          <div className="tc-product-slider" style={{ overflow: "hidden" }}>
+            {[1, 2, 3, 4].map((i) => (
+              <div className="tc-product-slide" key={i}>
+                <div className="tc-catalog-card tc-card-skeleton">
+                  <div className="tc-catalog-thumb-box tc-sk-thumb">
+                    <div className="tc-skeleton-shimmer" style={{ width: "100%", height: "100%" }} />
+                  </div>
+                  <div className="tc-catalog-content" style={{ padding: 12 }}>
+                    <div className="tc-skeleton-shimmer" style={{ height: 16, width: "85%", marginBottom: 8 }} />
+                    <div className="tc-skeleton-shimmer" style={{ height: 12, width: "50%", marginBottom: 12 }} />
+                    <div className="tc-skeleton-shimmer" style={{ height: 18, width: "60%" }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}

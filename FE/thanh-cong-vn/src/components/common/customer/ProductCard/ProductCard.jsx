@@ -112,6 +112,8 @@ export const ProductCard = memo(function ProductCard({
               alt={name}
               loading="lazy"
               decoding="async"
+              width={300}
+              height={255}
               className={`tc-catalog-thumb ${hoverImageUrl ? "has-hover" : ""}`}
               onError={(e) => {
                 e.target.src = defaultImg;
@@ -123,6 +125,8 @@ export const ProductCard = memo(function ProductCard({
                 alt={`${name} hover`}
                 loading="lazy"
                 decoding="async"
+                width={300}
+                height={255}
                 className="tc-catalog-thumb-hover"
                 onError={(e) => {
                   e.target.style.display = "none";
@@ -203,6 +207,8 @@ export const ProductCard = memo(function ProductCard({
           alt={name}
           loading="lazy"
           decoding="async"
+          width={300}
+          height={225}
           className={`tc-product-thumb ${hoverImageUrl ? "has-hover" : ""}`}
           onError={(e) => {
             e.target.src = defaultImg;
@@ -214,6 +220,8 @@ export const ProductCard = memo(function ProductCard({
             alt={`${name} hover`}
             loading="lazy"
             decoding="async"
+            width={300}
+            height={225}
             className="tc-product-thumb-hover"
             onError={(e) => {
               e.target.style.display = "none";

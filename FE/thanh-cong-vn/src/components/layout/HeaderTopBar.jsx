@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import { memo, useMemo, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import {
   SafetyCertificateOutlined,
@@ -10,7 +10,8 @@ import {
   LogoutOutlined,
   DownOutlined,
 } from "@ant-design/icons";
-import { Dropdown } from "antd";
+
+const Dropdown = lazy(() => import("antd").then((m) => ({ default: m.Dropdown })));
 
 export const HeaderTopBar = memo(function HeaderTopBar({ customerUser, onLogout }) {
   const menuItems = useMemo(() => {
@@ -142,35 +143,46 @@ export const HeaderTopBar = memo(function HeaderTopBar({ customerUser, onLogout 
           <Link to="/tin-tuc">Dự án đã thi công</Link>
           <Link to="/gio-hang">Kiểm tra đơn hàng</Link>
           {customerUser ? (
-            <Dropdown
-              menu={{ items: menuItems }}
-              placement="bottomRight"
-              trigger={["click", "hover"]}
-            >
-              <span className="tc-top-user-btn">
-                {customerUser.avatar ? (
-                  <img
-                    src={customerUser.avatar}
-                    alt="Avatar"
-                    style={{
-                      width: 20,
-                      height: 20,
-                      borderRadius: "50%",
-                      objectFit: "cover",
-                      marginRight: 2,
-                      display: "inline-block",
-                      verticalAlign: "middle",
-                    }}
-                  />
-                ) : (
+            <Suspense
+              fallback={
+                <span className="tc-top-user-btn">
                   <UserOutlined />
-                )}
-                <span className="tc-user-name">
-                  {customerUser.fullName || customerUser.email}
+                  <span className="tc-user-name">
+                    {customerUser.fullName || customerUser.email}
+                  </span>
                 </span>
-                <DownOutlined style={{ fontSize: 10 }} />
-              </span>
-            </Dropdown>
+              }
+            >
+              <Dropdown
+                menu={{ items: menuItems }}
+                placement="bottomRight"
+                trigger={["click", "hover"]}
+              >
+                <span className="tc-top-user-btn">
+                  {customerUser.avatar ? (
+                    <img
+                      src={customerUser.avatar}
+                      alt="Avatar"
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        marginRight: 2,
+                        display: "inline-block",
+                        verticalAlign: "middle",
+                      }}
+                    />
+                  ) : (
+                    <UserOutlined />
+                  )}
+                  <span className="tc-user-name">
+                    {customerUser.fullName || customerUser.email}
+                  </span>
+                  <DownOutlined style={{ fontSize: 10 }} />
+                </span>
+              </Dropdown>
+            </Suspense>
           ) : (
             <Link to="/dang-nhap" className="tc-top-login-btn">
               <UserOutlined /> Đăng nhập / Đăng ký

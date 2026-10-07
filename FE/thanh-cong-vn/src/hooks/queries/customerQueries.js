@@ -229,9 +229,14 @@ export function getCachedPostsDirect() {
 // 3. PREFETCH TRANG CHỦ & APP START (Chạy song song, không block UI)
 // ══════════════════════════════════════════════════════════════
 export function prefetchHomepageCriticalData() {
-  // Nạp ngầm song song 3 API chính mà không block bất kỳ render UI nào
   prefetchCustomerCategories();
   prefetchHomeSections();
   prefetchCustomerPosts();
-  prefetchCustomerProductsPage(0, 12);
+
+  // Hoãn prefetch trang /san-pham sau 2.5s để nhường 100% băng thông mạng cho ảnh LCP Banner và UI trang chủ
+  if (typeof window !== "undefined") {
+    window.setTimeout(() => {
+      prefetchCustomerProductsPage(0, 12);
+    }, 2500);
+  }
 }

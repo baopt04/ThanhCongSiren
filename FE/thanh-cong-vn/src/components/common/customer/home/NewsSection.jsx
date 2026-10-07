@@ -9,7 +9,7 @@ export function NewsSection() {
   const [newsList, setNewsList] = useState([]);
   const [videoProjects, setVideoProjects] = useState([]);
 
-  const { data: postsList = [] } = useCustomerPostsQuery();
+  const { data: postsList = [], isLoading } = useCustomerPostsQuery();
 
   useEffect(() => {
     if (!postsList || postsList.length === 0) return;
@@ -36,6 +36,45 @@ export function NewsSection() {
     setVideoProjects(videos);
     if (videos.length > 0 && !activeVideo) setActiveVideo(videos[0]);
   }, [postsList]);
+
+  if (isLoading && newsList.length === 0 && videoProjects.length === 0) {
+    return (
+      <section className="tc-news-section" aria-hidden="true">
+        <div className="tc-news-container">
+          <div className="tc-news-header">
+            <div className="tc-news-tab-badge">
+              <span>TIN TỨC - VIDEO</span>
+            </div>
+            <div className="tc-news-header-line"></div>
+          </div>
+          <div className="tc-news-grid" style={{ minHeight: 320 }}>
+            <div className="tc-news-left-col">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="tc-news-item" style={{ pointerEvents: "none" }}>
+                  <div className="tc-news-item-info">
+                    <div
+                      className="tc-skeleton-shimmer"
+                      style={{ height: 16, width: "80%", marginBottom: 6 }}
+                    />
+                    <div
+                      className="tc-skeleton-shimmer"
+                      style={{ height: 12, width: "50%" }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="tc-news-right-col">
+              <div
+                className="tc-video-player-box"
+                style={{ background: "#1e293b", minHeight: 220 }}
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (newsList.length === 0 && videoProjects.length === 0) {
     return null;
@@ -66,7 +105,14 @@ export function NewsSection() {
                 {item.image && (
                   <div className="tc-news-item-thumb">
                     <Link to={`/tin-tuc/${item.slug}`}>
-                      <img src={item.image} alt={item.title} loading="lazy" decoding="async" />
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        loading="lazy"
+                        decoding="async"
+                        width={80}
+                        height={60}
+                      />
                     </Link>
                   </div>
                 )}
@@ -84,6 +130,8 @@ export function NewsSection() {
                     className="tc-video-thumb"
                     loading="lazy"
                     decoding="async"
+                    width={540}
+                    height={300}
                   />
                   <Link
                     to={`/tin-tuc/${activeVideo.slug}`}

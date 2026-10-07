@@ -35,13 +35,6 @@ export default defineConfig({
           ) {
             return "react-vendor";
           }
-          if (
-            id.includes("antd") ||
-            id.includes("@ant-design") ||
-            id.includes("rc-")
-          ) {
-            return "antd-vendor";
-          }
           if (id.includes("axios")) {
             return "axios-vendor";
           }

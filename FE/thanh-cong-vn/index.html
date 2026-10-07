@@ -41,11 +41,36 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
       />
     </noscript>
+    <!-- Preload LCP Hero Banner for Mobile (<768px) and Desktop (>768px) -->
     <link
       rel="preload"
       as="image"
-      href="https://cdn0344.cdn4s.com/media/logo/cropped-logo-coihubaodong-2.png"
+      href="/src/assets/Banner_1_mobile.jpg"
+      type="image/jpeg"
+      media="(max-width: 768px)"
+      fetchpriority="high"
     />
+    <link
+      rel="preload"
+      as="image"
+      href="/src/assets/Banner_1.webp"
+      type="image/webp"
+      media="(min-width: 769px)"
+      fetchpriority="high"
+    />
+    <!-- Critical Layout Style to prevent FCP/CLS before stylesheet & JS execution -->
+    <style>
+      body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #ffffff; }
+      #root { min-height: 100vh; }
+      .tc-hero-section { width: 100%; background: #0f172a; }
+      .tc-hero-slider { width: 100%; aspect-ratio: 2078 / 757; min-height: 280px; max-height: min(72vh, 680px); background: #0f172a; overflow: hidden; }
+      @media (max-width: 768px) {
+        .tc-hero-slider { aspect-ratio: 16 / 9; max-height: min(42vh, 320px); min-height: 180px; }
+      }
+      @media (max-width: 480px) {
+        .tc-hero-slider { aspect-ratio: 2 / 1; max-height: 220px; min-height: 150px; }
+      }
+    </style>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",

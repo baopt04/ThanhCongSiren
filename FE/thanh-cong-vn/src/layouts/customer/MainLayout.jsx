@@ -3,7 +3,6 @@ import { Header } from "../../components/layout/Header";
 import { Footer } from "../../components/layout/Footer";
 import { Outlet } from "react-router-dom";
 import { PhoneOutlined, MessageOutlined, FileTextOutlined, CloseOutlined } from "@ant-design/icons";
-import { RouteSkeleton } from "../../components/common/RouteSkeleton";
 import "./MainLayout.css";
 
 const ZALO_URL = "https://zalo.me/0865130088";
@@ -37,9 +36,7 @@ export function MainLayout() {
     <div className="tc-layout">
       <Header />
       <main className="tc-layout-main">
-        <RouteSkeleton layout="customer" duration={60}>
-          <Outlet />
-        </RouteSkeleton>
+        <Outlet />
       </main>
 
       {showFloatWidgets && (
