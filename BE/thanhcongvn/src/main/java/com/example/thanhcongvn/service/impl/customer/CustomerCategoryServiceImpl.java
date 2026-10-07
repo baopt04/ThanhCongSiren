@@ -1,11 +1,12 @@
 package com.example.thanhcongvn.service.impl.customer;
 
+import com.example.thanhcongvn.dto.projection.CategoryTreeView;
 import com.example.thanhcongvn.dto.response.customer.category.ListCategoryCustomerResponse;
-import com.example.thanhcongvn.entity.Category;
 import com.example.thanhcongvn.repository.CategoryRepository;
 import com.example.thanhcongvn.service.customer.CustomerCategorySerivce;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,45 +16,69 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CustomerCategoryServiceImpl implements CustomerCategorySerivce {
+    private static final long TREE_CACHE_TTL_MS = 5 * 60 * 1000L;
+
     private final CategoryRepository categoryRepository;
 
+    private volatile List<ListCategoryCustomerResponse> cachedTree;
+    private volatile long cachedAt;
+
     @Override
+    @Transactional(readOnly = true)
     public List<ListCategoryCustomerResponse> getListCategoryTree() {
-        List<Category> categoryTree = categoryRepository.findAll();
-        Map<String , ListCategoryCustomerResponse> response = categoryTree.stream()
+        long now = System.currentTimeMillis();
+        List<ListCategoryCustomerResponse> snapshot = cachedTree;
+        if (snapshot != null && now - cachedAt < TREE_CACHE_TTL_MS) {
+            return snapshot;
+        }
+        synchronized (this) {
+            now = System.currentTimeMillis();
+            snapshot = cachedTree;
+            if (snapshot != null && now - cachedAt < TREE_CACHE_TTL_MS) {
+                return snapshot;
+            }
+            snapshot = buildTree();
+            cachedTree = snapshot;
+            cachedAt = now;
+            return snapshot;
+        }
+    }
+
+    private List<ListCategoryCustomerResponse> buildTree() {
+        List<CategoryTreeView> rows = categoryRepository.findAllForTree();
+        Map<String, ListCategoryCustomerResponse> byId = rows.stream()
                 .collect(Collectors.toMap(
-                        Category::getId,
-                        this::mapToResponseWithoutChildren
+                        CategoryTreeView::getId,
+                        this::mapToResponse,
+                        (a, b) -> a
                 ));
-        List<ListCategoryCustomerResponse> listCategory = new ArrayList<>();
-        for (Category category : categoryTree) {
-            ListCategoryCustomerResponse categoryCustomerReponse = response.get(category.getId());
-            String parentId = category.getParent() != null ? category.getParent().getId() : null;
+
+        List<ListCategoryCustomerResponse> roots = new ArrayList<>();
+        for (CategoryTreeView row : rows) {
+            ListCategoryCustomerResponse node = byId.get(row.getId());
+            String parentId = row.getParentId();
             if (parentId == null) {
-                listCategory.add(categoryCustomerReponse);
+                roots.add(node);
             } else {
-                ListCategoryCustomerResponse parentCategoryResponse = response.get(parentId);
-                if (parentCategoryResponse != null) {
-                    if (parentCategoryResponse.getChildren() == null) {
-                        parentCategoryResponse.setChildren(new ArrayList<>());
+                ListCategoryCustomerResponse parent = byId.get(parentId);
+                if (parent != null) {
+                    if (parent.getChildren() == null) {
+                        parent.setChildren(new ArrayList<>());
                     }
-                        parentCategoryResponse.getChildren().add(categoryCustomerReponse);
+                    parent.getChildren().add(node);
                 }
             }
-
         }
-        return listCategory;
+        return roots;
     }
-    private ListCategoryCustomerResponse mapToResponseWithoutChildren(Category category) {
+
+    private ListCategoryCustomerResponse mapToResponse(CategoryTreeView category) {
         return ListCategoryCustomerResponse.builder()
                 .id(category.getId())
                 .name(category.getName())
                 .slug(category.getSlug())
                 .status(category.getStatus())
-                .description(category.getDescription())
-                .createAt(category.getCreateAt())
-                .parentId(category.getParent() != null ? category.getParent().getId() : null)
-                .children(null) // sẽ gán sau nếu có con
+                .parentId(category.getParentId())
                 .build();
     }
 }

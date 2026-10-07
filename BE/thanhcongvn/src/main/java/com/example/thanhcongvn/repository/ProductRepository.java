@@ -32,14 +32,15 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Query("SELECT p FROM Product p")
     Page<Product> findAllWithCategoryAndBrand(Pageable pageable);
 
-    /** Customer list — no LONGTEXT columns. */
+    /** Customer list — no LONGTEXT columns, active products only. */
     @Query(value = """
             SELECT p.id AS id, p.name AS name, p.price AS price,
                    c.id AS categoryId, c.name AS categoryName
             FROM Product p
             LEFT JOIN p.category c
+            WHERE p.isActive = 1
             """,
-            countQuery = "SELECT COUNT(p) FROM Product p")
+            countQuery = "SELECT COUNT(p) FROM Product p WHERE p.isActive = 1")
     Page<ProductCardView> findAllCards(Pageable pageable);
 
     /** Admin list — excludes longDescription LONGTEXT. */

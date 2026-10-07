@@ -51,6 +51,17 @@ public interface ProductImageRepository extends JpaRepository<ProductImage, Stri
     List<ProductImageCardView> findCardImagesByProductIds(@Param("productIds") List<String> productIds);
 
     @Query("""
+        SELECT pi.productId AS productId,
+               pi.imageUrl AS imageUrl,
+               pi.isPrimary AS isPrimary,
+               pi.displayOrder AS displayOrder
+        FROM ProductImage pi
+        WHERE pi.productId IN :productIds
+        AND pi.isPrimary = 1
+        """)
+    List<ProductImageCardView> findPrimaryCardImagesByProductIds(@Param("productIds") List<String> productIds);
+
+    @Query("""
         SELECT pi FROM ProductImage pi
         WHERE pi.productId IN :productIds
         AND pi.isPrimary = 1

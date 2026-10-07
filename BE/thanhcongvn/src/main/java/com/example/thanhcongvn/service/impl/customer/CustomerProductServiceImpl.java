@@ -19,7 +19,6 @@ import com.example.thanhcongvn.repository.ProductRepository;
 import com.example.thanhcongvn.repository.ProductSpecificationRepository;
 import com.example.thanhcongvn.service.customer.CustomerProductService;
 import com.example.thanhcongvn.service.impl.TelegramNotificationSericeImpl;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -27,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -35,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class CustomerProductServiceImpl implements CustomerProductService {
     @Value("${home.featured-categories}")
     private String FEATURED_CATEGORY_SLUGS;
@@ -74,7 +75,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)
         );
         List<ProductImageReponse> images = productImageRepository.findByProductIdOrderByDisplayOrderAsc(product.getId())
-                .stream().map(this::mapToImageResponse).collect(Collectors.toList());
+                .stream().map(this::mapDetailImage).collect(Collectors.toList());
         List<ProductSpecification> specs = productSpecificationRepository.findByProductIdOrderByDisplayOrderAsc(product.getId());
 
         Map<String, List<ProductSpecificationResponse>> groupedSpecs = specs.stream()
@@ -120,12 +121,11 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .map(ProductSearchView::getId)
                 .collect(Collectors.toList());
 
-        List<ProductImage> primaryImages = productImageRepository.findPrimaryImagesByProductIds(productIds);
-
-        Map<String, ProductImageReponse> imageByProductId = primaryImages.stream()
+        Map<String, ProductImageReponse> imageByProductId = productImageRepository
+                .findPrimaryCardImagesByProductIds(productIds).stream()
                 .collect(Collectors.toMap(
-                        ProductImage::getProductId,
-                        this::mapToImageResponse,
+                        ProductImageCardView::getProductId,
+                        img -> ProductImageReponse.builder().imageUrl(img.getImageUrl()).build(),
                         (existing, replacement) -> existing
                 ));
 
@@ -179,8 +179,9 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .map(Category::getId)
                 .collect(Collectors.toList());
 
-        Map<String, List<Category>> childrenByParentId = categoryRepository.findByParent_IdIn(parentIds)
-                .stream()
+        Map<String, List<Category>> childrenByParentId = parentIds.isEmpty()
+                ? Map.of()
+                : categoryRepository.findByParent_IdIn(parentIds).stream()
                 .collect(Collectors.groupingBy(c -> c.getParent().getId()));
 
         Pageable limit = PageRequest.of(0, productLimitCategory);
@@ -269,7 +270,6 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     }
 
     @Override
-    @Transactional
     public Page<ListProductResponse> getProductsByCategory(String categoryId, Pageable pageable) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy danh mục"));
@@ -308,11 +308,10 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .build();
     }
 
-    private ProductImageReponse mapToImageResponse(ProductImage img) {
+    private ProductImageReponse mapDetailImage(ProductImage img) {
         return ProductImageReponse.builder()
                 .id(img.getId())
                 .imageUrl(img.getImageUrl())
-                .altText(img.getAltText())
                 .isPrimary(img.getIsPrimary())
                 .displayOrder(img.getDisplayOrder())
                 .build();
@@ -320,10 +319,8 @@ public class CustomerProductServiceImpl implements CustomerProductService {
 
     private ProductSpecificationResponse mapToSpecResponse(ProductSpecification spec) {
         return ProductSpecificationResponse.builder()
-                .id(spec.getId())
                 .specName(spec.getSpecName())
                 .specValue(spec.getSpecValue())
-                .displayOrder(spec.getDisplayOrder())
                 .build();
     }
 
