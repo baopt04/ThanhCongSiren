@@ -16,31 +16,63 @@ const QuoteModal = lazy(() =>
   }))
 );
 
+// ── Local Fallback Images (WebP 360w & 720w) ──
+import lk100a_360 from "../../assets/images/products/coi-quay-tay-lk100a-360.webp";
+import lk100a_720 from "../../assets/images/products/coi-quay-tay-lk100a-720.webp";
+import lkfx200_360 from "../../assets/images/products/coi-quay-tay-lkfx200-360.webp";
+import lkfx200_720 from "../../assets/images/products/coi-quay-tay-lkfx200-720.webp";
+import lk100_360 from "../../assets/images/products/coi-quay-tay-lk100-360.webp";
+import lk100_720 from "../../assets/images/products/coi-quay-tay-lk100-720.webp";
+import lk120a_360 from "../../assets/images/products/coi-quay-tay-lk120a-360.webp";
+import lk120a_720 from "../../assets/images/products/coi-quay-tay-lk120a-720.webp";
+
+import bf50_360 from "../../assets/images/products/quat-pin-bf50-360.webp";
+import bf50_720 from "../../assets/images/products/quat-pin-bf50-720.webp";
+import esv280_360 from "../../assets/images/products/may-thoi-khi-esv280-360.webp";
+import esv280_720 from "../../assets/images/products/may-thoi-khi-esv280-720.webp";
+import esv230_360 from "../../assets/images/products/may-thoi-khi-esv230-360.webp";
+import esv230_720 from "../../assets/images/products/may-thoi-khi-esv230-720.webp";
+import wf390_360 from "../../assets/images/products/may-thoi-khi-ap-luc-nuoc-360.webp";
+import wf390_720 from "../../assets/images/products/may-thoi-khi-ap-luc-nuoc-720.webp";
+
+import dem14x10_360 from "../../assets/images/products/dem-cuu-ho-14x10x35m-360.webp";
+import dem14x10_720 from "../../assets/images/products/dem-cuu-ho-14x10x35m-720.webp";
+import dem5x4_360 from "../../assets/images/products/dem-hoi-cuu-ho-5x4x25m-360.webp";
+import dem5x4_720 from "../../assets/images/products/dem-hoi-cuu-ho-5x4x25m-720.webp";
+import dem8x6_360 from "../../assets/images/products/dem-hoi-cuu-ho-8x6x25-360.webp";
+import dem8x6_720 from "../../assets/images/products/dem-hoi-cuu-ho-8x6x25-720.webp";
+import phao_360 from "../../assets/images/products/phao-cuu-sinh-360.webp";
+import phao_720 from "../../assets/images/products/phao-cuu-sinh-720.webp";
+
 // ── Fallback Products ensuring exactly 4 cards are always rendered beautifully ──
 const FALLBACK_SIRENS = [
   {
     name: "Còi báo động quay tay LK-100A",
     price: "1.500.000 VNĐ",
     slug: "coi-bao-dong-quay-tay-lk-100a",
-    image: "https://cdn0344.cdn4s.com/media/2020/11/coi-quay-tay-lk100a.jpg",
+    image: lk100a_720,
+    srcSet: `${lk100a_360} 360w, ${lk100a_720} 720w`,
   },
   {
     name: "Còi báo động quay tay FX-200",
     price: "1.000 VNĐ",
     slug: "coi-bao-dong-quay-tay-fx-200",
-    image: "https://cdn0344.cdn4s.com/media/2020/11/coi-quay-tay-lkfx200.jpg",
+    image: lkfx200_720,
+    srcSet: `${lkfx200_360} 360w, ${lkfx200_720} 720w`,
   },
   {
     name: "Còi báo động quay tay LK-100",
     price: "1.500.000 VNĐ",
     slug: "coi-bao-dong-quay-tay-lk-100",
-    image: "https://cdn0344.cdn4s.com/media/2020/11/lk-100.jpg",
+    image: lk100_720,
+    srcSet: `${lk100_360} 360w, ${lk100_720} 720w`,
   },
   {
     name: "Còi báo động quay tay LK-120A",
     price: "3.800.000 VNĐ",
     slug: "coi-bao-dong-quay-tay-lk-120a",
-    image: "https://cdn0344.cdn4s.com/media/2020/11/coi-quay-tay-lk120a.jpg",
+    image: lk120a_720,
+    srcSet: `${lk120a_360} 360w, ${lk120a_720} 720w`,
   },
 ];
 
@@ -49,25 +81,29 @@ const FALLBACK_BLOWERS = [
     name: "Quạt thổi gió phòng cháy chữa cháy chạy pin BF50",
     price: "Liên hệ báo giá",
     slug: "quat-gio-chay-bang-pin-bf50",
-    image: "https://cdn0344.cdn4s.com/thumbs/2026/quat-gio-chay-bang-pin-bf50/quat-gio-chay-bang-pin-bf50_thumb_350.jpg",
+    image: bf50_720,
+    srcSet: `${bf50_360} 360w, ${bf50_720} 720w`,
   },
   {
     name: "Máy thổi khí động cơ điện LK-ESV280",
     price: "Liên hệ báo giá",
     slug: "may-thoi-khi-dong-co-dien-lk-esv280",
-    image: "https://cdn0344.cdn4s.com/thumbs/2020/11/lk-esv280_thumb_350.jpg",
+    image: esv280_720,
+    srcSet: `${esv280_360} 360w, ${esv280_720} 720w`,
   },
   {
     name: "Máy thổi khí động cơ điện LK-ESV230",
     price: "Liên hệ báo giá",
     slug: "may-thoi-khi-dong-co-dien-lk-esv230",
-    image: "https://cdn0344.cdn4s.com/thumbs/2020/11/lk-esv230-2_thumb_350.jpg",
+    image: esv230_720,
+    srcSet: `${esv230_360} 360w, ${esv230_720} 720w`,
   },
   {
     name: "Quạt thổi khí áp lực nước PCCC WF390-16",
     price: "Liên hệ báo giá",
     slug: "may-thoi-khi-bang-ap-luc-nuoc",
-    image: "https://cdn0344.cdn4s.com/thumbs/2020/11/may-thoi-khi-bang-ap-luc-nuoc_thumb_350.jpg",
+    image: wf390_720,
+    srcSet: `${wf390_360} 360w, ${wf390_720} 720w`,
   },
 ];
 
@@ -76,25 +112,29 @@ const FALLBACK_MATTRESS = [
     name: "Đệm hơi cứu hộ cứu nạn 14x10x3.5M",
     price: "Liên hệ báo giá",
     slug: "dem-cuu-ho-14x10x35m",
-    image: "https://cdn0344.cdn4s.com/thumbs/2022/m%20h%C6%A1i%20cnch/14x10x35m/dem-cuu-ho-14x10x35m_thumb_350.jpg",
+    image: dem14x10_720,
+    srcSet: `${dem14x10_360} 360w, ${dem14x10_720} 720w`,
   },
   {
     name: "Đệm hơi không khí cứu hộ cứu nạn 5x4x2.5M",
     price: "Liên hệ báo giá",
     slug: "dem-hoi-cuu-ho-5x4x25m",
-    image: "https://cdn0344.cdn4s.com/thumbs/2022/m%20h%C6%A1i%20cnch/5x4x2%2C5m/dem-hoi-cuu-ho-5x4x25m_thumb_350.jpg",
+    image: dem5x4_720,
+    srcSet: `${dem5x4_360} 360w, ${dem5x4_720} 720w`,
   },
   {
     name: "Đệm cứu hộ cứu nạn chuyên dụng 8x6x2.5M",
     price: "Liên hệ báo giá",
     slug: "dem-hoi-cuu-ho-8x6x25",
-    image: "https://cdn0344.cdn4s.com/thumbs/2022/m%20h%C6%A1i%20cnch/8x6x2%2C5m/dem-hoi-cuu-ho-8x6x25_thumb_350.jpg",
+    image: dem8x6_720,
+    srcSet: `${dem8x6_360} 360w, ${dem8x6_720} 720w`,
   },
   {
     name: "Đệm cứu hộ bằng không khí Lion King",
     price: "Liên hệ báo giá",
     slug: "dem-cuu-ho-khong-khi",
-    image: "https://cdn0344.cdn4s.com/thumbs/2020/11/phao-cuu-sinh_thumb_350.jpg",
+    image: phao_720,
+    srcSet: `${phao_360} 360w, ${phao_720} 720w`,
   },
 ];
 

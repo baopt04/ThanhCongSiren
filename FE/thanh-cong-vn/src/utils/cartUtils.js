@@ -1,3 +1,5 @@
+import defaultCartImg from "../assets/images/projects/sapa-thuy-dien-360.webp";
+
 /**
  * Utility quản lý giỏ hàng với LocalStorage
  */
@@ -44,8 +46,7 @@ export function addToCart(product, quantity = 1) {
   const existingIndex = currentCart.findIndex((item) => item.id === product.id);
 
   // Lấy ảnh đại diện chính của sản phẩm
-  let imageUrl =
-    "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg";
+  let imageUrl = defaultCartImg;
 
   if (Array.isArray(product.images) && product.images.length > 0) {
     const primary = product.images.find((img) => img.isPrimary === 1);

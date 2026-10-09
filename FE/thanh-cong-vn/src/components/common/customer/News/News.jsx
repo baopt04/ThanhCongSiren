@@ -18,6 +18,7 @@ import { Pagination } from "antd";
 import { useCustomerPostsQuery } from "../../../../hooks/queries/customerQueries";
 import { useScrollRestoration } from "../../../../hooks/useScrollRestoration";
 import { preloadRouteChunks } from "../../../../utils/preloadChunks";
+import defaultNewsThumbnail from "../../../../assets/images/news/mo-hinh-to-lien-gia-720.webp";
 
 // Helper định dạng ngày DD/MM/YYYY
 function formatDate(dateStr) {
@@ -51,8 +52,7 @@ function estimateReadTime(text) {
 }
 
 // Fallback ảnh nếu không có thumbnail
-const DEFAULT_THUMBNAIL =
-  "https://cdn0344.cdn4s.com/media/coi%20bao%20chay/bao-chay-to-lien-gia/hien/mo-hinh-to-lien-gia-an-toan-pccc.jpg";
+const DEFAULT_THUMBNAIL = defaultNewsThumbnail;
 
 export default function News() {
   const [searchParams, setSearchParams] = useSearchParams();

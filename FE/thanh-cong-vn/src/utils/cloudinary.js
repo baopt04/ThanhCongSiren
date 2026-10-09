@@ -15,3 +15,21 @@ export const optimizeCloudinary = (url, width) => {
   }
   return url;
 };
+
+/**
+ * Tạo chuỗi srcSet cho ảnh Cloudinary với nhiều kích thước chiều rộng khác nhau.
+ *
+ * @param {string} url - Đường dẫn ảnh Cloudinary
+ * @param {number[]} [widths=[200, 320, 480]] - Danh sách kích thước chiều rộng (px)
+ * @returns {string|undefined} Chuỗi srcSet hoặc undefined nếu không phải URL Cloudinary
+ */
+export const cloudinarySrcSet = (url, widths = [200, 320, 480]) => {
+  if (!url || typeof url !== "string") return undefined;
+  if (!url.includes("res.cloudinary.com") || !url.includes("/upload/")) return undefined;
+
+  // Xóa transform cũ nếu có để tạo transform sạch mới
+  const baseUrl = url.replace(/\/upload\/(?:[a-zA-Z0-9_,-]+\/)?/, "/upload/");
+  return widths
+    .map((w) => `${baseUrl.replace("/upload/", `/upload/f_auto,q_auto,w_${w}/`)} ${w}w`)
+    .join(", ");
+};

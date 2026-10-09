@@ -3,29 +3,42 @@ import { Link } from "react-router-dom";
 import "./ProjectsSection.css";
 import { optimizeCloudinary } from "../../../../utils/cloudinary";
 
+import proj1_360 from "../../../../assets/images/projects/sapa-thuy-dien-360.webp";
+import proj1_720 from "../../../../assets/images/projects/sapa-thuy-dien-720.webp";
+import proj2_360 from "../../../../assets/images/projects/nha-may-thuy-dien-360.webp";
+import proj2_720 from "../../../../assets/images/projects/nha-may-thuy-dien-720.webp";
+import proj3_360 from "../../../../assets/images/projects/bao-dong-nha-may-360.webp";
+import proj3_720 from "../../../../assets/images/projects/bao-dong-nha-may-720.webp";
+import proj4_360 from "../../../../assets/images/projects/khai-thac-khoang-san-360.webp";
+import proj4_720 from "../../../../assets/images/projects/khai-thac-khoang-san-720.webp";
+
 const PROJECTS_DATA = [
   {
     id: "da-1",
     title: "Công trình Thủy điện Sapa - Hệ thống còi hú xả lũ",
-    image: "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg",
+    image: proj1_720,
+    srcSet: `${proj1_360} 360w, ${proj1_720} 720w`,
     link: "/tin-tuc",
   },
   {
     id: "da-2",
     title: "Nhà máy thủy điện Sông Hinh - Còi báo động lớn LK-JDW245PK",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/nha-may-thuy-dien.jpg",
+    image: proj2_720,
+    srcSet: `${proj2_360} 360w, ${proj2_720} 720w`,
     link: "/tin-tuc",
   },
   {
     id: "da-3",
     title: "Khu công nghiệp & Cảng biển - Còi hú báo động phòng thủ dân sự",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/bao-dong-nha-may-1.jpg",
+    image: proj3_720,
+    srcSet: `${proj3_360} 360w, ${proj3_720} 720w`,
     link: "/tin-tuc",
   },
   {
     id: "da-4",
     title: "Đơn vị CNCH mỏ khai khoáng - Máy thổi khí & Đệm hơi",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/khai-thac-khoang-san.jpg",
+    image: proj4_720,
+    srcSet: `${proj4_360} 360w, ${proj4_720} 720w`,
     link: "/tin-tuc",
   },
 ];
@@ -68,6 +81,8 @@ export const ProjectsSection = memo(function ProjectsSection() {
               <div className="tc-project-img-box">
                 <img
                   src={optimizeCloudinary(item.image, 640)}
+                  srcSet={item.srcSet}
+                  sizes="(max-width: 768px) 100vw, 360px"
                   alt={item.title}
                   className="tc-project-img"
                   loading="lazy"

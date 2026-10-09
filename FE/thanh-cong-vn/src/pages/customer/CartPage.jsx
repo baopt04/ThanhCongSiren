@@ -8,9 +8,9 @@ import {
   EditOutlined,
 } from "@ant-design/icons";
 import CartItem from "../../components/common/customer/cart/CartItem";
+import defaultCartImg from "../../assets/images/projects/sapa-thuy-dien-360.webp";
 import {
   getCart,
-  saveCart,
   updateCartItemQty,
   removeCartItem,
   clearCart,
@@ -84,9 +84,7 @@ export default function CartPage() {
     id: beItem.id, // Cart Item ID (dùng cho update/delete)
     productId: beItem.productId, // Product ID (dùng cho link/tạo đơn)
     name: beItem.productName || "Sản phẩm",
-    image:
-      beItem.productImage ||
-      "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg",
+    image: beItem.productImage || defaultCartImg,
     price: Number(beItem.unitPrice) || 0,
     quantity: Number(beItem.quantity) || 1,
     stockQuantity: Number(beItem.stockQuantity) || 0,

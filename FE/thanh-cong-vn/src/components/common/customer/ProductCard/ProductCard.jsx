@@ -10,7 +10,8 @@ import {
 } from "@ant-design/icons";
 import { prefetchProductDetail } from "../../../../hooks/queries/customerQueries";
 import { preloadRouteChunks } from "../../../../utils/preloadChunks";
-import { optimizeCloudinary } from "../../../../utils/cloudinary";
+import { optimizeCloudinary, cloudinarySrcSet } from "../../../../utils/cloudinary";
+import defaultProductImg from "../../../../assets/images/projects/sapa-thuy-dien-360.webp";
 
 export const ProductCard = memo(function ProductCard({
   id,
@@ -25,7 +26,7 @@ export const ProductCard = memo(function ProductCard({
   isNew,
   categoryTag,
   rating = 5,
-  defaultImg = "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg",
+  defaultImg = defaultProductImg,
   variant = "catalog",
 }) {
   const productLink = id ? `/san-pham/${id}` : (slug ? `/san-pham/${slug}` : "#");
@@ -86,17 +87,11 @@ export const ProductCard = memo(function ProductCard({
     primaryImageUrl = image.imageUrl;
   }
 
-  const primaryOptimized = optimizeCloudinary(primaryImageUrl, 480);
-  const primarySrcSet =
-    primaryImageUrl && primaryImageUrl.includes("res.cloudinary.com")
-      ? `${optimizeCloudinary(primaryImageUrl, 320)} 320w, ${optimizeCloudinary(primaryImageUrl, 480)} 480w`
-      : undefined;
+  const primaryOptimized = optimizeCloudinary(primaryImageUrl, 360);
+  const primarySrcSet = cloudinarySrcSet(primaryImageUrl, [200, 320, 480]);
 
-  const hoverOptimized = hoverImageUrl ? optimizeCloudinary(hoverImageUrl, 480) : null;
-  const hoverSrcSet =
-    hoverImageUrl && hoverImageUrl.includes("res.cloudinary.com")
-      ? `${optimizeCloudinary(hoverImageUrl, 320)} 320w, ${optimizeCloudinary(hoverImageUrl, 480)} 480w`
-      : undefined;
+  const hoverOptimized = hoverImageUrl ? optimizeCloudinary(hoverImageUrl, 360) : null;
+  const hoverSrcSet = hoverImageUrl ? cloudinarySrcSet(hoverImageUrl, [200, 320, 480]) : undefined;
 
   // Format price if numeric or numeric string
   const numPrice = Number(price);
@@ -123,7 +118,7 @@ export const ProductCard = memo(function ProductCard({
             <img
               src={primaryOptimized}
               srcSet={primarySrcSet}
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px"
+              sizes="(max-width: 640px) 48vw, (max-width: 1024px) 30vw, 280px"
               alt={name}
               loading="lazy"
               decoding="async"
@@ -138,7 +133,7 @@ export const ProductCard = memo(function ProductCard({
               <img
                 src={hoverOptimized}
                 srcSet={hoverSrcSet}
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px"
+                sizes="(max-width: 640px) 48vw, (max-width: 1024px) 30vw, 280px"
                 alt={`${name} hover`}
                 loading="lazy"
                 decoding="async"
@@ -222,7 +217,7 @@ export const ProductCard = memo(function ProductCard({
         <img
           src={primaryOptimized}
           srcSet={primarySrcSet}
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px"
+          sizes="(max-width: 640px) 48vw, (max-width: 1024px) 30vw, 280px"
           alt={name}
           loading="lazy"
           decoding="async"
@@ -237,7 +232,7 @@ export const ProductCard = memo(function ProductCard({
           <img
             src={hoverOptimized}
             srcSet={hoverSrcSet}
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px"
+            sizes="(max-width: 640px) 48vw, (max-width: 1024px) 30vw, 280px"
             alt={`${name} hover`}
             loading="lazy"
             decoding="async"

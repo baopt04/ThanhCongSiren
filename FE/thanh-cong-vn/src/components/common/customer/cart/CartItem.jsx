@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { getProductPath } from "../../../../utils/slugUtils";
+import fallbackCartImg1 from "../../../../assets/images/projects/sapa-thuy-dien-360.webp";
+import fallbackCartImg2 from "../../../../assets/images/products/coi-hu-song-hinh-360.webp";
 
 export default function CartItem({ item, onUpdateQty, onRemove }) {
   const [localQty, setLocalQty] = useState(item.quantity || 1);
@@ -50,16 +52,12 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
       {/* 1. Thumbnail Image */}
       <Link to={getProductPath(item)} className="cart-item-img-wrap">
         <img
-          src={
-            item.image ||
-            "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg"
-          }
+          src={item.image || fallbackCartImg1}
           alt={item.name}
           loading="lazy"
           decoding="async"
           onError={(e) => {
-            e.target.src =
-            "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-bao-dong-lk-jdw245pk-lap-tai-nha-may-thuy-dien-song-hinh.jpg";
+            e.target.src = fallbackCartImg2;
           }}
         />
       </Link>

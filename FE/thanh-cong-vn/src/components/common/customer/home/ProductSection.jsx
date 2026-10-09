@@ -2,7 +2,7 @@ import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./ProductSection.css";
 import { PLACEHOLDER_IMAGE } from "../../../../utils/placeholder";
-import { optimizeCloudinary } from "../../../../utils/cloudinary";
+import { optimizeCloudinary, cloudinarySrcSet } from "../../../../utils/cloudinary";
 
 const getCardImage = (product) => {
   let img = null;
@@ -12,7 +12,7 @@ const getCardImage = (product) => {
   else if (product.imageUrl) img = product.imageUrl;
   else if (product.thumbnail) img = product.thumbnail;
   else img = PLACEHOLDER_IMAGE;
-  return optimizeCloudinary(img, 360);
+  return optimizeCloudinary(img, 320);
 };
 
 const formatCardPrice = (price) => {
@@ -87,6 +87,7 @@ export const ProductSection = memo(function ProductSection({
 
             const imgSrc = getCardImage(item);
             const isPlaceholder = imgSrc === PLACEHOLDER_IMAGE || !imgSrc;
+            const cardSrcSet = item.srcSet || (!isPlaceholder ? cloudinarySrcSet(imgSrc, [200, 320, 480]) : undefined);
 
             return (
               <div
@@ -97,6 +98,8 @@ export const ProductSection = memo(function ProductSection({
                   {!isPlaceholder ? (
                     <img
                       src={imgSrc}
+                      srcSet={cardSrcSet}
+                      sizes="(max-width: 640px) 48vw, 280px"
                       alt={item.name || "Sản phẩm"}
                       className="tc-mock-card-img"
                       loading="lazy"

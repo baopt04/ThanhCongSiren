@@ -22,11 +22,13 @@ export function Seo({
   title,
   description = DEFAULT_DESCRIPTION,
   path = "",
-  image = "https://cdn0344.cdn4s.com/media/logo/cropped-logo-coihubaodong-2.png",
+  image = "/logo.png",
   noindex = false,
 }) {
   useEffect(() => {
+    const origin = window.location.origin;
     const fullTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
+    const ogImage = image.startsWith("http") ? image : `${origin}${image.startsWith("/") ? "" : "/"}${image}`;
     document.title = fullTitle;
 
     upsertMeta("name", "description", description);
@@ -35,12 +37,11 @@ export function Seo({
     upsertMeta("property", "og:description", description);
     upsertMeta("property", "og:type", "website");
     upsertMeta("property", "og:locale", "vi_VN");
-    upsertMeta("property", "og:image", image);
+    upsertMeta("property", "og:image", ogImage);
     upsertMeta("name", "twitter:card", "summary_large_image");
     upsertMeta("name", "twitter:title", fullTitle);
     upsertMeta("name", "twitter:description", description);
 
-    const origin = window.location.origin;
     const canonicalHref = `${origin}${path || window.location.pathname}`;
     let link = document.head.querySelector('link[rel="canonical"]');
     if (!link) {

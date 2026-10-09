@@ -1,12 +1,28 @@
 import { Link } from "react-router-dom";
 import "./AboutPage.css";
+import logoImg from "../../assets/logo.webp";
+import nhaMayThuyDien360 from "../../assets/images/projects/nha-may-thuy-dien-360.webp";
+import nhaMayThuyDien720 from "../../assets/images/projects/nha-may-thuy-dien-720.webp";
+import baoDongNhaMay360 from "../../assets/images/projects/bao-dong-nha-may-360.webp";
+import baoDongNhaMay720 from "../../assets/images/projects/bao-dong-nha-may-720.webp";
+import baoDongThanhPho360 from "../../assets/images/about/bao-dong-thanh-pho-360.webp";
+import baoDongThanhPho720 from "../../assets/images/about/bao-dong-thanh-pho-720.webp";
+import khaiThacKhoangSan360 from "../../assets/images/projects/khai-thac-khoang-san-360.webp";
+import khaiThacKhoangSan720 from "../../assets/images/projects/khai-thac-khoang-san-720.webp";
+import sanGolf360 from "../../assets/images/about/san-golf-360.webp";
+import sanGolf720 from "../../assets/images/about/san-golf-720.webp";
+import mayThoiKhiCuuHo360 from "../../assets/images/about/may-thoi-khi-cuu-ho-360.webp";
+import mayThoiKhiCuuHo720 from "../../assets/images/about/may-thoi-khi-cuu-ho-720.webp";
+import khachHangNoiVe360 from "../../assets/images/about/khach-hang-noi-ve-360.webp";
+import khachHangNoiVe720 from "../../assets/images/about/khach-hang-noi-ve-720.webp";
 
 const applicationList = [
   {
     id: 1,
     title: "Còi báo xả lũ hồ chứa & Nhà máy thủy điện",
     tag: "Thủy điện & Hồ chứa",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/nha-may-thuy-dien.jpg",
+    image: nhaMayThuyDien360,
+    srcSet: `${nhaMayThuyDien360} 360w, ${nhaMayThuyDien720} 720w`,
     desc: "Còi hú công suất lớn phục vụ báo xả lũ, báo đập tràn, cảnh báo khẩn cấp cho người dân vùng hạ lưu kịp thời sơ tán, bảo vệ tính mạng và tài sản.",
     models: "LK-SENTRY B, LK-STH21-2, LK-JDW450",
     link: "/san-pham/coi-bao-dong-co-lon",
@@ -15,7 +31,8 @@ const applicationList = [
     id: 2,
     title: "Còi báo động công nghiệp & Nhà máy xí nghiệp",
     tag: "KCN & Nhà xưởng",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/bao-dong-nha-may-1.jpg",
+    image: baoDongNhaMay360,
+    srcSet: `${baoDongNhaMay360} 360w, ${baoDongNhaMay720} 720w`,
     desc: "Cảnh báo sự cố dây chuyền sản xuất, báo cháy hỏa hoạn, báo tai nạn khẩn cấp cần sơ tán công nhân viên trên diện tích nhà xưởng hàng nghìn m².",
     models: "LK-JDW450, LK-JDW245B, LK-JDW400",
     link: "/san-pham/coi-bao-dong-co-trung",
@@ -24,7 +41,8 @@ const applicationList = [
     id: 3,
     title: "Còi tầm phòng không & Cảnh báo thiên tai",
     tag: "Phòng không & Thiên tai",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/bao-dong-thanh-pho.jpg",
+    image: baoDongThanhPho360,
+    srcSet: `${baoDongThanhPho360} 360w, ${baoDongThanhPho720} 720w`,
     desc: "Còi hú siêu công suất với bán kính truyền âm hàng km, ứng dụng phòng không quốc phòng, cảnh báo lũ quét, bão lớn, động đất cho thành phố, thị trấn.",
     models: "LK-2001, LK-STH10H, LK-STH21-2",
     link: "/san-pham/coi-bao-dong-co-lớn",
@@ -33,7 +51,8 @@ const applicationList = [
     id: 4,
     title: "Còi chống cháy nổ & Mỏ khai thác khoáng sản",
     tag: "Hầm mỏ & Khoáng sản",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/khai-thac-khoang-san.jpg",
+    image: khaiThacKhoangSan360,
+    srcSet: `${khaiThacKhoangSan360} 360w, ${khaiThacKhoangSan720} 720w`,
     desc: "Tiêu chuẩn chống cháy nổ nghiêm ngặt, cảnh báo lịch nổ mìn trong mỏ than, mỏ đá, đảm bảo an toàn tuyệt đối cho kỹ sư và công nhân hầm lò.",
     models: "LK-M2, LK-JDW400, LK-JDW245B",
     link: "/san-pham/coi-bao-dong-co-lon",
@@ -42,7 +61,8 @@ const applicationList = [
     id: 5,
     title: "Còi cảnh báo thời tiết & Giông sét sân Golf",
     tag: "Sân Golf & Nghỉ dưỡng",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/san-golf.jpg",
+    image: sanGolf360,
+    srcSet: `${sanGolf360} 360w, ${sanGolf720} 720w`,
     desc: "Phát tín hiệu cảnh báo sớm khi xuất hiện mưa giông, lốc sét trên diện rộng sân golf, giúp người chơi và nhân viên kịp thời vào nơi trú ẩn an toàn.",
     models: "LK-JDW245PK, LK-JDL480, GSM-4G",
     link: "/san-pham/coi-bao-dong-co-lon",
@@ -51,7 +71,8 @@ const applicationList = [
     id: 6,
     title: "Thiết bị PCCC & Cứu hộ cứu nạn chuyên dụng",
     tag: "PCCC & Cứu nạn",
-    image: "https://cdn0344.cdn4s.com/media/bv-gioi-thieu/may-thoi-khi-cuu-ho.jpg",
+    image: mayThoiKhiCuuHo360,
+    srcSet: `${mayThoiKhiCuuHo360} 360w, ${mayThoiKhiCuuHo720} 720w`,
     desc: "Đệm hơi cứu hộ nhảy tiếp đất thoát hiểm chung cư cao tầng, quạt thổi khí tăng áp chống ngạt khói cầu thang PCCC, thiết bị báo cháy tự động.",
     models: "Đệm hơi CNCH, Quạt thổi khí PCCC",
     link: "/san-pham/may-thoi-khi-va-dem-hoi-cuu-ho",
@@ -222,11 +243,15 @@ export function AboutPage() {
                 <div className="about-app-thumb">
                   <img
                     src={app.image}
+                    srcSet={app.srcSet}
+                    sizes="(max-width: 768px) 100vw, 360px"
                     alt={app.title}
                     loading="lazy"
                     decoding="async"
+                    width={360}
+                    height={240}
                     onError={(e) => {
-                      e.target.src = "https://cdn0344.cdn4s.com/media/logo/cropped-logo-coihubaodong.png";
+                      e.target.src = logoImg;
                     }}
                   />
                   <span className="about-app-badge-tag">{app.tag}</span>
@@ -277,10 +302,14 @@ export function AboutPage() {
 
           <div className="about-partners-img-box">
             <img
-              src="https://cdn0344.cdn4s.com/media/bv-gioi-thieu/coi-hu-bao-dong-khach-hang-noi-ve.jpg"
+              src={khachHangNoiVe360}
+              srcSet={`${khachHangNoiVe360} 360w, ${khachHangNoiVe720} 720w`}
+              sizes="(max-width: 768px) 100vw, 720px"
               alt="Đối tác tiêu biểu Thành Công Việt Nam"
               loading="lazy"
               decoding="async"
+              width={720}
+              height={450}
               onError={(e) => {
                 e.target.style.display = "none";
               }}

@@ -3,13 +3,17 @@ import { Link } from "react-router-dom";
 import { PlayCircleFilled } from "@ant-design/icons";
 import "./NewsSection.css";
 import { useCustomerPostsQuery } from "../../../../hooks/queries/customerQueries";
-import { optimizeCloudinary } from "../../../../utils/cloudinary";
+import { optimizeCloudinary, cloudinarySrcSet } from "../../../../utils/cloudinary";
+
+import sapaImg360 from "../../../../assets/images/projects/sapa-thuy-dien-360.webp";
+import sapaImg720 from "../../../../assets/images/projects/sapa-thuy-dien-720.webp";
 
 const FALLBACK_FEATURED = {
   id: "featured-1",
   title: "Lắp đặt và bàn giao hệ thống còi hú báo xả lũ cho công trình thủy điện Sapa",
   slug: "lap-dat-coi-bao-xa-lu-thuy-dien-sapa",
-  image: "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg",
+  image: sapaImg720,
+  srcSet: `${sapaImg360} 360w, ${sapaImg720} 720w`,
 };
 
 const FALLBACK_LIST = [
@@ -17,23 +21,25 @@ const FALLBACK_LIST = [
     id: "news-1",
     title: "Thử nghiệm thực tế còi báo động chống cháy nổ Lion King tại mỏ khai thác",
     slug: "thu-nghiem-coi-chong-chay-no",
-    image: "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg",
+    image: sapaImg360,
+    srcSet: `${sapaImg360} 360w, ${sapaImg720} 720w`,
   },
   {
     id: "news-2",
     title: "Bàn giao thiết bị đệm hơi cứu hộ và quạt hút khói cho lực lượng PCCC",
     slug: "ban-giao-dem-hoi-cuu-ho-pccc",
-    image: "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg",
+    image: sapaImg360,
+    srcSet: `${sapaImg360} 360w, ${sapaImg720} 720w`,
   },
   {
     id: "news-3",
     title: "Video thực tế: Vận hành còi hú báo động xé gió công suất lớn ngoài trời (video)",
     slug: "video-van-hanh-coi-hu-xe-gio",
-    image: "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg",
+    image: sapaImg360,
+    srcSet: `${sapaImg360} 360w, ${sapaImg720} 720w`,
     isVideo: true,
   },
 ];
-
 
 export const NewsSection = memo(function NewsSection() {
   const { data: postsList = [] } = useCustomerPostsQuery();
@@ -46,15 +52,18 @@ export const NewsSection = memo(function NewsSection() {
         title: postsList[0].title,
         slug: postsList[0].slug || postsList[0].id,
         image: optimizeCloudinary(rawFeaturedImg, 600),
+        srcSet: cloudinarySrcSet(rawFeaturedImg, [400, 600]) || (rawFeaturedImg === FALLBACK_FEATURED.image ? FALLBACK_FEATURED.srcSet : undefined),
       };
 
       const side = postsList.slice(1, 4).map((item, idx) => {
-        const rawSideImg = item.thumbnailUrl || item.image || FALLBACK_LIST[idx]?.image;
+        const fallbackItem = FALLBACK_LIST[idx] || FALLBACK_LIST[0];
+        const rawSideImg = item.thumbnailUrl || item.image || fallbackItem.image;
         return {
           id: item.id,
           title: item.title,
           slug: item.slug || item.id,
           image: optimizeCloudinary(rawSideImg, 300),
+          srcSet: cloudinarySrcSet(rawSideImg, [180, 360]) || fallbackItem.srcSet,
           isVideo: idx === 2,
         };
       });
@@ -98,6 +107,8 @@ export const NewsSection = memo(function NewsSection() {
               {featuredPost.image ? (
                 <img
                   src={featuredPost.image}
+                  srcSet={featuredPost.srcSet}
+                  sizes="(max-width: 768px) 100vw, 600px"
                   alt={featuredPost.title}
                   className="tc-news-featured-img"
                   loading="lazy"
@@ -128,6 +139,8 @@ export const NewsSection = memo(function NewsSection() {
                   {post.image ? (
                     <img
                       src={post.image}
+                      srcSet={post.srcSet}
+                      sizes="(max-width: 768px) 120px, 180px"
                       alt={post.title}
                       className="tc-news-side-img"
                       loading="lazy"

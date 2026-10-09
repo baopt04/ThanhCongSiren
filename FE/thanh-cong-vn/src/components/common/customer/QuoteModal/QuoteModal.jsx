@@ -10,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import { notificationTelegramQuote } from "../../../../services/customer/CustomerProductService";
 import { getCustomerUser } from "../../../../utils/auth";
+import defaultQuoteImg from "../../../../assets/images/projects/sapa-thuy-dien-360.webp";
 import "./QuoteModal.css";
 
 const PROJECT_OPTIONS = [
@@ -182,7 +183,7 @@ export function QuoteModal({ isOpen, onClose, product, quantity = 1 }) {
     product?.images?.find((img) => img.isPrimary === 1 || img.isPrimary === true)?.imageUrl ||
     product?.images?.[0]?.imageUrl ||
     product?.image?.[0]?.imageUrl ||
-    "https://cdn0344.cdn4s.com/media/2022/coi%20bao%20dong/jdw245pk/coi-hu-bao-xa-lu-lap-dat-tai-nha-dieu-hanh-thuy-dien-sapa.jpg";
+    defaultQuoteImg;
 
   return (
     <Modal
