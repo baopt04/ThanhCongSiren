@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Header } from "../../components/layout/Header";
 import { Footer } from "../../components/layout/Footer";
 import { Outlet } from "react-router-dom";
-import { PhoneOutlined, MessageOutlined, FileTextOutlined, CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined } from "@ant-design/icons";
+import zaloLogo from "../../assets/images/Logo_Zalo.png";
+import phoneLogo from "../../assets/images/telephoner.png";
+import messengerLogo from "../../assets/messenger-logo-icon-png_31773.png";
 import "./MainLayout.css";
 
 const ZALO_URL = "https://zalo.me/0865130088";
+const MESSENGER_URL = "https://www.facebook.com/pcccchchthanhcong";
 const HOTLINE_DISPLAY = "0865.130.088";
 const HOTLINE_TEL = "0865130088";
 
 export function MainLayout() {
   const [chatOpen, setChatOpen] = useState(false);
   const [showFloatWidgets] = useState(true);
-
 
   return (
     <div className="tc-layout">
@@ -31,7 +34,13 @@ export function MainLayout() {
               title={`Gọi Hotline ${HOTLINE_DISPLAY}`}
               aria-label={`Gọi Hotline ${HOTLINE_DISPLAY}`}
             >
-              <span>Gọi</span>
+              <img
+                src={phoneLogo}
+                alt={`Gọi Hotline ${HOTLINE_DISPLAY}`}
+                className="tc-float-icon-img"
+                width={48}
+                height={48}
+              />
             </a>
 
             <a
@@ -42,7 +51,30 @@ export function MainLayout() {
               title="Chat Zalo Tư Vấn Báo Giá"
               aria-label="Chat Zalo tư vấn báo giá"
             >
-              <span>Zalo</span>
+              <img
+                src={zaloLogo}
+                alt="Chat Zalo"
+                className="tc-float-icon-img"
+                width={48}
+                height={48}
+              />
+            </a>
+
+            <a
+              href={MESSENGER_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="tc-float-btn tc-mock-messenger-btn"
+              title="Chat Facebook Messenger"
+              aria-label="Chat Facebook Messenger"
+            >
+              <img
+                src={messengerLogo}
+                alt="Chat Facebook Messenger"
+                className="tc-float-icon-img"
+                width={48}
+                height={48}
+              />
             </a>
           </div>
 
