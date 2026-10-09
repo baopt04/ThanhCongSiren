@@ -28,6 +28,29 @@ const banners = [
 export const HeroBanner = memo(function HeroBanner() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [extraReady, setExtraReady] = useState(false);
+
+  // Trì hoãn nạp ảnh slide 2 & 3 đến sau khi trang đã load xong 1.5s
+  useEffect(() => {
+    let timerId = null;
+
+    const scheduleExtraReady = () => {
+      timerId = setTimeout(() => {
+        setExtraReady(true);
+      }, 1500);
+    };
+
+    if (document.readyState === "complete") {
+      scheduleExtraReady();
+    } else {
+      window.addEventListener("load", scheduleExtraReady, { once: true });
+    }
+
+    return () => {
+      if (timerId) clearTimeout(timerId);
+      window.removeEventListener("load", scheduleExtraReady);
+    };
+  }, []);
 
   const nextSlide = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % banners.length);
@@ -37,13 +60,14 @@ export const HeroBanner = memo(function HeroBanner() {
     setCurrentIndex((prev) => (prev - 1 + banners.length) % banners.length);
   }, []);
 
+  // Chỉ bắt đầu auto-slide sau khi slide phụ đã sẵn sàng (extraReady = true)
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || !extraReady) return;
     const timer = setInterval(() => {
       nextSlide();
     }, 4500);
     return () => clearInterval(timer);
-  }, [isPaused, nextSlide]);
+  }, [isPaused, extraReady, nextSlide]);
 
   return (
     <section className="tc-hero-section" aria-label="Banner chính">
@@ -55,6 +79,8 @@ export const HeroBanner = memo(function HeroBanner() {
         <div className="tc-hero-slides-wrapper">
           {banners.map((banner, index) => {
             const isActive = index === currentIndex;
+            const shouldRenderPicture = index === 0 || extraReady || isActive;
+
             return (
               <div
                 key={banner.alt}
@@ -62,25 +88,29 @@ export const HeroBanner = memo(function HeroBanner() {
                 aria-hidden={!isActive}
               >
                 <div className="tc-slide-media">
-                  <picture className="tc-slide-picture">
-                    <source
-                      media="(max-width: 768px)"
-                      srcSet={banner.srcMobile}
-                      width={768}
-                      height={280}
-                    />
-                    <img
-                      src={banner.src}
-                      alt={banner.alt}
-                      className="tc-slide-img"
-                      draggable={false}
-                      loading={index === 0 ? "eager" : "lazy"}
-                      decoding={index === 0 ? "sync" : "async"}
-                      fetchPriority={index === 0 ? "high" : "low"}
-                      width={1920}
-                      height={700}
-                    />
-                  </picture>
+                  {shouldRenderPicture ? (
+                    <picture className="tc-slide-picture">
+                      <source
+                        media="(max-width: 768px)"
+                        srcSet={banner.srcMobile}
+                        width={768}
+                        height={280}
+                      />
+                      <img
+                        src={banner.src}
+                        alt={banner.alt}
+                        className="tc-slide-img"
+                        draggable={false}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        decoding={index === 0 ? "sync" : "async"}
+                        fetchPriority={index === 0 ? "high" : "low"}
+                        width={1920}
+                        height={700}
+                      />
+                    </picture>
+                  ) : (
+                    <div className="tc-slide-placeholder" aria-hidden="true" />
+                  )}
                 </div>
               </div>
             );
