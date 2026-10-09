@@ -78,12 +78,12 @@ function mapApiToHeaderFormat(apiCategories) {
 }
 
 const mainNavItems = [
-  { label: "TRANG CHỦ", path: "/" },
-  { label: "GIỚI THIỆU", path: "/gioi-thieu" },
-  { label: "SẢN PHẨM", path: "/san-pham" },
-  { label: "TIN TỨC - DỰ ÁN", path: "/tin-tuc" },
-  { label: "LIÊN HỆ", path: "/lien-he" },
-  { label: "THIẾT BỊ BÁO CHÁY", path: "/san-pham/thiet-bi-bao-chay" },
+  { label: "Trang chủ", path: "/" },
+  { label: "Sản phẩm", path: "/san-pham" },
+  { label: "Giới thiệu", path: "/gioi-thieu" },
+  { label: "Tin tức dự án", path: "/tin-tuc" },
+  { label: "Liên hệ", path: "/lien-he" },
+  { label: "Thiết bị báo cháy", path: "/san-pham/thiet-bi-bao-chay" },
 ];
 
 export function Header() {
@@ -209,23 +209,35 @@ export function Header() {
           aria-expanded={mobileMenuOpen}
           onClick={() => setMobileMenuOpen((v) => !v)}
         >
-          {mobileMenuOpen ? <CloseOutlined /> : <MenuOutlined />}
+          {mobileMenuOpen ? <CloseOutlined /> : <span className="tc-mobile-menu-text">Menu</span>}
         </button>
 
         <Link to="/" className="tc-header-logo" onClick={closeMobileMenu}>
-          <img
-            src={logoImg}
-            alt="Thành Công Việt Nam - Còi hú báo động"
-            width={180}
-            height={52}
-            fetchPriority="high"
-            decoding="async"
-          />
-          <div className="tc-logo-text">
-            <span className="tc-logo-brand">THÀNH CÔNG VIỆT NAM</span>
-            <span className="tc-logo-sub">
-              Còi Hú Báo Động Công Suất Lớn • PCCC & CNCH
-            </span>
+          {/* Desktop logo */}
+          <div className="tc-desktop-logo-wrap">
+            <img
+              src={logoImg}
+              alt="Thành Công Việt Nam - Còi hú báo động"
+              width={180}
+              height={52}
+              fetchPriority="high"
+              decoding="async"
+            />
+            <div className="tc-logo-text">
+              <span className="tc-logo-brand">THÀNH CÔNG VIỆT NAM </span>
+              <span className="tc-logo-sub">
+                Còi Hú Báo Động Công Suất Lớn • PCCC & CNCH
+              </span>
+            </div>
+          </div>
+          {/* Mobile logo matching user request */}
+          <div className="tc-mobile-brand-logo-wrap">
+            <img
+              src={logoImg}
+              alt="Thành Công Việt Nam"
+              className="tc-mobile-logo-img"
+              height={34}
+            />
           </div>
         </Link>
 
@@ -235,19 +247,11 @@ export function Header() {
           setMobileSearchOpen={setMobileSearchOpen}
         />
 
-        {/* Actions & Hotlines */}
+        {/* Actions matching mockup */}
         <div className="tc-header-actions">
-          <div className="tc-header-contact-box">
-            <div className="tc-contact-icon">
-              <PhoneOutlined />
-            </div>
-            <div className="tc-contact-info">
-              <span className="tc-contact-title">TƯ VẤN BÁO GIÁ</span>
-              <a href="tel:0865130088" className="tc-contact-phone">
-                0865.130.088
-              </a>
-            </div>
-          </div>
+          <Link to="/lien-he" className="tc-header-quote-outline-btn">
+            Tư vấn báo giá
+          </Link>
 
           <button
             type="button"
@@ -285,19 +289,97 @@ export function Header() {
             </Link>
           )}
 
+          {/* Desktop Cart Button */}
           <Link
             to="/gio-hang"
-            className="tc-header-action-btn tc-cart-btn"
+            className="tc-header-cart-clean-btn"
             id="cart-btn"
           >
             <div className="tc-cart-icon-wrapper">
               <ShoppingCartOutlined className="tc-action-icon" />
               <span className="tc-cart-count">{cartCount}</span>
             </div>
-            <div className="tc-cart-text">
-              <span className="tc-cart-label">Giỏ hàng</span>
-              <span className="tc-cart-sub">{cartCount} sản phẩm</span>
-            </div>
+            <span className="tc-cart-label">Giỏ hàng</span>
+          </Link>
+
+          {/* Mobile Right Icons: Icon Đăng nhập & Icon Giỏ hàng */}
+          <div className="tc-mobile-right-actions">
+            {customerUser ? (
+              <Link
+                to="/tai-khoan"
+                className="tc-mobile-action-icon-btn"
+                title={customerUser.fullName || "Tài khoản"}
+                aria-label="Tài khoản"
+              >
+                <UserOutlined />
+              </Link>
+            ) : (
+              <Link
+                to="/dang-nhap"
+                className="tc-mobile-action-icon-btn"
+                title="Đăng nhập"
+                aria-label="Đăng nhập"
+              >
+                <UserOutlined />
+              </Link>
+            )}
+
+            <Link
+              to="/gio-hang"
+              className="tc-mobile-action-icon-btn tc-mobile-cart-btn"
+              title="Giỏ hàng"
+              aria-label="Giỏ hàng"
+            >
+              <ShoppingCartOutlined />
+              {cartCount > 0 && (
+                <span className="tc-mobile-cart-badge">{cartCount}</span>
+              )}
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Category Pills Bar matching mockup */}
+      <div className="tc-mobile-pills-bar">
+        <div className="tc-mobile-pills-scroll">
+          <button
+            type="button"
+            className="tc-mobile-pill-item"
+            onClick={() => {
+              const el = document.getElementById("section-coi-hu-bao-dong");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+              else navigate("/san-pham/coi-hu-bao-dong");
+            }}
+          >
+            Còi báo động
+          </button>
+          <button
+            type="button"
+            className="tc-mobile-pill-item"
+            onClick={() => {
+              const el = document.getElementById("section-may-thoi-khi");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+              else navigate("/san-pham/may-thoi-khi");
+            }}
+          >
+            Máy thổi khí
+          </button>
+          <button
+            type="button"
+            className="tc-mobile-pill-item"
+            onClick={() => {
+              const el = document.getElementById("section-dem-hoi-cuu-ho-cuu-nan");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+              else navigate("/san-pham/dem-hoi-cuu-ho-cuu-nan");
+            }}
+          >
+            Đệm hơi
+          </button>
+          <Link to="/san-pham/thiet-bi-bao-chay" className="tc-mobile-pill-item">
+            Thiết bị báo cháy
+          </Link>
+          <Link to="/san-pham/tu-dieu-khien" className="tc-mobile-pill-item">
+            Tủ điều khiển
           </Link>
         </div>
       </div>

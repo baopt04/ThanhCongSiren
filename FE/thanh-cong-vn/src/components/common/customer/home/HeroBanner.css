@@ -4,17 +4,15 @@
 
 .tc-hero-section {
   width: 100%;
-  background: #0f172a;
+  background: #f8fafc;
 }
 
 .tc-hero-slider {
   width: 100%;
   position: relative;
   overflow: hidden;
-  aspect-ratio: 2078 / 757;
-  min-height: 280px;
-  max-height: min(72vh, 680px);
-  background: #0f172a;
+  aspect-ratio: 1920 / 700;
+  background: #f8fafc;
 }
 
 .tc-hero-slider .ant-carousel {
@@ -43,12 +41,16 @@
 
 .tc-slide-media {
   width: 100%;
-  /* ~2078x757 — banner to trên desktop */
-  aspect-ratio: 2078 / 757;
-  min-height: 280px;
-  max-height: min(72vh, 680px);
-  background: #0f172a;
+  aspect-ratio: 1920 / 700;
+  background: #f8fafc;
   overflow: hidden;
+  position: relative;
+}
+
+.tc-slide-picture {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .tc-slide-img {
@@ -58,7 +60,6 @@
   object-position: center;
   display: block;
   user-select: none;
-  pointer-events: none;
 }
 
 /* --- Custom arrows (không đè lên dots) --- */
@@ -71,7 +72,7 @@
   height: 48px;
   margin: 0 !important;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.35) !important;
   color: #fff !important;
@@ -92,7 +93,7 @@
 
 .tc-hero-arrow:hover {
   background: rgba(185, 28, 28, 0.85) !important;
-  border-color: rgba(255, 255, 255, 0.55);
+  border-color: rgba(255, 255, 255, 0.65);
   color: #fff !important;
   transform: translateY(-50%) scale(1.06) !important;
 }
@@ -169,12 +170,6 @@
 /* ═══ Responsive ═══ */
 
 @media (max-width: 1024px) {
-  .tc-hero-slider,
-  .tc-slide-media {
-    max-height: min(52vh, 480px);
-    min-height: 240px;
-  }
-
   .tc-hero-arrow {
     width: 40px;
     height: 40px;
@@ -199,9 +194,7 @@
 @media (max-width: 768px) {
   .tc-hero-slider,
   .tc-slide-media {
-    aspect-ratio: 16 / 9;
-    max-height: min(42vh, 320px);
-    min-height: 180px;
+    aspect-ratio: 768 / 280;
   }
 
   .tc-hero-arrow {
@@ -239,9 +232,7 @@
 @media (max-width: 480px) {
   .tc-hero-slider,
   .tc-slide-media {
-    aspect-ratio: 2 / 1;
-    max-height: 220px;
-    min-height: 150px;
+    aspect-ratio: 768 / 280;
   }
 
   .tc-hero-arrow {

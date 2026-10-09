@@ -1,12 +1,13 @@
+import { memo } from "react";
 import "./HeroBanner.css";
 import { Carousel } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import banner1 from "../../../../assets/Banner_1.webp";
 import banner2 from "../../../../assets/Banner_2.webp";
 import banner3 from "../../../../assets/Banner_3.webp";
-import banner1Mobile from "../../../../assets/Banner_1_mobile.jpg";
-import banner2Mobile from "../../../../assets/Banner_2_mobile.jpg";
-import banner3Mobile from "../../../../assets/Banner_3_mobile.jpg";
+import banner1Mobile from "../../../../assets/Banner_1_mobile.webp";
+import banner2Mobile from "../../../../assets/Banner_2_mobile.webp";
+import banner3Mobile from "../../../../assets/Banner_3_mobile.webp";
 
 const banners = [
   {
@@ -57,7 +58,7 @@ function NextArrow({ className, style, onClick }) {
   );
 }
 
-export function HeroBanner() {
+export const HeroBanner = memo(function HeroBanner() {
   return (
     <section className="tc-hero-section" aria-label="Banner chính">
       <div className="tc-hero-slider">
@@ -75,7 +76,7 @@ export function HeroBanner() {
           {banners.map((banner, index) => (
             <div key={banner.alt} className="tc-slide-item">
               <div className="tc-slide-media">
-                <picture>
+                <picture className="tc-slide-picture">
                   <source
                     media="(max-width: 768px)"
                     srcSet={banner.srcMobile}
@@ -101,4 +102,4 @@ export function HeroBanner() {
       </div>
     </section>
   );
-}
+});

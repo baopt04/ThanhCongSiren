@@ -62,9 +62,16 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
           <ul className="tc-mobile-nav-links">
             {mainNavItems.map((item) => {
               const isProducts = item.path === "/san-pham";
-              const isActive =
-                currentPath === item.path ||
-                (isProducts && currentPath.startsWith("/san-pham"));
+              const isExactMatch = currentPath === item.path;
+              const isPrefixMatch =
+                item.path !== "/" &&
+                currentPath?.startsWith(item.path + "/") &&
+                !mainNavItems.some(
+                  (other) =>
+                    other.path !== item.path &&
+                    (currentPath === other.path || currentPath?.startsWith(other.path + "/"))
+                );
+              const isActive = isExactMatch || isPrefixMatch;
 
               if (isProducts) {
                 return (
@@ -100,9 +107,26 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
                           const hasChildren =
                             cat.children && cat.children.length > 0;
                           const isExpanded = expandedMobileCat === cat.slug;
+                          const hasActiveChild = cat.children?.some(
+                            (sub) =>
+                              Boolean(
+                                sub.slug &&
+                                  (currentPath === `/san-pham/${sub.slug}` ||
+                                    currentPath.startsWith(`/san-pham/${sub.slug}/`))
+                              ) || Boolean(sub.path && currentPath === sub.path)
+                          );
+                          const isCatActive =
+                            Boolean(
+                              cat.slug &&
+                                (currentPath === `/san-pham/${cat.slug}` ||
+                                  currentPath.startsWith(`/san-pham/${cat.slug}/`))
+                            ) ||
+                            Boolean(cat.path && currentPath === cat.path) ||
+                            Boolean(hasActiveChild);
+
                           return (
                             <li key={cat.slug || cat.label}>
-                              <div className="tc-mobile-cat-row">
+                              <div className={`tc-mobile-cat-row ${isCatActive ? "active" : ""}`}>
                                 <Link to={cat.path} onClick={handleClose}>
                                   {cat.label}
                                 </Link>
@@ -127,16 +151,26 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
                               </div>
                               {hasChildren && isExpanded && (
                                 <ul className="tc-mobile-subcat-list">
-                                  {cat.children.map((sub) => (
-                                    <li key={sub.slug || sub.label}>
-                                      <Link
-                                        to={sub.path}
-                                        onClick={handleClose}
-                                      >
-                                        {sub.label}
-                                      </Link>
-                                    </li>
-                                  ))}
+                                  {cat.children.map((sub) => {
+                                    const isSubActive =
+                                      Boolean(
+                                        sub.slug &&
+                                          (currentPath === `/san-pham/${sub.slug}` ||
+                                            currentPath.startsWith(`/san-pham/${sub.slug}/`))
+                                      ) || Boolean(sub.path && currentPath === sub.path);
+
+                                    return (
+                                      <li key={sub.slug || sub.label}>
+                                        <Link
+                                          to={sub.path}
+                                          className={isSubActive ? "active" : ""}
+                                          onClick={handleClose}
+                                        >
+                                          {sub.label}
+                                        </Link>
+                                      </li>
+                                    );
+                                  })}
                                 </ul>
                               )}
                             </li>

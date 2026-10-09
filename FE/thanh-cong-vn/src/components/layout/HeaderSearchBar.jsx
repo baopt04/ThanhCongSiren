@@ -153,14 +153,14 @@ export const HeaderSearchBar = memo(function HeaderSearchBar({
               setShowSearchResults(true);
             }
           }}
-          placeholder="Nhập tên sản phẩm (VD: LK-JDW400, Còi thủy điện...)"
+          placeholder="Bạn cần tìm thiết bị gì?"
           aria-label="Tìm kiếm sản phẩm"
           id="search-input"
           autoComplete="off"
         />
-        <button type="submit" className="tc-search-btn" aria-label="Tìm kiếm">
-          {isSearching ? <LoadingOutlined spin /> : <SearchOutlined />}
-          <span>Tìm kiếm</span>
+        <button type="submit" className="tc-search-btn" aria-label="Tìm">
+          {isSearching ? <LoadingOutlined spin /> : null}
+          <span>Tìm</span>
         </button>
         <button
           type="button"
@@ -229,14 +229,6 @@ export const HeaderSearchBar = memo(function HeaderSearchBar({
           </div>
         </div>
       )}
-
-      <div className="tc-search-tags">
-        <span>Từ khóa hot:</span>
-        <Link to="/san-pham/coi-bao-dong-dong-co-dien-co-lon">Còi thủy điện</Link>
-        <Link to="/san-pham/coi-hu-chong-chay-no">Còi chống cháy nổ</Link>
-        <Link to="/san-pham/tu-dieu-khien">Tủ điều khiển GSM</Link>
-        <Link to="/san-pham/may-thoi-khi">Quạt hút khói</Link>
-      </div>
     </div>
   );
 });

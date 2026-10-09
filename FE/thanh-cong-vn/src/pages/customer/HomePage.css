@@ -1,0 +1,59 @@
+/* ═══════════════════════════════════════════
+   HOME PAGE — Layout & Category Filter Pills
+   Matching new desktop homepage mockup
+   ═══════════════════════════════════════════ */
+
+.tc-home-cat-filter-section {
+  width: 100%;
+  padding: 10px 16px 20px;
+  background: #ffffff;
+}
+
+.tc-home-cat-filter-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tc-home-cat-pills-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.tc-home-cat-pill-btn {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  color: #334155;
+  padding: 7px 20px;
+  border-radius: 999px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tc-home-cat-pill-btn:hover {
+  border-color: #b91c1c;
+  color: #b91c1c;
+  background: #fef2f2;
+  transform: translateY(-1px);
+}
+
+.tc-home-cat-pill-btn.active {
+  border-color: #b91c1c;
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .tc-home-cat-filter-section {
+    display: none;
+  }
+}
+

@@ -130,18 +130,15 @@ export const HeaderTopBar = memo(function HeaderTopBar({ customerUser, onLogout 
     <div className="tc-header-top">
       <div className="tc-header-top-inner">
         <div className="tc-header-top-info">
-          <span className="tc-company-badge">
-            <SafetyCertificateOutlined /> CÔNG TY TNHH THÀNH CÔNG VIỆT NAM
-          </span>
-          <span className="tc-top-divider">|</span>
           <span className="tc-hotline-item">
-            <PhoneOutlined /> Hotline tư vấn: <strong>0865.130.088</strong> -{" "}
-            <strong>0364.862.148</strong>
+            Hotline tư vấn: <strong>0865 130 088</strong>
           </span>
         </div>
         <div className="tc-header-top-right">
           <Link to="/tin-tuc">Dự án đã thi công</Link>
+          <span className="tc-top-divider">|</span>
           <Link to="/gio-hang">Kiểm tra đơn hàng</Link>
+          <span className="tc-top-divider">|</span>
           {customerUser ? (
             <Suspense
               fallback={
@@ -184,8 +181,8 @@ export const HeaderTopBar = memo(function HeaderTopBar({ customerUser, onLogout 
               </Dropdown>
             </Suspense>
           ) : (
-            <Link to="/dang-nhap" className="tc-top-login-btn">
-              <UserOutlined /> Đăng nhập / Đăng ký
+            <Link to="/dang-nhap" className="tc-top-login-clean">
+              Đăng nhập
             </Link>
           )}
         </div>

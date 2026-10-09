@@ -40,6 +40,28 @@
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+.tc-mock-call-btn {
+  background: #b91c1c;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(185, 28, 28, 0.4);
+}
+
+.tc-mock-zalo-btn {
+  background: #ffffff;
+  border: 1.5px solid #b91c1c;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.tc-mock-zalo-btn:hover {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 .tc-zalo-btn {
   background: #0068ff;
 }
@@ -207,18 +229,12 @@
 @media (max-width: 1024px) {
   .tc-floating-widget {
     right: 14px;
-    gap: 10px;
-  }
-
-  .tc-float-btn {
-    width: 44px;
-    height: 44px;
-    font-size: 18px;
+    gap: 12px;
   }
 
   .tc-zalo-chat-widget {
     right: 14px;
-    bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    bottom: max(20px, env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -230,44 +246,80 @@ body.mobile-menu-open .tc-zalo-chat-widget {
   visibility: hidden !important;
 }
 
+/* Mobile: Hiển thị Gọi & Zalo ở sườn phải, Chat bong bóng xanh ở góc dưới phải đúng Ảnh 3 */
 @media (max-width: 768px) {
-  /* Trên điện thoại, ẩn widget chat Zalo trùng lặp để tránh che 40% màn hình */
-  .tc-zalo-chat-widget {
-    display: none !important;
-  }
-
-  /* Đưa bộ nút liên hệ xuống góc dưới phải, không đè ngang giữa các banner */
   .tc-floating-widget {
-    top: auto;
-    bottom: max(20px, env(safe-area-inset-bottom, 0px));
-    transform: none;
-    right: max(12px, env(safe-area-inset-right, 0px));
-    gap: 10px;
-    z-index: 990;
+    position: fixed !important;
+    top: 42% !important;
+    transform: translateY(-50%) !important;
+    right: 12px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    z-index: 999 !important;
   }
 
   .tc-float-btn {
-    width: 44px;
-    height: 44px;
-    font-size: 18px;
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .tc-mock-call-btn {
+    background: #b91c1c !important;
+    color: #ffffff !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 14px rgba(185, 28, 28, 0.45) !important;
+  }
+
+  .tc-mock-zalo-btn {
+    background: #ffffff !important;
+    border: 1.5px solid #b91c1c !important;
+    color: #b91c1c !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
   }
 
   .tc-float-tooltip {
-    display: none;
+    display: none !important;
+  }
+
+  /* Widget chat bong bóng xanh góc dưới phải đúng Ảnh 3 */
+  .tc-zalo-chat-widget {
+    display: flex !important;
+    position: fixed !important;
+    right: 12px !important;
+    bottom: max(20px, env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 1000 !important;
+  }
+
+  .tc-zalo-chat-launcher {
+    width: 52px !important;
+    height: 52px !important;
+    background: #00b14f !important;
+    border-radius: 50% !important;
+    box-shadow: 0 6px 18px rgba(0, 177, 79, 0.4) !important;
+  }
+
+  .tc-zalo-chat-badge {
+    position: absolute !important;
+    top: -2px !important;
+    right: -2px !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    border-radius: 50% !important;
+    background: #ef4444 !important;
+    color: #ffffff !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 }
 
-@media (max-width: 480px) {
-  .tc-floating-widget {
-    bottom: max(16px, env(safe-area-inset-bottom, 0px));
-    right: max(10px, env(safe-area-inset-right, 0px));
-    gap: 8px;
-  }
-
-  .tc-float-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-}

@@ -1,0 +1,107 @@
+/* ═══════════════════════════════════════════
+   PROJECTS SECTION — Dự án đã thi công
+   Matching mobile & desktop mockup
+   ═══════════════════════════════════════════ */
+
+.tc-home-projects-section {
+  width: 100%;
+  padding: 20px 16px;
+  background: #ffffff;
+}
+
+.tc-projects-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tc-projects-scroll-wrapper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.tc-project-card-item {
+  display: block;
+  text-decoration: none;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+}
+
+.tc-project-card-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.tc-project-img-box {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.tc-project-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.tc-project-card-item:hover .tc-project-img {
+  transform: scale(1.05);
+}
+
+.tc-project-overlay-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(15, 23, 42, 0.55);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 16px;
+  backdrop-filter: blur(2px);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Mobile Styling */
+@media (max-width: 768px) {
+  .tc-home-projects-section {
+    padding: 12px 12px;
+  }
+
+  /* Cuộn ngang trơn tru trên mobile */
+  .tc-projects-scroll-wrapper {
+    display: flex !important;
+    overflow-x: auto !important;
+    gap: 12px !important;
+    padding-bottom: 6px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+
+  .tc-projects-scroll-wrapper::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tc-project-card-item {
+    flex: 0 0 65% !important;
+    min-width: 200px !important;
+    max-width: 250px !important;
+    scroll-snap-align: start;
+    border-radius: 8px;
+  }
+
+  .tc-project-img-box {
+    aspect-ratio: 16 / 10;
+  }
+}

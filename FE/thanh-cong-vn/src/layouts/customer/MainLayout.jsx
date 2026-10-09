@@ -11,25 +11,7 @@ const HOTLINE_TEL = "0865130088";
 
 export function MainLayout() {
   const [chatOpen, setChatOpen] = useState(false);
-  const [showFloatWidgets, setShowFloatWidgets] = useState(false);
-
-  // Hoãn widget nổi / chat tới sau khi trang render (đỡ chiếm main thread lúc mở trang)
-  useEffect(() => {
-    let idleId;
-    let timerId;
-    const show = () => setShowFloatWidgets(true);
-
-    if (typeof window.requestIdleCallback === "function") {
-      idleId = window.requestIdleCallback(show, { timeout: 2500 });
-    } else {
-      timerId = window.setTimeout(show, 1200);
-    }
-
-    return () => {
-      if (idleId && window.cancelIdleCallback) window.cancelIdleCallback(idleId);
-      if (timerId) window.clearTimeout(timerId);
-    };
-  }, []);
+  const [showFloatWidgets] = useState(true);
 
 
   return (
@@ -41,35 +23,24 @@ export function MainLayout() {
 
       {showFloatWidgets && (
         <>
-          {/* Floating contact — giữa cạnh phải */}
+          {/* Floating contact matching mockup — cạnh phải */}
           <div className="tc-floating-widget" aria-label="Liên hệ nhanh">
+            <a
+              href={`tel:${HOTLINE_TEL}`}
+              className="tc-float-btn tc-mock-call-btn"
+              title={`Gọi Hotline ${HOTLINE_DISPLAY}`}
+            >
+              <span>Gọi</span>
+            </a>
+
             <a
               href={ZALO_URL}
               target="_blank"
               rel="noreferrer"
-              className="tc-float-btn tc-zalo-btn"
+              className="tc-float-btn tc-mock-zalo-btn"
               title="Chat Zalo Tư Vấn Báo Giá"
             >
-              <MessageOutlined />
-              <span className="tc-float-tooltip">Chat Zalo</span>
-            </a>
-
-            <a
-              href={`tel:${HOTLINE_TEL}`}
-              className="tc-float-btn tc-phone-btn"
-              title={`Gọi Hotline ${HOTLINE_DISPLAY}`}
-            >
-              <PhoneOutlined />
-              <span className="tc-float-tooltip">{HOTLINE_DISPLAY}</span>
-            </a>
-
-            <a
-              href="/lien-he"
-              className="tc-float-btn tc-top-btn"
-              title="Yêu cầu báo giá"
-            >
-              <FileTextOutlined />
-              <span className="tc-float-tooltip">Báo Giá</span>
+              <span>Zalo</span>
             </a>
           </div>
 
