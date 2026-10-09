@@ -33,25 +33,38 @@ const FALLBACK_LIST = [
   },
 ];
 
+const optimizeCloudinary = (url, width = 600) => {
+  if (!url || typeof url !== "string") return url;
+  if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
+    if (url.includes("/upload/f_auto") || url.includes("/upload/w_")) return url;
+    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
+  }
+  return url;
+};
+
 export const NewsSection = memo(function NewsSection() {
   const { data: postsList = [] } = useCustomerPostsQuery();
 
   const { featuredPost, sidePosts } = useMemo(() => {
     if (postsList && postsList.length > 0) {
+      const rawFeaturedImg = postsList[0].thumbnailUrl || postsList[0].image || FALLBACK_FEATURED.image;
       const featured = {
         id: postsList[0].id,
         title: postsList[0].title,
         slug: postsList[0].slug || postsList[0].id,
-        image: postsList[0].thumbnailUrl || postsList[0].image || FALLBACK_FEATURED.image,
+        image: optimizeCloudinary(rawFeaturedImg, 600),
       };
 
-      const side = postsList.slice(1, 4).map((item, idx) => ({
-        id: item.id,
-        title: item.title,
-        slug: item.slug || item.id,
-        image: item.thumbnailUrl || item.image || FALLBACK_LIST[idx]?.image,
-        isVideo: idx === 2,
-      }));
+      const side = postsList.slice(1, 4).map((item, idx) => {
+        const rawSideImg = item.thumbnailUrl || item.image || FALLBACK_LIST[idx]?.image;
+        return {
+          id: item.id,
+          title: item.title,
+          slug: item.slug || item.id,
+          image: optimizeCloudinary(rawSideImg, 300),
+          isVideo: idx === 2,
+        };
+      });
 
       // Pad if fewer than 3 side items
       while (side.length < 3) {
@@ -96,6 +109,8 @@ export const NewsSection = memo(function NewsSection() {
                   className="tc-news-featured-img"
                   loading="lazy"
                   decoding="async"
+                  width={600}
+                  height={380}
                 />
               ) : null}
               <div className="tc-news-featured-label">
@@ -124,6 +139,8 @@ export const NewsSection = memo(function NewsSection() {
                       className="tc-news-side-img"
                       loading="lazy"
                       decoding="async"
+                      width={180}
+                      height={120}
                     />
                   ) : null}
                   <div className="tc-news-side-thumb-label">

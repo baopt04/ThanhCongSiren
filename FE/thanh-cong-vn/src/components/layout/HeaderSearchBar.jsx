@@ -138,6 +138,9 @@ export const HeaderSearchBar = memo(function HeaderSearchBar({
           }
         }}
       >
+        <label htmlFor="search-input" className="tc-sr-only">
+          Tìm kiếm sản phẩm
+        </label>
         <input
           ref={searchInputRef}
           type="text"

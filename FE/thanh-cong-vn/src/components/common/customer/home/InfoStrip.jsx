@@ -27,7 +27,7 @@ export const InfoStrip = memo(function InfoStrip() {
             </svg>
           </div>
           <div className="tc-info-card-content">
-            <h4 className="tc-info-card-title">ĐA DẠNG SẢN PHẨM</h4>
+            <h2 className="tc-info-card-title">ĐA DẠNG SẢN PHẨM</h2>
             <p className="tc-info-card-desc">
               Còi hú báo động - Còi báo xả lũ - Còi báo cháy
             </p>
@@ -58,9 +58,9 @@ export const InfoStrip = memo(function InfoStrip() {
             </svg>
           </div>
           <div className="tc-info-card-content">
-            <h4 className="tc-info-card-title">
+            <h2 className="tc-info-card-title">
               CHẤT LƯỢNG HÀNG<br />ĐẦU
-            </h4>
+            </h2>
             <p className="tc-info-card-desc">
               Sản phẩm được nhập khẩu 100%, cam kết uy tín từ nhà sản xuất.
             </p>
@@ -94,7 +94,7 @@ export const InfoStrip = memo(function InfoStrip() {
             </svg>
           </div>
           <div className="tc-info-card-content">
-            <h4 className="tc-info-card-title">BẢO HÀNH 12 THÁNG</h4>
+            <h2 className="tc-info-card-title">BẢO HÀNH 12 THÁNG</h2>
             <p className="tc-info-card-desc">
               Tất cả các sản phẩm đều được bảo hành miễn phí trong vòng 12 tháng.
             </p>
@@ -119,7 +119,7 @@ export const InfoStrip = memo(function InfoStrip() {
             </svg>
           </div>
           <div className="tc-info-card-content">
-            <h4 className="tc-info-card-title">GIAO HÀNG MIỄN PHÍ</h4>
+            <h2 className="tc-info-card-title">GIAO HÀNG MIỄN PHÍ</h2>
             <p className="tc-info-card-desc">
               Miễn phí giao hàng nội thành Hà Nội với các đơn hàng trên 1 triệu đồng
             </p>

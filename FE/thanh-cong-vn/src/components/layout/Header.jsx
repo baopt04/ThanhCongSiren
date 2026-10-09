@@ -236,6 +236,7 @@ export function Header() {
               src={logoImg}
               alt="Thành Công Việt Nam"
               className="tc-mobile-logo-img"
+              width={118}
               height={34}
             />
           </div>
@@ -294,6 +295,7 @@ export function Header() {
             to="/gio-hang"
             className="tc-header-cart-clean-btn"
             id="cart-btn"
+            aria-label={`Giỏ hàng (${cartCount})`}
           >
             <div className="tc-cart-icon-wrapper">
               <ShoppingCartOutlined className="tc-action-icon" />
@@ -328,7 +330,7 @@ export function Header() {
               to="/gio-hang"
               className="tc-mobile-action-icon-btn tc-mobile-cart-btn"
               title="Giỏ hàng"
-              aria-label="Giỏ hàng"
+              aria-label={`Giỏ hàng (${cartCount})`}
             >
               <ShoppingCartOutlined />
               {cartCount > 0 && (

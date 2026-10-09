@@ -45,6 +45,7 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
         className={`tc-mobile-drawer ${isOpen ? "is-open" : ""}`}
         aria-hidden={!isOpen}
         aria-label="Menu điều hướng"
+        inert={!isOpen ? "" : undefined}
       >
         <div className="tc-mobile-drawer-header">
           <span>Menu</span>

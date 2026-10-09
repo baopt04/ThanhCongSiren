@@ -1,5 +1,4 @@
 import { useState, memo } from "react";
-import { message } from "antd";
 import { LoadingOutlined, CheckCircleFilled } from "@ant-design/icons";
 import { notificationTelegramQuote } from "../../../../services/customer/CustomerProductService";
 import "./FastQuoteBanner.css";
@@ -15,10 +14,12 @@ export const FastQuoteBanner = memo(function FastQuoteBanner() {
     const phoneRegex = /^(0|\+84)[1-9][0-9]{8,9}$/;
 
     if (!cleanPhone) {
+      const { message } = await import("antd");
       message.warning("Vui lòng nhập số điện thoại hoặc Zalo để chúng tôi gọi lại!");
       return;
     }
     if (!phoneRegex.test(cleanPhone)) {
+      const { message } = await import("antd");
       message.warning("Số điện thoại không hợp lệ (VD: 0865130088 hoặc 0904537559)!");
       return;
     }
@@ -33,10 +34,12 @@ export const FastQuoteBanner = memo(function FastQuoteBanner() {
       };
       await notificationTelegramQuote(payload);
       setSubmitted(true);
+      const { message } = await import("antd");
       message.success("Đã gửi yêu cầu thành công! Chúng tôi sẽ gọi lại ngay.");
     } catch {
       // Cho dù telegram có lỗi kết nối thì vẫn báo thành công để trải nghiệm khách hàng tốt
       setSubmitted(true);
+      const { message } = await import("antd");
       message.success("Đã ghi nhận yêu cầu! Đội ngũ tư vấn sẽ liên hệ lại sớm nhất.");
     } finally {
       setLoading(false);
@@ -64,7 +67,11 @@ export const FastQuoteBanner = memo(function FastQuoteBanner() {
               </div>
             ) : (
               <form className="tc-fast-quote-form" onSubmit={handleSubmit}>
+                <label htmlFor="fast-quote-phone" className="tc-sr-only">
+                  Số điện thoại nhận báo giá
+                </label>
                 <input
+                  id="fast-quote-phone"
                   type="tel"
                   className="tc-fast-quote-input"
                   placeholder="Số điện thoại"

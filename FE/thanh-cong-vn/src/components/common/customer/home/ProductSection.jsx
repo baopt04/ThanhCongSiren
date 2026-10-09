@@ -3,13 +3,24 @@ import { Link } from "react-router-dom";
 import "./ProductSection.css";
 import { PLACEHOLDER_IMAGE } from "../../../../utils/placeholder";
 
+const optimizeCloudinary = (url, width = 360) => {
+  if (!url || typeof url !== "string") return url;
+  if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
+    if (url.includes("/upload/f_auto") || url.includes("/upload/w_")) return url;
+    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
+  }
+  return url;
+};
+
 const getCardImage = (product) => {
-  if (product.image && typeof product.image === "string") return product.image;
-  if (Array.isArray(product.image) && product.image[0]?.imageUrl) return product.image[0].imageUrl;
-  if (product.images?.imageUrl) return product.images.imageUrl;
-  if (product.imageUrl) return product.imageUrl;
-  if (product.thumbnail) return product.thumbnail;
-  return PLACEHOLDER_IMAGE;
+  let img = null;
+  if (product.image && typeof product.image === "string") img = product.image;
+  else if (Array.isArray(product.image) && product.image[0]?.imageUrl) img = product.image[0].imageUrl;
+  else if (product.images?.imageUrl) img = product.images.imageUrl;
+  else if (product.imageUrl) img = product.imageUrl;
+  else if (product.thumbnail) img = product.thumbnail;
+  else img = PLACEHOLDER_IMAGE;
+  return optimizeCloudinary(img, 360);
 };
 
 const formatCardPrice = (price) => {
@@ -98,6 +109,8 @@ export const ProductSection = memo(function ProductSection({
                       className="tc-mock-card-img"
                       loading="lazy"
                       decoding="async"
+                      width={280}
+                      height={280}
                       onError={(e) => {
                         e.target.style.display = "none";
                       }}

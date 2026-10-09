@@ -232,11 +232,4 @@ export function prefetchHomepageCriticalData() {
   prefetchCustomerCategories();
   prefetchHomeSections();
   prefetchCustomerPosts();
-
-  // Hoãn prefetch trang /san-pham sau 2.5s để nhường 100% băng thông mạng cho ảnh LCP Banner và UI trang chủ
-  if (typeof window !== "undefined") {
-    window.setTimeout(() => {
-      prefetchCustomerProductsPage(0, 12);
-    }, 2500);
-  }
 }

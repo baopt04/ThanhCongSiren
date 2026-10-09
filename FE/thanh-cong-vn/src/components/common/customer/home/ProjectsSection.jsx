@@ -71,6 +71,8 @@ export const ProjectsSection = memo(function ProjectsSection() {
                   className="tc-project-img"
                   loading="lazy"
                   decoding="async"
+                  width={360}
+                  height={240}
                 />
                 <div className="tc-project-overlay-label">
                   <span>Ảnh công trình</span>

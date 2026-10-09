@@ -29,6 +29,7 @@ export function MainLayout() {
               href={`tel:${HOTLINE_TEL}`}
               className="tc-float-btn tc-mock-call-btn"
               title={`Gọi Hotline ${HOTLINE_DISPLAY}`}
+              aria-label={`Gọi Hotline ${HOTLINE_DISPLAY}`}
             >
               <span>Gọi</span>
             </a>
@@ -39,6 +40,7 @@ export function MainLayout() {
               rel="noreferrer"
               className="tc-float-btn tc-mock-zalo-btn"
               title="Chat Zalo Tư Vấn Báo Giá"
+              aria-label="Chat Zalo tư vấn báo giá"
             >
               <span>Zalo</span>
             </a>
@@ -71,6 +73,7 @@ export function MainLayout() {
               rel="noreferrer"
               className="tc-zalo-chat-launcher"
               title="Chat Zalo"
+              aria-label="Chat Zalo 1"
               onClick={() => setChatOpen(true)}
             >
               <span className="tc-zalo-chat-icon" aria-hidden="true">
@@ -87,7 +90,7 @@ export function MainLayout() {
                   />
                 </svg>
               </span>
-              <span className="tc-zalo-chat-badge">1</span>
+              <span className="tc-zalo-chat-badge" aria-hidden="true">1</span>
             </a>
           </div>
         </>

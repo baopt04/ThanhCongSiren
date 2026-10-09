@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { HeroBanner } from "../../components/common/customer/home/HeroBanner";
 import { InfoStrip } from "../../components/common/customer/home/InfoStrip";
@@ -6,10 +6,15 @@ import { ProductSection } from "../../components/common/customer/home/ProductSec
 import { ProjectsSection } from "../../components/common/customer/home/ProjectsSection";
 import { NewsSection } from "../../components/common/customer/home/NewsSection";
 import { FastQuoteBanner } from "../../components/common/customer/home/FastQuoteBanner";
-import { QuoteModal } from "../../components/common/customer/QuoteModal/QuoteModal";
 import { useHomeSectionsQuery } from "../../hooks/queries/customerQueries";
 import { Seo } from "../../components/common/Seo";
 import "./HomePage.css";
+
+const QuoteModal = lazy(() =>
+  import("../../components/common/customer/QuoteModal/QuoteModal").then((m) => ({
+    default: m.QuoteModal,
+  }))
+);
 
 // ── Fallback Products ensuring exactly 4 cards are always rendered beautifully ──
 const FALLBACK_SIRENS = [
@@ -143,6 +148,11 @@ export function HomePage() {
         path="/"
       />
 
+      {/* Semantic H1 heading for SEO & Accessibility */}
+      <h1 className="tc-sr-only">
+        Còi hú báo động &amp; Thiết bị PCCC Thành Công Việt Nam - Đại lý ủy quyền Lion King
+      </h1>
+
       {/* 1. Hero 2-column card matching mockup */}
       <HeroBanner onOpenQuote={() => setQuoteModalOpen(true)} />
 
@@ -230,11 +240,15 @@ export function HomePage() {
       {/* 8. Section: Cần báo giá nhanh? (Inline callout card matching mockup) */}
       <FastQuoteBanner />
 
-      {/* Quick Quote Modal */}
-      <QuoteModal
-        isOpen={quoteModalOpen}
-        onClose={() => setQuoteModalOpen(false)}
-      />
+      {/* Quick Quote Modal loaded on-demand */}
+      {quoteModalOpen && (
+        <Suspense fallback={null}>
+          <QuoteModal
+            isOpen={quoteModalOpen}
+            onClose={() => setQuoteModalOpen(false)}
+          />
+        </Suspense>
+      )}
     </>
   );
 }

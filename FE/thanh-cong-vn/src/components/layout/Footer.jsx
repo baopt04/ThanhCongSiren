@@ -13,6 +13,10 @@ export function Footer() {
             <img
               src="https://cdn0344.cdn4s.com/media/logo/cropped-logo-coihubaodong-2.png"
               alt="CÔNG TY TNHH THÀNH CÔNG VIỆT NAM"
+              width={180}
+              height={52}
+              loading="lazy"
+              decoding="async"
               onError={(e) => {
                 e.target.src = "https://coihubaodong.com/templates/fashion01/assets/media/cropped-logo-coihubaodong-2.png";
               }}
