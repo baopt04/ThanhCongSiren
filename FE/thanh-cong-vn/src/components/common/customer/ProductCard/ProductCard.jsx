@@ -10,6 +10,7 @@ import {
 } from "@ant-design/icons";
 import { prefetchProductDetail } from "../../../../hooks/queries/customerQueries";
 import { preloadRouteChunks } from "../../../../utils/preloadChunks";
+import { optimizeCloudinary } from "../../../../utils/cloudinary";
 
 export const ProductCard = memo(function ProductCard({
   id,
@@ -85,6 +86,18 @@ export const ProductCard = memo(function ProductCard({
     primaryImageUrl = image.imageUrl;
   }
 
+  const primaryOptimized = optimizeCloudinary(primaryImageUrl, 480);
+  const primarySrcSet =
+    primaryImageUrl && primaryImageUrl.includes("res.cloudinary.com")
+      ? `${optimizeCloudinary(primaryImageUrl, 320)} 320w, ${optimizeCloudinary(primaryImageUrl, 480)} 480w`
+      : undefined;
+
+  const hoverOptimized = hoverImageUrl ? optimizeCloudinary(hoverImageUrl, 480) : null;
+  const hoverSrcSet =
+    hoverImageUrl && hoverImageUrl.includes("res.cloudinary.com")
+      ? `${optimizeCloudinary(hoverImageUrl, 320)} 320w, ${optimizeCloudinary(hoverImageUrl, 480)} 480w`
+      : undefined;
+
   // Format price if numeric or numeric string
   const numPrice = Number(price);
   const displayPrice =
@@ -108,7 +121,9 @@ export const ProductCard = memo(function ProductCard({
         <div className="tc-catalog-thumb-box">
           <Link to={productLink} className="tc-catalog-thumb-link">
             <img
-              src={primaryImageUrl}
+              src={primaryOptimized}
+              srcSet={primarySrcSet}
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px"
               alt={name}
               loading="lazy"
               decoding="async"
@@ -121,7 +136,9 @@ export const ProductCard = memo(function ProductCard({
             />
             {hoverImageUrl && (
               <img
-                src={hoverImageUrl}
+                src={hoverOptimized}
+                srcSet={hoverSrcSet}
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px"
                 alt={`${name} hover`}
                 loading="lazy"
                 decoding="async"
@@ -203,7 +220,9 @@ export const ProductCard = memo(function ProductCard({
       {/* Image Container */}
       <Link to={productLink} className="tc-product-thumb-wrapper">
         <img
-          src={primaryImageUrl}
+          src={primaryOptimized}
+          srcSet={primarySrcSet}
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px"
           alt={name}
           loading="lazy"
           decoding="async"
@@ -216,7 +235,9 @@ export const ProductCard = memo(function ProductCard({
         />
         {hoverImageUrl && (
           <img
-            src={hoverImageUrl}
+            src={hoverOptimized}
+            srcSet={hoverSrcSet}
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px"
             alt={`${name} hover`}
             loading="lazy"
             decoding="async"

@@ -1,6 +1,7 @@
 import "./Footer.css";
 import { Link } from "react-router-dom";
 import { PhoneOutlined, MailOutlined, EnvironmentOutlined, SafetyCertificateOutlined } from "@ant-design/icons";
+import logoImg from "../../assets/logo.webp";
 
 export function Footer() {
   return (
@@ -11,15 +12,12 @@ export function Footer() {
         <div className="tc-footer-col tc-footer-brand">
           <div className="tc-footer-logo">
             <img
-              src="https://cdn0344.cdn4s.com/media/logo/cropped-logo-coihubaodong-2.png"
+              src={logoImg}
               alt="CÔNG TY TNHH THÀNH CÔNG VIỆT NAM"
               width={180}
               height={52}
               loading="lazy"
               decoding="async"
-              onError={(e) => {
-                e.target.src = "https://coihubaodong.com/templates/fashion01/assets/media/cropped-logo-coihubaodong-2.png";
-              }}
             />
             <div className="tc-footer-logo-text">
               <span className="tc-footer-brand-name">THÀNH CÔNG VIỆT NAM</span>

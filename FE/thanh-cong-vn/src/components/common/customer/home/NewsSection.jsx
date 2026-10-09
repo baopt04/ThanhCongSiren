@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { PlayCircleFilled } from "@ant-design/icons";
 import "./NewsSection.css";
 import { useCustomerPostsQuery } from "../../../../hooks/queries/customerQueries";
+import { optimizeCloudinary } from "../../../../utils/cloudinary";
 
 const FALLBACK_FEATURED = {
   id: "featured-1",
@@ -33,14 +34,6 @@ const FALLBACK_LIST = [
   },
 ];
 
-const optimizeCloudinary = (url, width = 600) => {
-  if (!url || typeof url !== "string") return url;
-  if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
-    if (url.includes("/upload/f_auto") || url.includes("/upload/w_")) return url;
-    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
-  }
-  return url;
-};
 
 export const NewsSection = memo(function NewsSection() {
   const { data: postsList = [] } = useCustomerPostsQuery();

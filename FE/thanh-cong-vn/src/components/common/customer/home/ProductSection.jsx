@@ -2,15 +2,7 @@ import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./ProductSection.css";
 import { PLACEHOLDER_IMAGE } from "../../../../utils/placeholder";
-
-const optimizeCloudinary = (url, width = 360) => {
-  if (!url || typeof url !== "string") return url;
-  if (url.includes("res.cloudinary.com") && url.includes("/upload/")) {
-    if (url.includes("/upload/f_auto") || url.includes("/upload/w_")) return url;
-    return url.replace("/upload/", `/upload/f_auto,q_auto,w_${width}/`);
-  }
-  return url;
-};
+import { optimizeCloudinary } from "../../../../utils/cloudinary";
 
 const getCardImage = (product) => {
   let img = null;

@@ -1,6 +1,7 @@
 import { memo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./ProjectsSection.css";
+import { optimizeCloudinary } from "../../../../utils/cloudinary";
 
 const PROJECTS_DATA = [
   {
@@ -66,7 +67,7 @@ export const ProjectsSection = memo(function ProjectsSection() {
             >
               <div className="tc-project-img-box">
                 <img
-                  src={item.image}
+                  src={optimizeCloudinary(item.image, 640)}
                   alt={item.title}
                   className="tc-project-img"
                   loading="lazy"
