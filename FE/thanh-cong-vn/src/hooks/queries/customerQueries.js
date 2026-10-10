@@ -5,6 +5,7 @@ import {
   getByProductForCategeroy,
   detailProductForId,
   categorySections,
+  searchCategoryBySlug,
 } from "../../services/customer/CustomerProductService";
 import { getAllCategoriesForCustomer } from "../../services/customer/CustomerCategoryService";
 import { getAllPostsForCustomer } from "../../services/customer/CustomerPostService";
@@ -146,6 +147,31 @@ export function prefetchCategoryProducts(categoryId) {
       return Array.isArray(list) ? list : [];
     },
     staleTime: 5 * 60 * 1000,
+  });
+}
+
+// 2.2b Sản phẩm theo slug danh mục
+export const categoryProductsBySlugQueryKey = (slug) => [
+  "customer",
+  "products",
+  "category-slug",
+  String(slug),
+];
+
+export function useCategoryProductsBySlugQuery(slug, options = {}) {
+  return useQuery({
+    queryKey: categoryProductsBySlugQueryKey(slug),
+    queryFn: async () => {
+      if (!slug || slug === "all") return [];
+      const res = await searchCategoryBySlug(slug);
+      const list = res?.data || (Array.isArray(res) ? res : []);
+      return Array.isArray(list) ? list : [];
+    },
+    enabled: Boolean(slug && slug !== "all"),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 25 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    ...options,
   });
 }
 

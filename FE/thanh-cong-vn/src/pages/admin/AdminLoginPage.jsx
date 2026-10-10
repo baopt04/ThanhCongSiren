@@ -15,8 +15,7 @@ import "./AdminLoginPage.css";
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("thanhbao2401@gmail.com");
-  const [password, setPassword] = useState("123456");
+
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -100,7 +99,6 @@ export function AdminLoginPage() {
                 className="admin-login-input"
                 type="email"
                 placeholder="Nhập địa chỉ email..."
-                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
                 autoFocus
@@ -120,7 +118,6 @@ export function AdminLoginPage() {
                 className="admin-login-input"
                 type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu..."
-                value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 disabled={loading}

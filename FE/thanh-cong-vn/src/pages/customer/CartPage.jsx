@@ -80,21 +80,29 @@ export default function CartPage() {
   const [useCustomAddress, setUseCustomAddress] = useState(false);
 
   // Helper chuyển đổi item từ Backend sang định dạng giao diện CartItem
-  const mapBackendCartItem = (beItem) => ({
-    id: beItem.id, // Cart Item ID (dùng cho update/delete)
-    productId: beItem.productId, // Product ID (dùng cho link/tạo đơn)
-    name: beItem.productName || "Sản phẩm",
-    image: beItem.productImage || defaultCartImg,
-    price: Number(beItem.unitPrice) || 0,
-    quantity: Number(beItem.quantity) || 1,
-    stockQuantity: Number(beItem.stockQuantity) || 0,
-    subtotal:
-      Number(beItem.subtotal) ||
-      (Number(beItem.unitPrice) || 0) * (Number(beItem.quantity) || 1),
-    sku: beItem.sku || beItem.productId,
-    brand: beItem.brand || "Lion King",
-    warranty: beItem.warranty || "24 tháng",
-  });
+  const mapBackendCartItem = (beItem) => {
+    const rawSku = beItem.sku || beItem.productSku || beItem.productCode || beItem.code || "";
+    const cleanSku =
+      rawSku && rawSku !== beItem.slug && rawSku !== beItem.productSlug && rawSku !== String(beItem.productId)
+        ? rawSku
+        : "";
+    return {
+      id: beItem.id, // Cart Item ID (dùng cho update/delete)
+      productId: beItem.productId, // Product ID (dùng cho link/tạo đơn)
+      name: beItem.productName || "Sản phẩm",
+      image: beItem.productImage || defaultCartImg,
+      price: Number(beItem.unitPrice) || 0,
+      quantity: Number(beItem.quantity) || 1,
+      stockQuantity: Number(beItem.stockQuantity) || 0,
+      subtotal:
+        Number(beItem.subtotal) ||
+        (Number(beItem.unitPrice) || 0) * (Number(beItem.quantity) || 1),
+      sku: cleanSku,
+      brand: beItem.brand || "Lion King",
+      warranty: beItem.warranty || "24 tháng",
+      slug: beItem.slug || beItem.productSlug || beItem.productId || "",
+    };
+  };
 
   const fetchBackendCart = async () => {
     try {
@@ -111,12 +119,12 @@ export default function CartPage() {
         });
         try {
           localStorage.setItem("tc_cart", JSON.stringify(mapped));
-        } catch (e) {}
+        } catch (e) { }
       } else {
         setCartItems([]);
         try {
           localStorage.setItem("tc_cart", JSON.stringify([]));
-        } catch (e) {}
+        } catch (e) { }
       }
     } catch (err) {
       console.error("Lỗi khi tải giỏ hàng từ máy chủ:", err);
@@ -339,10 +347,10 @@ export default function CartPage() {
       prev.map((it) =>
         it.id === id
           ? {
-              ...it,
-              quantity: newQty,
-              subtotal: (Number(it.price) || 0) * newQty,
-            }
+            ...it,
+            quantity: newQty,
+            subtotal: (Number(it.price) || 0) * newQty,
+          }
           : it
       )
     );
@@ -379,8 +387,8 @@ export default function CartPage() {
           console.error("Lỗi cập nhật số lượng giỏ hàng:", err);
           message.error(
             err?.response?.data?.message ||
-              err?.message ||
-              "Cập nhật số lượng sản phẩm thất bại!"
+            err?.message ||
+            "Cập nhật số lượng sản phẩm thất bại!"
           );
           // Hoàn nguyên lại dữ liệu từ BE nếu có lỗi
           fetchBackendCart();
@@ -447,8 +455,8 @@ export default function CartPage() {
           console.error("Lỗi xóa sản phẩm khỏi giỏ hàng:", err);
           message.error(
             err?.response?.data?.message ||
-              err?.message ||
-              "Xóa sản phẩm khỏi giỏ hàng thất bại!"
+            err?.message ||
+            "Xóa sản phẩm khỏi giỏ hàng thất bại!"
           );
         }
       },
@@ -642,8 +650,8 @@ export default function CartPage() {
         paymentMethod === "banking"
           ? "Chuyển khoản Ngân hàng (MBBank)"
           : paymentMethod === "contract"
-          ? "Hợp đồng dự án / Tiến độ"
-          : "Thanh toán khi nhận hàng (COD)",
+            ? "Hợp đồng dự án / Tiến độ"
+            : "Thanh toán khi nhận hàng (COD)",
       needVat: formData.needVat,
       vatInfo: formData.needVat
         ? `${formData.companyName || "Chưa có tên cty"} (MST: ${formData.taxCode || "---"})`
@@ -699,13 +707,13 @@ export default function CartPage() {
           pendingOrder.payload.paymentMethod === "BANK_TRANSFER"
             ? "Chuyển khoản ngân hàng"
             : pendingOrder.payload.paymentMethod === "CONTRACT"
-            ? "Hợp đồng dự án / Công nợ"
-            : "Thanh toán khi nhận hàng (COD)",
+              ? "Hợp đồng dự án / Công nợ"
+              : "Thanh toán khi nhận hàng (COD)",
         total: pendingOrder.total,
         items: cartItems.map((item) => ({
           id: item.id,
           name: item.name,
-          code: item.code || "TC-SP",
+          code: (item.sku && item.sku !== item.slug ? item.sku : "") || item.code || "TC-SP",
           image: item.image || item.imageUrl || PLACEHOLDER_IMAGE,
           price: Number(item.price) || 0,
           quantity: Number(item.quantity) || 1,
@@ -918,9 +926,8 @@ export default function CartPage() {
                   {/* Chọn giới tính xưng hô */}
                   <div className="cart-gender-pills">
                     <label
-                      className={`cart-gender-pill ${
-                        gender === "anh" ? "active" : ""
-                      }`}
+                      className={`cart-gender-pill ${gender === "anh" ? "active" : ""
+                        }`}
                     >
                       <input
                         type="radio"
@@ -932,9 +939,8 @@ export default function CartPage() {
                       <span>Anh</span>
                     </label>
                     <label
-                      className={`cart-gender-pill ${
-                        gender === "chi" ? "active" : ""
-                      }`}
+                      className={`cart-gender-pill ${gender === "chi" ? "active" : ""
+                        }`}
                     >
                       <input
                         type="radio"
@@ -988,9 +994,8 @@ export default function CartPage() {
                   {/* Chọn hình thức nhận hàng */}
                   <div className="cart-delivery-cards">
                     <label
-                      className={`cart-method-card ${
-                        deliveryMethod === "delivery" ? "active" : ""
-                      }`}
+                      className={`cart-method-card ${deliveryMethod === "delivery" ? "active" : ""
+                        }`}
                     >
                       <input
                         type="radio"
@@ -1016,9 +1021,8 @@ export default function CartPage() {
                     </label>
 
                     <label
-                      className={`cart-method-card ${
-                        deliveryMethod === "pickup" ? "active" : ""
-                      }`}
+                      className={`cart-method-card ${deliveryMethod === "pickup" ? "active" : ""
+                        }`}
                     >
                       <input
                         type="radio"
@@ -1095,7 +1099,7 @@ export default function CartPage() {
                                       type="radio"
                                       name="selectedAddress"
                                       checked={isSelected}
-                                      onChange={() => {}}
+                                      onChange={() => { }}
                                     />
                                   </div>
                                   <div className="cart-saved-addr-body">
@@ -1179,8 +1183,8 @@ export default function CartPage() {
                                   {loadingDistricts
                                     ? "-- Đang tải quận/huyện... --"
                                     : !formData.provinceId
-                                    ? "-- Chọn Tỉnh/Thành trước --"
-                                    : "-- Chọn Quận / Huyện --"}
+                                      ? "-- Chọn Tỉnh/Thành trước --"
+                                      : "-- Chọn Quận / Huyện --"}
                                 </option>
                                 {districts.map((dist) => (
                                   <option key={dist.DistrictID} value={dist.DistrictID}>
@@ -1202,8 +1206,8 @@ export default function CartPage() {
                                   {loadingWards
                                     ? "-- Đang tải phường/xã... --"
                                     : !formData.districtId
-                                    ? "-- Chọn Quận/Huyện trước --"
-                                    : "-- Chọn Phường / Xã --"}
+                                      ? "-- Chọn Quận/Huyện trước --"
+                                      : "-- Chọn Phường / Xã --"}
                                 </option>
                                 {wards.map((ward) => (
                                   <option key={ward.WardCode} value={ward.WardCode}>
@@ -1307,9 +1311,8 @@ export default function CartPage() {
                   <div className="cart-payment-options">
                     {/* COD */}
                     <label
-                      className={`cart-pay-card ${
-                        paymentMethod === "cod" ? "active" : ""
-                      }`}
+                      className={`cart-pay-card ${paymentMethod === "cod" ? "active" : ""
+                        }`}
                     >
                       <input
                         type="radio"
@@ -1329,9 +1332,8 @@ export default function CartPage() {
 
                     {/* Chuyển khoản ngân hàng */}
                     <label
-                      className={`cart-pay-card ${
-                        paymentMethod === "banking" ? "active" : ""
-                      }`}
+                      className={`cart-pay-card ${paymentMethod === "banking" ? "active" : ""
+                        }`}
                     >
                       <input
                         type="radio"
@@ -1367,9 +1369,8 @@ export default function CartPage() {
 
                     {/* Hợp đồng dự án / Công nợ */}
                     <label
-                      className={`cart-pay-card ${
-                        paymentMethod === "contract" ? "active" : ""
-                      }`}
+                      className={`cart-pay-card ${paymentMethod === "contract" ? "active" : ""
+                        }`}
                     >
                       <input
                         type="radio"

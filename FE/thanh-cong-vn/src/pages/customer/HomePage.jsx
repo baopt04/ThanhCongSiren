@@ -6,7 +6,10 @@ import { ProductSection } from "../../components/common/customer/home/ProductSec
 import { ProjectsSection } from "../../components/common/customer/home/ProjectsSection";
 import { NewsSection } from "../../components/common/customer/home/NewsSection";
 import { FastQuoteBanner } from "../../components/common/customer/home/FastQuoteBanner";
-import { useHomeSectionsQuery } from "../../hooks/queries/customerQueries";
+import {
+  useHomeSectionsQuery,
+  useCategoryProductsBySlugQuery,
+} from "../../hooks/queries/customerQueries";
 import { Seo } from "../../components/common/Seo";
 import "./HomePage.css";
 
@@ -76,6 +79,33 @@ const FALLBACK_SIRENS = [
   },
 ];
 
+const FALLBACK_LARGE_SIRENS = [
+  {
+    name: "Còi báo động LK-JDW245 | Còi động cơ điện cỡ lớn",
+    price: "1.000 VND",
+    slug: "0cfe5169-6208-45c9-a9ad-792e8750b1fc",
+    image: "https://res.cloudinary.com/dvyplsqxd/image/upload/v1790787193/thanhcongvn-products/yehcjpgrbk6qptwpsj54.png",
+  },
+  {
+    name: "Còi báo động động cơ điện cỡ lớn LK-STH21-2",
+    price: "1.000 VND",
+    slug: "373ae81a-d522-4ebe-99de-5befc176200e",
+    image: "https://res.cloudinary.com/dvyplsqxd/image/upload/v1790783636/thanhcongvn-products/oxggjplkl2dt0660defy.png",
+  },
+  {
+    name: "Còi báo động cảnh báo cỡ lớn LK-JDW450",
+    price: "1.000 VND",
+    slug: "90daf6ed-fa5f-4a38-b056-b68a25ef80d0",
+    image: "https://res.cloudinary.com/dvyplsqxd/image/upload/v1790784594/thanhcongvn-products/sequktbobkawrc4zy0t7.png",
+  },
+  {
+    name: "Còi báo động động cơ điện cỡ lớn LK-JDL550",
+    price: "1.000 VND",
+    slug: "7fba3f1b-4941-414c-9aa8-cc492189aebb",
+    image: "https://res.cloudinary.com/dvyplsqxd/image/upload/v1790786194/thanhcongvn-products/wjcxe9qocnnm6fmamfxj.png",
+  },
+];
+
 const FALLBACK_BLOWERS = [
   {
     name: "Quạt thổi gió phòng cháy chữa cháy chạy pin BF50",
@@ -140,6 +170,8 @@ const FALLBACK_MATTRESS = [
 
 export function HomePage() {
   const { data: sections = [], isLoading: loading } = useHomeSectionsQuery();
+  const { data: largeSirenProducts = [], isLoading: loadingLargeSirens } =
+    useCategoryProductsBySlugQuery("coi-bao-dong-co-lon");
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
 
   // Match API sections if available
@@ -210,9 +242,16 @@ export function HomePage() {
             <button
               type="button"
               className="tc-home-cat-pill-btn"
-              onClick={() => scrollToSection("section-coi-hu-bao-dong")}
+              onClick={() => scrollToSection("section-coi-bao-dong-co-lon")}
             >
               Còi báo động
+            </button>
+            <button
+              type="button"
+              className="tc-home-cat-pill-btn"
+              onClick={() => scrollToSection("section-coi-bao-dong-quay-tay")}
+            >
+              Còi quay tay
             </button>
             <button
               type="button"
@@ -238,15 +277,26 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* 4. Section: Còi báo động (Lưới 2 cột x 2 hàng trên mobile) */}
+      {/* 4. Section: Còi báo động (Cỡ lớn - coi-bao-dong-co-lon) */}
       <ProductSection
         title="Còi báo động"
-        categorySlug="coi-hu-bao-dong"
+        categorySlug="coi-bao-dong-co-lon"
+        products={largeSirenProducts}
+        fallbackProducts={FALLBACK_LARGE_SIRENS}
+        showButton={true}
+        loading={loadingLargeSirens}
+        isScrollableOnMobile={false}
+      />
+
+      {/* 4b. Section: Còi báo động quay tay */}
+      <ProductSection
+        title="Còi báo động quay tay"
+        categorySlug="coi-bao-dong-quay-tay"
         products={sirenProducts}
         fallbackProducts={FALLBACK_SIRENS}
         showButton={true}
         loading={loading}
-        isScrollableOnMobile={false}
+        isScrollableOnMobile={true}
       />
 
       {/* 5. Section: Máy thổi khí (Cuộn ngang trên mobile) */}
@@ -270,9 +320,6 @@ export function HomePage() {
         loading={loading}
         isScrollableOnMobile={true}
       />
-
-      {/* 7. Section: Dự án đã thi công (Cuộn ngang matching mockup Ảnh 1) */}
-      <ProjectsSection />
 
       {/* 8. Section: Tin tức (Matching mockup Ảnh 2) */}
       <NewsSection />

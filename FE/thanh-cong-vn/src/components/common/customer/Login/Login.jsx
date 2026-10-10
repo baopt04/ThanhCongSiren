@@ -74,12 +74,11 @@ export default function Login() {
 
     return (
         <div>
-            <div className="breadcrumb">
-                <div className="breadcrumb-inner">
-                    <Link to="/" style={{ color: "inherit", textDecoration: "none" }}>
-                        Trang chủ
-                    </Link>{" "}
-                    › Đăng nhập
+            <div className="register-breadcrumb">
+                <div className="register-breadcrumb-inner">
+                    <Link to="/">Trang chủ</Link>
+                    <span>›</span>
+                    <span>Đăng nhập</span>
                 </div>
             </div>
 

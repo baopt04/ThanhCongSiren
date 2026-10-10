@@ -14,7 +14,17 @@ export function getCart() {
     const raw = localStorage.getItem(CART_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    // Tự động chuẩn hóa dữ liệu giỏ hàng: nếu sku trước đây bị gán nhầm thành slug thì xóa slug khỏi sku
+    return parsed.map((item) => {
+      if (item.sku && item.slug && item.sku === item.slug) {
+        return {
+          ...item,
+          sku: item.code || item.productCode || "",
+        };
+      }
+      return item;
+    });
   } catch (error) {
     console.error("Lỗi khi đọc giỏ hàng từ localStorage:", error);
     return [];
@@ -69,6 +79,9 @@ export function addToCart(product, quantity = 1) {
       : 0;
 
   const validQty = Math.max(1, parseInt(quantity, 10) || 1);
+  const rawSku = product.sku || product.productCode || product.code || "";
+  const resolvedSku =
+    rawSku && rawSku !== product.slug && rawSku !== product.id ? rawSku : "";
 
   let updatedCart;
   if (existingIndex > -1) {
@@ -80,6 +93,7 @@ export function addToCart(product, quantity = 1) {
             quantity: item.quantity + validQty,
             price: numericPrice || item.price,
             image: imageUrl || item.image,
+            sku: resolvedSku || (item.sku !== item.slug ? item.sku : ""),
           }
         : item
     );
@@ -88,7 +102,7 @@ export function addToCart(product, quantity = 1) {
     const newItem = {
       id: product.id,
       name: product.name || "Sản phẩm",
-      sku: product.slug || product.code || "",
+      sku: resolvedSku,
       brand: product.brandName || "Lion King",
       warranty: "24 tháng",
       price: numericPrice,

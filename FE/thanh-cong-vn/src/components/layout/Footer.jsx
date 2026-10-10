@@ -44,7 +44,7 @@ export function Footer() {
             </div>
             <div className="tc-footer-contact-item">
               <EnvironmentOutlined className="tc-foot-icon" />
-              <span>Địa chỉ: TP. Hà Nội, Việt Nam</span>
+              <span>Địa chỉ:Số 9, ngõ 68 Phú Diễn, Q. Bắc Từ Liêm, TP. Hà Nội, Việt Nam</span>
             </div>
           </div>
         </div>

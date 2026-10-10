@@ -94,6 +94,12 @@ export default function ProductDetail() {
     [product?.longDescription]
   );
 
+  // Chuẩn hóa mã SKU sản phẩm (tuyệt đối không lấy nhầm slug)
+  const productSku = useMemo(() => {
+    const raw = product?.sku || product?.productCode || product?.code || "";
+    return raw && raw !== product?.slug && raw !== String(product?.id) ? raw : "";
+  }, [product?.sku, product?.productCode, product?.code, product?.slug, product?.id]);
+
   // Format price
   const formatPrice = (price) => {
     if (!price || price === 0) return "Liên hệ báo giá";
@@ -132,7 +138,7 @@ export default function ProductDetail() {
         });
         window.dispatchEvent(new Event("tc_cart_updated"));
       } else {
-        addToCart(product, quantity);
+        addToCart({ ...product, sku: productSku }, quantity);
       }
       message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng thành công!`);
     } catch (err) {
@@ -158,7 +164,7 @@ export default function ProductDetail() {
         });
         window.dispatchEvent(new Event("tc_cart_updated"));
       } else {
-        addToCart(product, quantity);
+        addToCart({ ...product, sku: productSku }, quantity);
       }
       navigate("/gio-hang");
     } catch (err) {
@@ -294,10 +300,10 @@ export default function ProductDetail() {
             </h1>
 
             <div className="pd-meta-bar">
-              {(product.sku || product.productCode || product.code) && (
+              {productSku && (
                 <>
                   <span className="pd-meta-item">
-                    Mã SP: <strong>{product.sku || product.productCode || product.code}</strong>
+                    Mã SP: <strong>{productSku}</strong>
                   </span>
                   <span className="pd-meta-divider">•</span>
                 </>

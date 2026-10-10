@@ -108,13 +108,13 @@ export const HeaderTopBar = memo(function HeaderTopBar({ customerUser, onLogout 
       { type: "divider" },
       ...(customerUser.role === "ADMIN"
         ? [
-            {
-              key: "admin-panel",
-              icon: <SafetyCertificateOutlined />,
-              label: <Link to="/admin">Trang quản trị Admin</Link>,
-            },
-            { type: "divider" },
-          ]
+          {
+            key: "admin-panel",
+            icon: <SafetyCertificateOutlined />,
+            label: <Link to="/admin">Trang quản trị Admin</Link>,
+          },
+          { type: "divider" },
+        ]
         : []),
       {
         key: "logout",

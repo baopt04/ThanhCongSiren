@@ -70,7 +70,9 @@ export default function CartItem({ item, onUpdateQty, onRemove }) {
         >
           {item.name}
         </Link>
-        {item.sku && <span className="cart-item-sku">Mã SP: {item.sku}</span>}
+        {item.sku && item.sku !== item.slug && item.sku !== item.productId && (
+          <span className="cart-item-sku">Mã SP: {item.sku}</span>
+        )}
         <div className="cart-item-spec">
           {item.brand && <span className="cart-spec-pill">{item.brand}</span>}
           {item.warranty && (

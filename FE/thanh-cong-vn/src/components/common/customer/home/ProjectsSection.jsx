@@ -59,15 +59,7 @@ export const ProjectsSection = memo(function ProjectsSection() {
     <section className="tc-home-projects-section" id="section-du-an">
       <div className="tc-projects-container">
         {/* Header matching mockup */}
-        <div className="tc-section-header-modern">
-          <div className="tc-section-title-wrap">
-            <span className="tc-title-indicator" />
-            <h2 className="tc-section-title-text">Dự án đã thi công</h2>
-          </div>
-          <Link to="/tin-tuc" className="tc-section-more-link">
-            Xem tất cả
-          </Link>
-        </div>
+
 
         {/* Horizontal scroll list */}
         <div className="tc-projects-scroll-wrapper" onScroll={handleScroll}>
@@ -90,9 +82,7 @@ export const ProjectsSection = memo(function ProjectsSection() {
                   width={360}
                   height={240}
                 />
-                <div className="tc-project-overlay-label">
-                  <span>Ảnh công trình</span>
-                </div>
+
               </div>
             </Link>
           ))}
