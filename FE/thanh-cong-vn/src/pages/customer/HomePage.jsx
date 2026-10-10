@@ -10,6 +10,7 @@ import {
   useHomeSectionsQuery,
   useCategoryProductsBySlugQuery,
 } from "../../hooks/queries/customerQueries";
+import { usePrefetchNextPages } from "../../hooks/usePrefetchNextPages";
 import { Seo } from "../../components/common/Seo";
 import "./HomePage.css";
 
@@ -169,6 +170,7 @@ const FALLBACK_MATTRESS = [
 ];
 
 export function HomePage() {
+  usePrefetchNextPages();
   const { data: sections = [], isLoading: loading } = useHomeSectionsQuery();
   const { data: largeSirenProducts = [], isLoading: loadingLargeSirens } =
     useCategoryProductsBySlugQuery("coi-bao-dong-co-lon");

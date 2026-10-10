@@ -9,10 +9,11 @@ import {
 
 function handleHoverLink(path) {
   try {
+    if (typeof navigator !== "undefined" && navigator.connection?.saveData === true) return;
     if (path === "/san-pham" || path?.startsWith("/san-pham")) {
       preloadRouteChunks.siren?.();
       prefetchCustomerProductsPage(0, 12);
-    } else if (path === "/tin-tuc") {
+    } else if (path === "/tin-tuc" || path?.startsWith("/tin-tuc")) {
       preloadRouteChunks.news?.();
       prefetchCustomerPosts();
     }
@@ -58,6 +59,8 @@ export const HeaderNav = memo(function HeaderNav({
                 <Link
                   to={item.path}
                   onMouseEnter={() => handleHoverLink(item.path)}
+                  onTouchStart={() => handleHoverLink(item.path)}
+                  onFocus={() => handleHoverLink(item.path)}
                 >
                   {item.label}
                   {isProductItem && <DownOutlined className="tc-nav-dropdown-arrow" />}
@@ -96,6 +99,8 @@ export const HeaderNav = memo(function HeaderNav({
                               to={cat.path}
                               onClick={() => setShowProductDropdown(false)}
                               onMouseEnter={() => handleHoverLink(cat.path)}
+                              onTouchStart={() => handleHoverLink(cat.path)}
+                              onFocus={() => handleHoverLink(cat.path)}
                             >
                               <span>{cat.label}</span>
                               {cat.children && cat.children.length > 0 && (
@@ -118,6 +123,8 @@ export const HeaderNav = memo(function HeaderNav({
                                       className={`tc-sub-item ${isSubActive ? "active" : ""}`}
                                       onClick={() => setShowProductDropdown(false)}
                                       onMouseEnter={() => handleHoverLink(sub.path)}
+                                      onTouchStart={() => handleHoverLink(sub.path)}
+                                      onFocus={() => handleHoverLink(sub.path)}
                                     >
                                       {sub.label}
                                     </Link>

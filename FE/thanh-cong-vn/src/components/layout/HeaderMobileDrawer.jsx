@@ -6,6 +6,26 @@ import {
   MinusOutlined,
   SafetyCertificateOutlined,
 } from "@ant-design/icons";
+import { preloadRouteChunks } from "../../utils/preloadChunks";
+import {
+  prefetchCustomerProductsPage,
+  prefetchCustomerPosts,
+} from "../../hooks/queries/customerQueries";
+
+function handlePrefetchLink(path) {
+  try {
+    if (typeof navigator !== "undefined" && navigator.connection?.saveData === true) return;
+    if (path === "/san-pham" || path?.startsWith("/san-pham")) {
+      preloadRouteChunks.siren?.();
+      prefetchCustomerProductsPage(0, 12);
+    } else if (path === "/tin-tuc" || path?.startsWith("/tin-tuc")) {
+      preloadRouteChunks.news?.();
+      prefetchCustomerPosts();
+    }
+  } catch {
+    // Ignore prefetch error
+  }
+}
 
 export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
   isOpen,
@@ -81,7 +101,13 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
                     className={`tc-mobile-nav-group ${isActive ? "active" : ""}`}
                   >
                     <div className="tc-mobile-nav-row">
-                      <Link to={item.path} onClick={handleClose}>
+                      <Link
+                        to={item.path}
+                        onClick={handleClose}
+                        onTouchStart={() => handlePrefetchLink(item.path)}
+                        onFocus={() => handlePrefetchLink(item.path)}
+                        onMouseEnter={() => handlePrefetchLink(item.path)}
+                      >
                         {item.label}
                       </Link>
                       <button
@@ -128,7 +154,13 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
                           return (
                             <li key={cat.slug || cat.label}>
                               <div className={`tc-mobile-cat-row ${isCatActive ? "active" : ""}`}>
-                                <Link to={cat.path} onClick={handleClose}>
+                                <Link
+                                  to={cat.path}
+                                  onClick={handleClose}
+                                  onTouchStart={() => handlePrefetchLink(cat.path)}
+                                  onFocus={() => handlePrefetchLink(cat.path)}
+                                  onMouseEnter={() => handlePrefetchLink(cat.path)}
+                                >
                                   {cat.label}
                                 </Link>
                                 {hasChildren && (
@@ -166,6 +198,9 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
                                           to={sub.path}
                                           className={isSubActive ? "active" : ""}
                                           onClick={handleClose}
+                                          onTouchStart={() => handlePrefetchLink(sub.path)}
+                                          onFocus={() => handlePrefetchLink(sub.path)}
+                                          onMouseEnter={() => handlePrefetchLink(sub.path)}
                                         >
                                           {sub.label}
                                         </Link>
@@ -185,7 +220,13 @@ export const HeaderMobileDrawer = memo(function HeaderMobileDrawer({
 
               return (
                 <li key={item.label} className={isActive ? "active" : ""}>
-                  <Link to={item.path} onClick={handleClose}>
+                  <Link
+                    to={item.path}
+                    onClick={handleClose}
+                    onTouchStart={() => handlePrefetchLink(item.path)}
+                    onFocus={() => handlePrefetchLink(item.path)}
+                    onMouseEnter={() => handlePrefetchLink(item.path)}
+                  >
                     {item.label}
                   </Link>
                 </li>

@@ -93,7 +93,7 @@ export function useCustomerProductsQuery(page = 0, size = 12, options = {}) {
       const res = await getAllProductsForCustomer({ page, size });
       return res;
     },
-    staleTime: 3 * 60 * 1000, // 3 phút
+    staleTime: 5 * 60 * 1000, // 5 phút (override riêng cho danh sách sản phẩm)
     gcTime: 20 * 60 * 1000,
     placeholderData: keepPreviousData, // Giữ trang cũ hiển thị mượt mà khi đổi trang
     ...options,
@@ -108,7 +108,7 @@ export function prefetchCustomerProductsPage(page, size = 12) {
       const res = await getAllProductsForCustomer({ page, size });
       return res;
     },
-    staleTime: 3 * 60 * 1000,
+    staleTime: 5 * 60 * 1000, // 5 phút (khớp với useCustomerProductsQuery)
   });
 }
 
