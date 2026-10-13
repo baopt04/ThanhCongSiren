@@ -6,37 +6,19 @@ import { MainLayout } from "../layouts/customer/MainLayout";
 import { RouteSkeleton } from "../components/common/RouteSkeleton";
 import { PrivateRoute } from "../components/common/PrivateRoute";
 import { HomePage } from "../pages/customer/HomePage";
-const SirenPage = lazy(() =>
-  import("../pages/customer/SirenPage").then((m) => ({ default: m.SirenPage }))
-);
-const FireAlarmPage = lazy(() =>
-  import("../pages/customer/FireAlarmPage").then((m) => ({ default: m.FireAlarmPage }))
-);
-const AirBlowerPage = lazy(() =>
-  import("../pages/customer/AirBlowerPage").then((m) => ({ default: m.AirBlowerPage }))
-);
-const AirMattressPage = lazy(() =>
-  import("../pages/customer/AirMattressPage").then((m) => ({ default: m.AirMattressPage }))
-);
-const ProductDetail = lazy(() =>
-  import("../components/common/customer/ProductDetail/ProductDetail")
-);
-const CartPage = lazy(() => import("../pages/customer/CartPage"));
-const NewsPage = lazy(() =>
-  import("../pages/customer/NewsPage").then((m) => ({ default: m.NewsPage }))
-);
-const NewsDetailPage = lazy(() =>
-  import("../pages/customer/NewsDetailPage").then((m) => ({ default: m.NewsDetailPage }))
-);
-const ContactPage = lazy(() =>
-  import("../pages/customer/ContactPage").then((m) => ({ default: m.ContactPage }))
-);
-const AboutPage = lazy(() =>
-  import("../pages/customer/AboutPage").then((m) => ({ default: m.AboutPage }))
-);
-const Login = lazy(() => import("../components/common/customer/Login/Login"));
-const RegisterPage = lazy(() => import("../pages/customer/RegisterPage"));
-const AccountPage = lazy(() => import("../pages/customer/AccountPage"));
+import { SirenPage } from "../pages/customer/SirenPage";
+import { FireAlarmPage } from "../pages/customer/FireAlarmPage";
+import { AirBlowerPage } from "../pages/customer/AirBlowerPage";
+import { AirMattressPage } from "../pages/customer/AirMattressPage";
+import ProductDetail from "../components/common/customer/ProductDetail/ProductDetail";
+import CartPage from "../pages/customer/CartPage";
+import { NewsPage } from "../pages/customer/NewsPage";
+import { NewsDetailPage } from "../pages/customer/NewsDetailPage";
+import { ContactPage } from "../pages/customer/ContactPage";
+import { AboutPage } from "../pages/customer/AboutPage";
+import Login from "../components/common/customer/Login/Login";
+import RegisterPage from "../pages/customer/RegisterPage";
+import AccountPage from "../pages/customer/AccountPage";
 
 const AdminLayout = lazy(() =>
   import("../layouts/admin/AdminLayout").then((m) => ({ default: m.AdminLayout }))
@@ -176,9 +158,9 @@ function ProductRouteHandler() {
   return <ProductDetail />;
 }
 
-function LazyPage({ children, layout = "customer" }) {
+function LazyPage({ children }) {
   return (
-    <Suspense fallback={<RouteSkeleton layout={layout} duration={60} />}>
+    <Suspense fallback={null}>
       {children}
     </Suspense>
   );
@@ -191,22 +173,22 @@ export function AppRouter() {
       <Routes>
         <Route element={<MainLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/gioi-thieu" element={<LazyPage><AboutPage /></LazyPage>} />
-          <Route path="/cong-ty-tnhh-thanh-cong-viet-nam" element={<LazyPage><AboutPage /></LazyPage>} />
-          <Route path="/san-pham" element={<LazyPage><SirenPage /></LazyPage>} />
-          <Route path="/san-pham/:param" element={<LazyPage><ProductRouteHandler /></LazyPage>} />
-          <Route path="/san-pham/chi-tiet/:id" element={<LazyPage><ProductDetail /></LazyPage>} />
-          <Route path="/thiet-bi-bao-chay" element={<LazyPage><FireAlarmPage /></LazyPage>} />
-          <Route path="/may-thoi-khi" element={<LazyPage><AirBlowerPage /></LazyPage>} />
-          <Route path="/dem-hoi-cuu-ho-cuu-nan" element={<LazyPage><AirMattressPage /></LazyPage>} />
-          <Route path="/gio-hang" element={<LazyPage><CartPage /></LazyPage>} />
-          <Route path="/tin-tuc" element={<LazyPage><NewsPage /></LazyPage>} />
-          <Route path="/tin-tuc/:slug" element={<LazyPage><NewsDetailPage /></LazyPage>} />
-          <Route path="/lien-he" element={<LazyPage><ContactPage /></LazyPage>} />
-          <Route path="/dang-nhap" element={<LazyPage><Login /></LazyPage>} />
-          <Route path="/dang-ky" element={<LazyPage><RegisterPage /></LazyPage>} />
-          <Route path="/tai-khoan" element={<LazyPage><AccountPage /></LazyPage>} />
-          <Route path="/tai-khoan/:tab" element={<LazyPage><AccountPage /></LazyPage>} />
+          <Route path="/gioi-thieu" element={<AboutPage />} />
+          <Route path="/cong-ty-tnhh-thanh-cong-viet-nam" element={<AboutPage />} />
+          <Route path="/san-pham" element={<SirenPage />} />
+          <Route path="/san-pham/:param" element={<ProductRouteHandler />} />
+          <Route path="/san-pham/chi-tiet/:id" element={<ProductDetail />} />
+          <Route path="/thiet-bi-bao-chay" element={<FireAlarmPage />} />
+          <Route path="/may-thoi-khi" element={<AirBlowerPage />} />
+          <Route path="/dem-hoi-cuu-ho-cuu-nan" element={<AirMattressPage />} />
+          <Route path="/gio-hang" element={<CartPage />} />
+          <Route path="/tin-tuc" element={<NewsPage />} />
+          <Route path="/tin-tuc/:slug" element={<NewsDetailPage />} />
+          <Route path="/lien-he" element={<ContactPage />} />
+          <Route path="/dang-nhap" element={<Login />} />
+          <Route path="/dang-ky" element={<RegisterPage />} />
+          <Route path="/tai-khoan" element={<AccountPage />} />
+          <Route path="/tai-khoan/:tab" element={<AccountPage />} />
         </Route>
 
         <Route

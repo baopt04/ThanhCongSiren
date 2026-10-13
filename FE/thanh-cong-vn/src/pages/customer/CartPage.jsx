@@ -797,14 +797,6 @@ export default function CartPage() {
               padding: "48px 24px",
             }}
           >
-            <Spin
-              indicator={
-                <LoadingOutlined
-                  style={{ fontSize: 40, color: "#d90429" }}
-                  spin
-                />
-              }
-            />
             <h3
               style={{
                 marginTop: 20,

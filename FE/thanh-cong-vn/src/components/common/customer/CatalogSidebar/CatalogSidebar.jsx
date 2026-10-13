@@ -177,7 +177,7 @@ export function CatalogSidebar({
 
         {loading ? (
           <div className="tc-sidebar-loading">
-            <LoadingOutlined spin /> Đang tải danh mục...
+            Đang tải danh mục...
           </div>
         ) : (
           <ul className="tc-sidebar-cat-list">

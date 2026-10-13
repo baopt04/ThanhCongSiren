@@ -210,12 +210,7 @@ export function NewsDetailPage() {
   };
 
   if (loading) {
-    return (
-      <div className="news-detail-page news-detail-loading-state">
-        <LoadingOutlined spin style={{ fontSize: 38, color: "#b91c1c" }} />
-        <p className="news-loading-text">Đang tải nội dung bài viết...</p>
-      </div>
-    );
+    return null;
   }
 
   if (notFound || !article) {

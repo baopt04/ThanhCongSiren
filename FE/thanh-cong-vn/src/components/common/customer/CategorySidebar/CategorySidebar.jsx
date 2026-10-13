@@ -143,7 +143,6 @@ function CategoryTreeItem({
             <div className="tc-cat-flyout-body">
               {isLoading ? (
                 <div className="tc-cat-flyout-loading">
-                  <LoadingOutlined spin />
                   <span>Đang tải sản phẩm...</span>
                 </div>
               ) : productsList && productsList.length > 0 ? (
@@ -292,7 +291,7 @@ export function CategorySidebar() {
 
         {loading ? (
           <div className="tc-cat-loading">
-            <LoadingOutlined spin /> Đang tải danh mục...
+            Đang tải danh mục...
           </div>
         ) : useFallback ? (
           /* Fallback: hiển thị danh mục tĩnh */

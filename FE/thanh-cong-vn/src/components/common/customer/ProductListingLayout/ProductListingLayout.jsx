@@ -318,15 +318,8 @@ export function ProductListingLayout({
               </div>
             )}
 
-            {/* Product Grid (3-4 products per row) */}
-            {loading || isLoadingCategory ? (
-              <div className="tc-listing-loading-box">
-                <LoadingOutlined spin style={{ fontSize: 36, color: "#b91c1c" }} />
-                <p style={{ marginTop: 14, color: "#64748b", fontWeight: 500, fontSize: 14 }}>
-                  Đang tải sản phẩm...
-                </p>
-              </div>
-            ) : paginatedProducts.length > 0 ? (
+            {/* Product Grid (3-4 products per row) - Không hiển thị xoay tròn */}
+            {paginatedProducts.length > 0 ? (
               <div className="tc-listing-product-grid">
                 {paginatedProducts.map((product) => (
                   <ProductCard
@@ -336,7 +329,7 @@ export function ProductListingLayout({
                   />
                 ))}
               </div>
-            ) : (
+            ) : (loading || isLoadingCategory) ? null : (
               <div className="tc-listing-empty-state">
                 <p className="tc-empty-message">Không có sản phẩm nào thuộc danh mục này.</p>
                 <button

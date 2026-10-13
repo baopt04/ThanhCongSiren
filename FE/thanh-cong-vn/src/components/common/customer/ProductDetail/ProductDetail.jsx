@@ -179,9 +179,9 @@ export default function ProductDetail() {
     }
   };
 
-  // === Loading State: Hiệu ứng làm mờ skeleton delay đợi server load ===
-  if (loading) {
-    return <CustomerDetailSkeleton />;
+  // === Loading State: Tạm thời bỏ hiệu ứng làm mờ skeleton khi chuyển trang để kiểm tra tốc độ thực tế ===
+  if (loading && !product) {
+    return null;
   }
 
   // === Error State ===

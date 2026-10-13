@@ -284,12 +284,7 @@ export default function News() {
         <div className="tc-news-main-grid">
           {/* CỘT TRÁI: DANH SÁCH BÀI VIẾT DẠNG THẺ NGANG */}
           <main className="tc-news-feed-col">
-            {loading ? (
-              <div className="tc-news-loading-card">
-                <LoadingOutlined spin style={{ fontSize: 40, color: "#d90429" }} />
-                <p>Đang tải danh sách bài viết...</p>
-              </div>
-            ) : paginatedArticles.length > 0 ? (
+            {paginatedArticles.length > 0 ? (
               <div className="tc-news-feed-list">
                 {paginatedArticles.map((article, idx) => {
                   const articleSlug = article.slug || article.id;

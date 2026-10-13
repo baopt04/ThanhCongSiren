@@ -389,3 +389,13 @@ html {
   white-space: nowrap;
   border: 0;
 }
+
+/* Tạm thời tắt biểu tượng xoay tròn loading spinner khi chuyển tab/trang */
+.anticon-spin,
+.ant-spin,
+.ant-spin-dot,
+.tc-listing-loading-box .anticon,
+.tc-news-loading-card .anticon {
+  display: none !important;
+  animation: none !important;
+}
