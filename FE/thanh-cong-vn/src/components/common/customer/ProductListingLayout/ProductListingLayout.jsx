@@ -9,6 +9,7 @@ import { getCachedCustomerCategories, findCategoryInTree } from "../../../../uti
 import { queryClient } from "../../../../config/queryClient";
 import { categoryProductsQueryKey } from "../../../../hooks/queries/customerQueries";
 import { useScrollRestoration } from "../../../../hooks/useScrollRestoration";
+import { startFaviconSpinner } from "../../../../utils/faviconSpinner";
 import "./ProductListingLayout.css";
 
 export function ProductListingLayout({
@@ -72,6 +73,7 @@ export function ProductListingLayout({
 
   // Xử lý khi người dùng chọn vào danh mục ở sidebar bên trái
   const handleSelectCategory = async (catIdOrSlug, catObj, shouldNavigate = true) => {
+    startFaviconSpinner(350);
     // 1. Kiểm tra nếu chọn "Tất cả sản phẩm"
     const isAll = !catIdOrSlug || catIdOrSlug === "all" || catObj?.id === "all";
     if (isAll) {
@@ -210,6 +212,7 @@ export function ProductListingLayout({
     : filteredProducts.slice(startIndex, startIndex + pageSize);
 
   const handlePageChangeInternal = (newPage) => {
+    startFaviconSpinner(350);
     if (isServerPaginated && onPageChange) {
       onPageChange(newPage);
     } else {

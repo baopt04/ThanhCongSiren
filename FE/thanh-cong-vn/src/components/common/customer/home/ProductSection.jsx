@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import "./ProductSection.css";
 import { PLACEHOLDER_IMAGE } from "../../../../utils/placeholder";
 import { optimizeCloudinary, cloudinarySrcSet } from "../../../../utils/cloudinary";
+import { toSlug } from "../../../../utils/slugUtils";
+import { startFaviconSpinner } from "../../../../utils/faviconSpinner";
 
 const getCardImage = (product) => {
   let img = null;
@@ -79,11 +81,8 @@ export const ProductSection = memo(function ProductSection({
           onScroll={isScrollableOnMobile ? handleScroll : undefined}
         >
           {displayItems.map((item, idx) => {
-            const productLink = item.id
-              ? `/san-pham/${item.id}`
-              : item.slug
-              ? `/san-pham/${item.slug}`
-              : viewAllPath;
+            const targetSlug = item.slug || (item.name ? toSlug(item.name) : item.id);
+            const productLink = targetSlug ? `/san-pham/${targetSlug}` : viewAllPath;
 
             const imgSrc = getCardImage(item);
             const isPlaceholder = imgSrc === PLACEHOLDER_IMAGE || !imgSrc;
@@ -94,7 +93,11 @@ export const ProductSection = memo(function ProductSection({
                 key={item.id || item.code || item.slug || idx}
                 className="tc-mock-product-card"
               >
-                <Link to={productLink} className="tc-mock-card-img-wrap">
+                <Link
+                  to={productLink}
+                  className="tc-mock-card-img-wrap"
+                  onClick={() => startFaviconSpinner(350)}
+                >
                   {!isPlaceholder ? (
                     <img
                       src={imgSrc}
@@ -117,13 +120,19 @@ export const ProductSection = memo(function ProductSection({
 
                 <div className="tc-mock-card-body">
                   <h3 className="tc-mock-card-name" title={item.name}>
-                    <Link to={productLink}>{item.name || "Tên sản phẩm"}</Link>
+                    <Link to={productLink} onClick={() => startFaviconSpinner(350)}>
+                      {item.name || "Tên sản phẩm"}
+                    </Link>
                   </h3>
                   <div className="tc-mock-card-price">
                     {formatCardPrice(item.price)}
                   </div>
                   {showButton && (
-                    <Link to={productLink} className="tc-mock-card-btn">
+                    <Link
+                      to={productLink}
+                      className="tc-mock-card-btn"
+                      onClick={() => startFaviconSpinner(350)}
+                    >
                       Xem chi tiết
                     </Link>
                   )}

@@ -11,6 +11,8 @@ import {
 import { prefetchProductDetail } from "../../../../hooks/queries/customerQueries";
 import { preloadRouteChunks } from "../../../../utils/preloadChunks";
 import { optimizeCloudinary, cloudinarySrcSet } from "../../../../utils/cloudinary";
+import { toSlug } from "../../../../utils/slugUtils";
+import { startFaviconSpinner } from "../../../../utils/faviconSpinner";
 import defaultProductImg from "../../../../assets/images/projects/sapa-thuy-dien-360.webp";
 
 export const ProductCard = memo(function ProductCard({
@@ -29,7 +31,8 @@ export const ProductCard = memo(function ProductCard({
   defaultImg = defaultProductImg,
   variant = "catalog",
 }) {
-  const productLink = id ? `/san-pham/${id}` : (slug ? `/san-pham/${slug}` : "#");
+  const targetSlug = slug || (name ? toSlug(name) : id);
+  const productLink = targetSlug ? `/san-pham/${targetSlug}` : "#";
 
   const handlePrefetch = () => {
     try {
@@ -37,9 +40,8 @@ export const ProductCard = memo(function ProductCard({
     } catch {
       // Ignore prefetch error
     }
-    const target = id || slug;
-    if (target) {
-      prefetchProductDetail(target);
+    if (targetSlug) {
+      prefetchProductDetail(targetSlug);
     }
   };
 
@@ -114,7 +116,11 @@ export const ProductCard = memo(function ProductCard({
 
         {/* Product Image + Hover Action Icons */}
         <div className="tc-catalog-thumb-box">
-          <Link to={productLink} className="tc-catalog-thumb-link">
+          <Link
+            to={productLink}
+            className="tc-catalog-thumb-link"
+            onClick={() => startFaviconSpinner(350)}
+          >
             <img
               src={primaryOptimized}
               srcSet={primarySrcSet}
@@ -153,6 +159,7 @@ export const ProductCard = memo(function ProductCard({
               to={productLink}
               className="tc-catalog-action-btn"
               title="Thêm báo giá / giỏ hàng"
+              onClick={() => startFaviconSpinner(350)}
             >
               <ShoppingOutlined />
             </Link>
@@ -160,6 +167,7 @@ export const ProductCard = memo(function ProductCard({
               to={productLink}
               className="tc-catalog-action-btn"
               title="Xem nhanh chi tiết"
+              onClick={() => startFaviconSpinner(350)}
             >
               <EyeOutlined />
             </Link>
@@ -169,7 +177,7 @@ export const ProductCard = memo(function ProductCard({
         {/* Content Box */}
         <div className="tc-catalog-content">
           <h3 className="tc-catalog-name">
-            <Link to={productLink} title={name}>
+            <Link to={productLink} title={name} onClick={() => startFaviconSpinner(350)}>
               {name}
             </Link>
           </h3>
@@ -213,7 +221,11 @@ export const ProductCard = memo(function ProductCard({
       </div>
 
       {/* Image Container */}
-      <Link to={productLink} className="tc-product-thumb-wrapper">
+      <Link
+        to={productLink}
+        className="tc-product-thumb-wrapper"
+        onClick={() => startFaviconSpinner(350)}
+      >
         <img
           src={primaryOptimized}
           srcSet={primarySrcSet}
@@ -260,7 +272,7 @@ export const ProductCard = memo(function ProductCard({
         )}
 
         <h3 className="tc-product-name">
-          <Link to={productLink} title={name}>
+          <Link to={productLink} title={name} onClick={() => startFaviconSpinner(350)}>
             {name}
           </Link>
         </h3>
