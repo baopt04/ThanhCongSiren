@@ -96,7 +96,7 @@ export const ProductSection = memo(function ProductSection({
                 <Link
                   to={productLink}
                   className="tc-mock-card-img-wrap"
-                  onClick={() => startFaviconSpinner(350)}
+                  onClick={() => startFaviconSpinner()}
                 >
                   {!isPlaceholder ? (
                     <img
@@ -120,7 +120,7 @@ export const ProductSection = memo(function ProductSection({
 
                 <div className="tc-mock-card-body">
                   <h3 className="tc-mock-card-name" title={item.name}>
-                    <Link to={productLink} onClick={() => startFaviconSpinner(350)}>
+                    <Link to={productLink} onClick={() => startFaviconSpinner()}>
                       {item.name || "Tên sản phẩm"}
                     </Link>
                   </h3>
@@ -131,7 +131,7 @@ export const ProductSection = memo(function ProductSection({
                     <Link
                       to={productLink}
                       className="tc-mock-card-btn"
-                      onClick={() => startFaviconSpinner(350)}
+                      onClick={() => startFaviconSpinner()}
                     >
                       Xem chi tiết
                     </Link>

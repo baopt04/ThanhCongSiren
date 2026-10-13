@@ -19,11 +19,11 @@ export function ScrollToTop() {
   }, []);
 
   useEffect(() => {
-    // Kích hoạt logo xoay tròn trên tab trình duyệt (delay ngắn 350ms)
+    // Kích hoạt logo xoay tròn trên tab trình duyệt
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
     } else {
-      startFaviconSpinner(350);
+      startFaviconSpinner();
     }
 
     // Chỉ cuộn lên đầu nếu là thao tác điều hướng trang mới (PUSH)

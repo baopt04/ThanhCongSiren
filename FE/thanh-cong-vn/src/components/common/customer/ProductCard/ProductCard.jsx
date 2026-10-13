@@ -119,7 +119,7 @@ export const ProductCard = memo(function ProductCard({
           <Link
             to={productLink}
             className="tc-catalog-thumb-link"
-            onClick={() => startFaviconSpinner(350)}
+            onClick={() => startFaviconSpinner()}
           >
             <img
               src={primaryOptimized}
@@ -159,7 +159,7 @@ export const ProductCard = memo(function ProductCard({
               to={productLink}
               className="tc-catalog-action-btn"
               title="Thêm báo giá / giỏ hàng"
-              onClick={() => startFaviconSpinner(350)}
+              onClick={() => startFaviconSpinner()}
             >
               <ShoppingOutlined />
             </Link>
@@ -167,7 +167,7 @@ export const ProductCard = memo(function ProductCard({
               to={productLink}
               className="tc-catalog-action-btn"
               title="Xem nhanh chi tiết"
-              onClick={() => startFaviconSpinner(350)}
+              onClick={() => startFaviconSpinner()}
             >
               <EyeOutlined />
             </Link>
@@ -177,7 +177,7 @@ export const ProductCard = memo(function ProductCard({
         {/* Content Box */}
         <div className="tc-catalog-content">
           <h3 className="tc-catalog-name">
-            <Link to={productLink} title={name} onClick={() => startFaviconSpinner(350)}>
+            <Link to={productLink} title={name} onClick={() => startFaviconSpinner()}>
               {name}
             </Link>
           </h3>
@@ -224,7 +224,7 @@ export const ProductCard = memo(function ProductCard({
       <Link
         to={productLink}
         className="tc-product-thumb-wrapper"
-        onClick={() => startFaviconSpinner(350)}
+        onClick={() => startFaviconSpinner()}
       >
         <img
           src={primaryOptimized}
@@ -272,7 +272,7 @@ export const ProductCard = memo(function ProductCard({
         )}
 
         <h3 className="tc-product-name">
-          <Link to={productLink} title={name} onClick={() => startFaviconSpinner(350)}>
+          <Link to={productLink} title={name} onClick={() => startFaviconSpinner()}>
             {name}
           </Link>
         </h3>

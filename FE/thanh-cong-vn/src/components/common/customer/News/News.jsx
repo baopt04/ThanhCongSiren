@@ -145,7 +145,7 @@ export default function News() {
 
   // Xử lý chuyển trang & lưu vào URL + SessionStorage
   const handlePageChange = (page) => {
-    startFaviconSpinner(350);
+    startFaviconSpinner();
     setCurrentPage(page);
     sessionStorage.setItem("tc_news_page", String(page));
     setSearchParams(
@@ -165,7 +165,7 @@ export default function News() {
 
   // Xử lý đổi chuyên mục
   const handleCategoryChange = (catName) => {
-    startFaviconSpinner(350);
+    startFaviconSpinner();
     setSelectedCategory(catName);
     setCurrentPage(1);
     sessionStorage.setItem("tc_news_category", catName);

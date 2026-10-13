@@ -73,7 +73,7 @@ export function ProductListingLayout({
 
   // Xử lý khi người dùng chọn vào danh mục ở sidebar bên trái
   const handleSelectCategory = async (catIdOrSlug, catObj, shouldNavigate = true) => {
-    startFaviconSpinner(350);
+    startFaviconSpinner();
     // 1. Kiểm tra nếu chọn "Tất cả sản phẩm"
     const isAll = !catIdOrSlug || catIdOrSlug === "all" || catObj?.id === "all";
     if (isAll) {
@@ -212,7 +212,7 @@ export function ProductListingLayout({
     : filteredProducts.slice(startIndex, startIndex + pageSize);
 
   const handlePageChangeInternal = (newPage) => {
-    startFaviconSpinner(350);
+    startFaviconSpinner();
     if (isServerPaginated && onPageChange) {
       onPageChange(newPage);
     } else {

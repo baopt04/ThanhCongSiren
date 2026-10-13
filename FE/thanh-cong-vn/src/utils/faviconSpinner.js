@@ -37,11 +37,13 @@ if (typeof window !== "undefined") {
   initLogoImage();
 }
 
+export const DEFAULT_SPINNER_DURATION = 700;
+
 /**
  * Kích hoạt hiệu ứng xoay tròn trên tab trình duyệt
- * @param {number} duration - Thời gian xoay (mặc định 350ms)
+ * @param {number} duration - Thời gian xoay (mặc định 700ms, tăng hơn chút so với 350ms cũ)
  */
-export function startFaviconSpinner(duration = 350) {
+export function startFaviconSpinner(duration = DEFAULT_SPINNER_DURATION) {
   if (typeof window === "undefined") return;
 
   initLogoImage();

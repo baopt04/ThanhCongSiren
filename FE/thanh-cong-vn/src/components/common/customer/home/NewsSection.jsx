@@ -4,6 +4,7 @@ import { PlayCircleFilled } from "@ant-design/icons";
 import "./NewsSection.css";
 import { useCustomerPostsQuery } from "../../../../hooks/queries/customerQueries";
 import { optimizeCloudinary, cloudinarySrcSet } from "../../../../utils/cloudinary";
+import { startFaviconSpinner } from "../../../../utils/faviconSpinner";
 
 import sapaImg360 from "../../../../assets/images/projects/sapa-thuy-dien-360.webp";
 import sapaImg720 from "../../../../assets/images/projects/sapa-thuy-dien-720.webp";
@@ -91,7 +92,7 @@ export const NewsSection = memo(function NewsSection() {
             <span className="tc-title-indicator" />
             <h2 className="tc-section-title-text">Tin tức</h2>
           </div>
-          <Link to="/tin-tuc" className="tc-section-more-link">
+          <Link to="/tin-tuc" className="tc-section-more-link" onClick={() => startFaviconSpinner()}>
             Xem tất cả
           </Link>
         </div>
@@ -103,6 +104,7 @@ export const NewsSection = memo(function NewsSection() {
             <Link
               to={`/tin-tuc/${featuredPost.slug || featuredPost.id}`}
               className="tc-news-featured-thumb-wrap"
+              onClick={() => startFaviconSpinner()}
             >
               {featuredPost.image ? (
                 <img
@@ -122,7 +124,7 @@ export const NewsSection = memo(function NewsSection() {
               </div>
             </Link>
             <h3 className="tc-news-featured-title">
-              <Link to={`/tin-tuc/${featuredPost.slug || featuredPost.id}`}>
+              <Link to={`/tin-tuc/${featuredPost.slug || featuredPost.id}`} onClick={() => startFaviconSpinner()}>
                 {featuredPost.title}
               </Link>
             </h3>
@@ -135,6 +137,7 @@ export const NewsSection = memo(function NewsSection() {
                 <Link
                   to={`/tin-tuc/${post.slug || post.id}`}
                   className="tc-news-side-thumb-wrap"
+                  onClick={() => startFaviconSpinner()}
                 >
                   {post.image ? (
                     <img
@@ -161,7 +164,7 @@ export const NewsSection = memo(function NewsSection() {
 
                 <div className="tc-news-side-info">
                   <h4 className="tc-news-side-title">
-                    <Link to={`/tin-tuc/${post.slug || post.id}`}>
+                    <Link to={`/tin-tuc/${post.slug || post.id}`} onClick={() => startFaviconSpinner()}>
                       {post.title}
                     </Link>
                   </h4>
