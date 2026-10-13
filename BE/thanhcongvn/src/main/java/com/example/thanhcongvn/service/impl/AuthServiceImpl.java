@@ -87,12 +87,12 @@ public class AuthServiceImpl implements AuthService {
         String newAccessToken = jwtService.generateAccessToken(user);
         // cập nhật token mới xóa token cu
        String newRefreshToken = jwtService.generateRefreshToken(user);
-       authTokenRepository.delete(storedToken);
+//       authTokenRepository.delete(storedToken);
        saveRefreshToken(user , newRefreshToken);
 
         return AuthResponse.builder()
                 .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
+                .refreshToken(newRefreshToken)
                 .id(user.getId())
                 .email(user.getEmail())
                 .fullName(user.getName())

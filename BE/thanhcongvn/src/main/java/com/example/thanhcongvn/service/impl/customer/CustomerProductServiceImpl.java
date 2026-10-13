@@ -13,6 +13,7 @@ import com.example.thanhcongvn.entity.ProductImage;
 import com.example.thanhcongvn.entity.ProductSpecification;
 import com.example.thanhcongvn.infrastructure.exception.AppException;
 import com.example.thanhcongvn.infrastructure.exception.ErrorCode;
+import com.example.thanhcongvn.infrastructure.listener.ImageUrls;
 import com.example.thanhcongvn.repository.CategoryRepository;
 import com.example.thanhcongvn.repository.ProductImageRepository;
 import com.example.thanhcongvn.repository.ProductRepository;
@@ -21,6 +22,7 @@ import com.example.thanhcongvn.service.customer.CustomerProductService;
 import com.example.thanhcongvn.service.impl.TelegramNotificationSericeImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -49,8 +52,10 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     private CategoryRepository categoryRepository;
     @Autowired
     private TelegramNotificationSericeImpl notificationSerice;
+    private ImageUrls imageUrls;
 
     @Override
+    @Cacheable(cacheNames = "productList", key = "#pageable")
     public Page<ListProductResponse> getAllProducts(Pageable pageable) {
         Page<ProductCardView> productPage = productRepository.findAllCards(pageable);
 
@@ -70,6 +75,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     }
 
     @Override
+    @Cacheable(cacheNames = "productDetail", key = "#id")
     public ProductDetailResponse getProductDetailForId(String id) {
         Product product = productRepository.findDetailById(id).orElseThrow(
                 () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)
@@ -105,6 +111,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     }
 
     @Override
+    @Cacheable(cacheNames = "productSearch", key = "#keyword.trim().toLowerCase()")
     public List<ProductSearchResponse> searchProducts(String keyword) {
         if (keyword == null || keyword.trim().isEmpty()) {
             return Collections.emptyList();
@@ -125,7 +132,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
                 .findPrimaryCardImagesByProductIds(productIds).stream()
                 .collect(Collectors.toMap(
                         ProductImageCardView::getProductId,
-                        img -> ProductImageReponse.builder().imageUrl(img.getImageUrl()).build(),
+                        img -> ProductImageReponse.builder().imageUrl(ImageUrls.optimize(img.getImageUrl(), 300)).build(),
                         (existing, replacement) -> existing
                 ));
 
@@ -141,6 +148,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     }
 
     @Override
+    @Cacheable(cacheNames = "categoryProducts", key = "#slug + '|' + #pageable")
     public Page<ListProductResponse> getByIdProductCategory(String slug, Pageable pageable) {
         Category category = categoryRepository.findBySlug(slug).orElseThrow(
                 () -> new AppException(ErrorCode.CATEGORY_NOT_FOUND)
@@ -165,6 +173,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     }
 
     @Override
+    @Cacheable(cacheNames = "homeSections", key = "#productLimitCategory")
     public List<HomeCategorySectionResponse> getHomeCategorySection(int productLimitCategory) {
         List<String> slugs = Arrays.asList(FEATURED_CATEGORY_SLUGS.split(","));
 
@@ -234,6 +243,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     }
 
     @Override
+
     public QuoteResponse createQuote(QuoteResponse quote) {
         LocalDateTime now = LocalDateTime.now();
 
@@ -245,31 +255,32 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         String message = String.format(
                 "🔔 <b>YÊU CẦU BÁO GIÁ MỚI</b>\n" +
                         "━━━━━━━━━━━━━━━━━━\n\n" +
-                        "📅 <b>Thời gian:</b> %s\n\n" +
+                        "<b>Thời gian:</b> %s\n\n" +
 
-                        "👤 <b>Khách hàng</b>\n" +
+                        "<b>Khách hàng</b>\n" +
                         "   └ Họ tên: %s\n" +
                         "   └ Số điện thoại: %s\n\n" +
 
-                        "🏗️ <b>Thông tin công trình</b>\n" +
+                        "🏗<b>Thông tin công trình</b>\n" +
                         "   └ Loại dự án: %s\n\n" +
 
-                        "📝 <b>Ghi chú</b>\n" +
+                        "<b>Ghi chú</b>\n" +
                         "   └ %s\n\n" +
 
                         "━━━━━━━━━━━━━━━━━━\n" +
-                        "📩 <i>Vui lòng liên hệ khách hàng để tư vấn.</i>",
+                        "<i>Vui lòng liên hệ khách hàng để tư vấn.</i>",
                 dateTime,
-                quote.getName(),
-                quote.getNumberPhone(),
-                quote.getProject(),
-                quote.getNote()
+                HtmlUtils.htmlEscape(quote.getName()),
+                HtmlUtils.htmlEscape(quote.getNumberPhone()),
+                HtmlUtils.htmlEscape(quote.getProject()),
+                HtmlUtils.htmlEscape(quote.getNote())
         );
         notificationSerice.sendMessageTelegramBot(message);
         return quote;
     }
 
     @Override
+    @Cacheable(cacheNames = "categoryProductsById", key = "#categoryId + '|' + #pageable")
     public Page<ListProductResponse> getProductsByCategory(String categoryId, Pageable pageable) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy danh mục"));
@@ -302,7 +313,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
 
     private ProductImageReponse mapCardImage(ProductImageCardView img) {
         return ProductImageReponse.builder()
-                .imageUrl(img.getImageUrl())
+                .imageUrl(ImageUrls.optimize(img.getImageUrl(), 500))
                 .isPrimary(img.getIsPrimary())
                 .displayOrder(img.getDisplayOrder())
                 .build();
@@ -311,7 +322,7 @@ public class CustomerProductServiceImpl implements CustomerProductService {
     private ProductImageReponse mapDetailImage(ProductImage img) {
         return ProductImageReponse.builder()
                 .id(img.getId())
-                .imageUrl(img.getImageUrl())
+                .imageUrl(ImageUrls.optimize(img.getImageUrl(), 500))
                 .isPrimary(img.getIsPrimary())
                 .displayOrder(img.getDisplayOrder())
                 .build();

@@ -5,16 +5,19 @@ import com.example.thanhcongvn.dto.response.error.ApiFeResponse;
 import com.example.thanhcongvn.dto.response.pagination.PaginationResponse;
 import com.example.thanhcongvn.infrastructure.listener.PageResponse;
 import com.example.thanhcongvn.service.impl.customer.CustomerProductServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/v1/customer/product")
@@ -22,36 +25,45 @@ import java.util.List;
 public class CustomerProductController {
     private static final int MAX_PAGE_SIZE = 50;
 
+
     private final CustomerProductServiceImpl customerProductService;
+    private static final CacheControl PUBLIC_CACHE = CacheControl
+            .maxAge(5, TimeUnit.MINUTES)
+            .cachePublic()
+            .staleWhileRevalidate(1, TimeUnit.HOURS);
 
     @GetMapping
     public ResponseEntity<ApiFeResponse<List<ListProductResponse>>> getAllListProduct(
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<ListProductResponse> page = customerProductService.getAllProducts(cap(pageable));
-        return ResponseEntity.ok(wrapPage(page));
+        return ResponseEntity.ok()
+                .cacheControl(PUBLIC_CACHE)
+                .body(wrapPage(page));
     }
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<ApiFeResponse<ProductDetailResponse>> getProductDetailForId(@PathVariable String id) {
         ProductDetailResponse productDetail = customerProductService.getProductDetailForId(id);
-        return ResponseEntity.ok(
-                ApiFeResponse.<ProductDetailResponse>builder()
-                        .success(true)
-                        .data(productDetail)
-                        .build()
-        );
+        return ResponseEntity.ok()
+                        .cacheControl(PUBLIC_CACHE)
+                                .body( ApiFeResponse.<ProductDetailResponse>builder()
+                                        .success(true)
+                                        .data(productDetail)
+                                        .build());
     }
 
     @GetMapping("/search")
     public ResponseEntity<ApiFeResponse<List<ProductSearchResponse>>> searchProducts(
             @RequestParam("keyword") String keyword) {
         List<ProductSearchResponse> result = customerProductService.searchProducts(keyword);
-        return ResponseEntity.ok(
-                ApiFeResponse.<List<ProductSearchResponse>>builder()
-                        .success(true)
-                        .data(result)
-                        .build()
-        );
+        return ResponseEntity.ok()
+                        .cacheControl(PUBLIC_CACHE)
+                                .body(ApiFeResponse.<List<ProductSearchResponse>>builder()
+                                        .success(true)
+                                        .data(result)
+                                        .build()
+                                );
+
     }
 
     @GetMapping("/category/{slug}")
@@ -67,17 +79,18 @@ public class CustomerProductController {
             @RequestParam(defaultValue = "8") int limit) {
         int safeLimit = Math.min(Math.max(limit, 1), MAX_PAGE_SIZE);
         List<HomeCategorySectionResponse> result = customerProductService.getHomeCategorySection(safeLimit);
-        return ResponseEntity.ok(
-                ApiFeResponse.<List<HomeCategorySectionResponse>>builder()
+        return ResponseEntity.ok()
+                .cacheControl(PUBLIC_CACHE)
+                .body(  ApiFeResponse.<List<HomeCategorySectionResponse>>builder()
                         .success(true)
                         .data(result)
                         .build()
-        );
+                );
     }
 
     @PostMapping("/quote")
     public ResponseEntity<ApiFeResponse<QuoteResponse>> createQuote(
-            @RequestBody QuoteResponse request) {
+            @RequestBody @Valid QuoteResponse request) {
         QuoteResponse response = customerProductService.createQuote(request);
         return ResponseEntity.ok(
                 ApiFeResponse.<QuoteResponse>builder()
@@ -91,8 +104,10 @@ public class CustomerProductController {
     public ResponseEntity<PageResponse<ListProductResponse>> getProducts(
             @PathVariable String categoryId,
             @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(PageResponse.of(
-                customerProductService.getProductsByCategory(categoryId, cap(pageable))));
+        return ResponseEntity.ok()
+                .cacheControl(PUBLIC_CACHE)
+                .body(PageResponse.of(
+                        customerProductService.getProductsByCategory(categoryId, cap(pageable))));
     }
 
     private Pageable cap(Pageable pageable) {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -22,7 +23,7 @@ public class TelegramNotificationSericeImpl implements TelegramService {
     @Value("${telegram.bot.chat-id}")
     private String chatId;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = createRestTemplate();
 
     @Override
     @Async
@@ -45,5 +46,11 @@ public class TelegramNotificationSericeImpl implements TelegramService {
             // Không nên để lỗi gửi Telegram làm crash luồng nghiệp vụ chính
             System.err.println("Gửi thông báo Telegram thất bại: " + e.getMessage());
         }
+    }
+    private static RestTemplate createRestTemplate() {
+        SimpleClientHttpRequestFactory f = new SimpleClientHttpRequestFactory();
+        f.setConnectTimeout(3000);
+        f.setReadTimeout(5000);
+        return new RestTemplate(f);
     }
 }

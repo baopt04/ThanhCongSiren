@@ -7,6 +7,7 @@ import com.example.thanhcongvn.repository.ProductImageRepository;
 import com.example.thanhcongvn.repository.ProductRepository;
 import com.example.thanhcongvn.service.CloudinaryService;
 import com.example.thanhcongvn.service.ProductImageService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,6 +76,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Override
+    @Transactional
     public void setPrimaryImage(String imageId) {
         ProductImage image = imageRepository.findById(imageId)
                 .orElseThrow(() -> new RuntimeException("Image không tồn tại"));
