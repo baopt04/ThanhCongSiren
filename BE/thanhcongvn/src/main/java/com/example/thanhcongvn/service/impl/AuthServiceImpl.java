@@ -38,6 +38,7 @@ public class AuthServiceImpl implements AuthService {
     private long refreshTokenExpiration;
 
     @Override
+    @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("Email đã được sử dụng");
@@ -69,6 +70,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public AuthResponse refreshToken(String refreshToken) {
         // kiểm tra JWT có hợp lệ không
         if (!jwtService.isRefreshTokenValid(refreshToken)) {

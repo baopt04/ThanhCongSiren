@@ -39,7 +39,7 @@ public class ProductImageServiceImpl implements ProductImageService {
         // Nếu set là primary → bỏ primary cũ
         if (isPrimary != null && isPrimary == 1) {
             imageRepository.findByProductIdAndIsPrimary(productId, 1)
-                    .ifPresent(img -> img.setIsPrimary(0));
+                    .ifPresent(img -> { img.setIsPrimary(0); imageRepository.save(img); });
         }
 
         ProductImage image = ProductImage.builder()

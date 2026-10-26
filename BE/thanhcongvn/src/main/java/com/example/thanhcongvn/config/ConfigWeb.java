@@ -13,7 +13,8 @@ public class ConfigWeb implements WebMvcConfigurer {
                 .allowedOrigins(
                         "http://localhost:3000",
                         "http://localhost:5173",
-                        "https://thanh-cong-siren.vercel.app"
+                        "https://thanh-cong-siren.vercel.app" ,
+                        "https://thanhcongsiren.phamthaibao2410.workers.dev"
                 )
                 .allowedMethods(
                         "GET",
