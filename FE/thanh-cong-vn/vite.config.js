@@ -2,12 +2,15 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import viteCompression from "vite-plugin-compression";
 
+import { visualizer } from "rollup-plugin-visualizer";
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
     viteCompression({ algorithm: "gzip", ext: ".gz", threshold: 10240 }),
     viteCompression({ algorithm: "brotliCompress", ext: ".br", threshold: 10240 }),
+    visualizer({ filename: "stats.html", open: false, gzipSize: true, brotliSize: true }),
   ],
   esbuild: {
     pure: ["console.log"],

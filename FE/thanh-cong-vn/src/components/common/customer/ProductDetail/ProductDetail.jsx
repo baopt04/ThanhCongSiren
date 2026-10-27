@@ -142,7 +142,7 @@ export default function ProductDetail() {
       }
       message.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng thành công!`);
     } catch (err) {
-      console.error("Lỗi khi thêm vào giỏ hàng:", err);
+      console.error("Lỗi khi thêm vào giỏ hàng:", err); 
       message.error(
         err?.response?.data?.message ||
         err?.message ||
