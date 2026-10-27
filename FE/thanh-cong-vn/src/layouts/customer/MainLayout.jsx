@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { Header } from "../../components/layout/Header";
 import { Footer } from "../../components/layout/Footer";
 import { Outlet } from "react-router-dom";
+import { RouteSkeleton } from "../../components/common/RouteSkeleton";
 import { CloseOutlined } from "@ant-design/icons";
 import zaloLogo from "../../assets/images/Logo_Zalo.png";
 import phoneLogo from "../../assets/images/telephoner.png";
@@ -21,7 +22,9 @@ export function MainLayout() {
     <div className="tc-layout">
       <Header />
       <main className="tc-layout-main">
-        <Outlet />
+        <Suspense fallback={<RouteSkeleton />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       {showFloatWidgets && (

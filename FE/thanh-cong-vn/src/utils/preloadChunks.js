@@ -7,4 +7,10 @@ export const preloadRouteChunks = {
     import("../components/common/customer/ProductDetail/ProductDetail"),
   news: () => import("../pages/customer/NewsPage"),
   newsDetail: () => import("../pages/customer/NewsDetailPage"),
+  fireAlarm: () => import("../pages/customer/FireAlarmPage"),
+  airBlower: () => import("../pages/customer/AirBlowerPage"),
+  airMattress: () => import("../pages/customer/AirMattressPage"),
+  cart: () => import("../pages/customer/CartPage"),
+  about: () => import("../pages/customer/AboutPage"),
+  contact: () => import("../pages/customer/ContactPage"),
 };

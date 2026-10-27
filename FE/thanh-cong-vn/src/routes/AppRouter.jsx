@@ -6,19 +6,45 @@ import { MainLayout } from "../layouts/customer/MainLayout";
 import { RouteSkeleton } from "../components/common/RouteSkeleton";
 import { PrivateRoute } from "../components/common/PrivateRoute";
 import { HomePage } from "../pages/customer/HomePage";
-import { SirenPage } from "../pages/customer/SirenPage";
-import { FireAlarmPage } from "../pages/customer/FireAlarmPage";
-import { AirBlowerPage } from "../pages/customer/AirBlowerPage";
-import { AirMattressPage } from "../pages/customer/AirMattressPage";
-import ProductDetail from "../components/common/customer/ProductDetail/ProductDetail";
-import CartPage from "../pages/customer/CartPage";
-import { NewsPage } from "../pages/customer/NewsPage";
-import { NewsDetailPage } from "../pages/customer/NewsDetailPage";
-import { ContactPage } from "../pages/customer/ContactPage";
-import { AboutPage } from "../pages/customer/AboutPage";
-import Login from "../components/common/customer/Login/Login";
-import RegisterPage from "../pages/customer/RegisterPage";
-import AccountPage from "../pages/customer/AccountPage";
+const SirenPage = lazy(() =>
+  import("../pages/customer/SirenPage").then((m) => ({ default: m.SirenPage || m.default }))
+);
+const FireAlarmPage = lazy(() =>
+  import("../pages/customer/FireAlarmPage").then((m) => ({ default: m.FireAlarmPage || m.default }))
+);
+const AirBlowerPage = lazy(() =>
+  import("../pages/customer/AirBlowerPage").then((m) => ({ default: m.AirBlowerPage || m.default }))
+);
+const AirMattressPage = lazy(() =>
+  import("../pages/customer/AirMattressPage").then((m) => ({ default: m.AirMattressPage || m.default }))
+);
+const ProductDetail = lazy(() =>
+  import("../components/common/customer/ProductDetail/ProductDetail")
+);
+const CartPage = lazy(() =>
+  import("../pages/customer/CartPage")
+);
+const NewsPage = lazy(() =>
+  import("../pages/customer/NewsPage").then((m) => ({ default: m.NewsPage || m.default }))
+);
+const NewsDetailPage = lazy(() =>
+  import("../pages/customer/NewsDetailPage").then((m) => ({ default: m.NewsDetailPage || m.default }))
+);
+const ContactPage = lazy(() =>
+  import("../pages/customer/ContactPage").then((m) => ({ default: m.ContactPage || m.default }))
+);
+const AboutPage = lazy(() =>
+  import("../pages/customer/AboutPage").then((m) => ({ default: m.AboutPage || m.default }))
+);
+const Login = lazy(() =>
+  import("../components/common/customer/Login/Login")
+);
+const RegisterPage = lazy(() =>
+  import("../pages/customer/RegisterPage").then((m) => ({ default: m.RegisterPage || m.default }))
+);
+const AccountPage = lazy(() =>
+  import("../pages/customer/AccountPage").then((m) => ({ default: m.AccountPage || m.default }))
+);
 
 const AdminLayout = lazy(() =>
   import("../layouts/admin/AdminLayout").then((m) => ({ default: m.AdminLayout }))

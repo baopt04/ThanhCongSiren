@@ -22,13 +22,48 @@ export function CustomerDetailSkeleton() {
 }
 
 /**
-/**
- * RouteSkeleton: Tạm thời vô hiệu hóa bộ khung làm mờ để kiểm tra tốc độ chuyển trang thực tế.
- * Hiển thị nội dung trực tiếp ngay lập tức (0ms).
+ * RouteSkeleton: Khung hiển thị khi đang tải (Suspense fallback) cho các trang khách
+ * Đảm bảo header/footer không mất và có hiệu ứng shimmer mượt mà.
  */
 export function RouteSkeleton({ children }) {
-  if (!children) return null;
-  return <>{children}</>;
+  if (children) return <>{children}</>;
+  return (
+    <div className="tc-route-skeleton-container" aria-busy="true" aria-label="Đang tải trang...">
+      <div className="tc-route-progress-bar" />
+      <div className="tc-skeleton-customer">
+        <div className="tc-sk-cust-container">
+          <div className="tc-sk-cust-banner">
+            <div className="tc-skeleton-shimmer tc-sk-cust-crumb" />
+            <div className="tc-skeleton-shimmer tc-sk-cust-title" />
+            <div className="tc-skeleton-shimmer tc-sk-cust-desc" />
+          </div>
+          <div className="tc-sk-cust-filters">
+            <div className="tc-skeleton-shimmer tc-sk-cust-pill" />
+            <div className="tc-skeleton-shimmer tc-sk-cust-pill" />
+            <div className="tc-skeleton-shimmer tc-sk-cust-pill" />
+            <div className="tc-skeleton-shimmer tc-sk-cust-pill" />
+          </div>
+          <div className="tc-sk-cust-grid">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="tc-sk-cust-card">
+                <div className="tc-skeleton-shimmer tc-sk-cust-card-img" />
+                <div className="tc-sk-cust-card-body">
+                  <div className="tc-skeleton-shimmer tc-sk-cust-card-badge" />
+                  <div className="tc-skeleton-shimmer tc-sk-cust-card-line1" />
+                  <div className="tc-skeleton-shimmer tc-sk-cust-card-line2" />
+                  <div className="tc-skeleton-shimmer tc-sk-cust-card-spec" />
+                  <div className="tc-sk-cust-card-footer">
+                    <div className="tc-skeleton-shimmer tc-sk-cust-card-price" />
+                    <div className="tc-skeleton-shimmer tc-sk-cust-card-btn" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default RouteSkeleton;
