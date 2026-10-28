@@ -82,13 +82,15 @@ export function saveAdminAuth(data) {
     localStorage.removeItem(STORAGE_KEYS.ADMIN_REFRESH_TOKEN);
   }
 
+  const normalizedRole = data.role === "ROLE_ADMIN" ? "ADMIN" : (data.role || "ADMIN");
+
   localStorage.setItem(
     STORAGE_KEYS.ADMIN_USER,
     JSON.stringify({
       id: data.id,
       email: data.email,
       fullName: data.fullName,
-      role: data.role || "ADMIN",
+      role: normalizedRole,
     })
   );
 
@@ -122,8 +124,8 @@ export function getAdminUser() {
   }
 }
 
-export function isRefreshTokenExpired() {
-  const refreshToken = getRefreshToken();
+export function isRefreshTokenExpired(token) {
+  const refreshToken = token || getRefreshToken();
   if (!refreshToken) return true;
 
   const payload = decodeJwt(refreshToken);
@@ -134,8 +136,9 @@ export function isRefreshTokenExpired() {
 }
 
 export function isAdminAuthenticated() {
-  const hasToken = !!getAdminAccessToken() || (!!getAdminRefreshToken() && !isRefreshTokenExpired());
-  return hasToken && getAdminUser()?.role === "ADMIN";
+  const hasToken = !!getAdminAccessToken() || (!!getAdminRefreshToken() && !isRefreshTokenExpired(getAdminRefreshToken()));
+  const role = getAdminUser()?.role;
+  return hasToken && (role === "ADMIN" || role === "ROLE_ADMIN");
 }
 
 // ─── CUSTOMER AUTH MANAGEMENT ───────────────────────────────

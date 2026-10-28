@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   MailOutlined,
   LockOutlined,
@@ -9,17 +9,26 @@ import {
   ArrowLeftOutlined,
 } from "@ant-design/icons";
 import { login } from "../../services/LoginService";
-import { saveAdminAuth } from "../../utils/auth";
+import { saveAdminAuth, isAdminAuthenticated } from "../../utils/auth";
 import adminLogo from "../../assets/logo.webp";
 import "./AdminLoginPage.css";
 
 export function AdminLoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (isAdminAuthenticated()) {
+      navigate("/admin", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,11 +51,14 @@ export function AdminLoginPage() {
       console.log("[AdminLogin] Phản hồi từ server:", response);
       const authData = response?.data?.accessToken ? response.data : (response?.accessToken ? response : null);
       if (authData?.accessToken) {
-        authData.role = authData.role || "ADMIN";
+        if (!authData.role || authData.role === "ROLE_ADMIN") {
+          authData.role = "ADMIN";
+        }
         // Save accessToken + user info into admin localStorage
         saveAdminAuth(authData);
-        // Navigate to admin dashboard
-        navigate("/admin", { replace: true });
+        // Navigate to admin dashboard or intended route
+        const redirectPath = location.state?.from?.pathname || "/admin";
+        navigate(redirectPath, { replace: true });
       } else {
         setError(response?.message || "Đăng nhập không thành công.");
       }
@@ -99,6 +111,7 @@ export function AdminLoginPage() {
                 className="admin-login-input"
                 type="email"
                 placeholder="Nhập địa chỉ email..."
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 autoComplete="email"
                 autoFocus
@@ -118,6 +131,7 @@ export function AdminLoginPage() {
                 className="admin-login-input"
                 type={showPassword ? "text" : "password"}
                 placeholder="Nhập mật khẩu..."
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 disabled={loading}
